@@ -1,0 +1,114 @@
+% TODO: check other dependencies, i.e. xparse, ?, i.e. don't fail, if they're 
+% already loaded
+% TODO: add ensuremath everywhere where appropriate
+\usepackage{xparse}
+\usepackage{ifthen,calc}
+
+\usepackage{amsmath,amstext,amssymb,amsthm,amsfonts}
+\usepackage{mathtools}
+
+
+% symbols
+% TODO: switch according to language, i.e. Spanish is cte.
+\newcommand{\const}{\mathrm{const}}
+
+
+% sets
+\newcommand{\N}{\ensuremath{\mathbb{N}}}
+\newcommand{\Z}{\ensuremath{\mathbb{Z}}}
+\newcommand{\R}{\ensuremath{\mathbb{R}}}
+\newcommand{\Q}{\ensuremath{\mathbb{Q}}}
+
+\newcommand{\nats}{\N} % natural numbers
+\newcommand{\natsz}{\ensuremath{\nats_{\mathrm{0}}}} % natural numbers incl. zero
+
+\newcommand{\Pset}[1]{\ensuremath{\mathcal{P}\left(#1\right)}}
+
+
+% norms etc.
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}
+
+
+% ranges
+% TODO: let these accept a variable number of initial values, e.g.
+% \idxrange{1}[1][2][3][5]{n}
+\newcommand{\idxrange}[3]{{#1}_{#2}\dots{#1}_{#3}}
+\newcommand{\idxrangec}[3]{{#1}_{#2},\dots{#1}_{#3}}  % comma-separated
+
+% complex numbers
+\newcommand{\conj}[1]{#1^{\ast}}
+
+
+% vectors etc.
+\newcommand{\vecb}[1]{\mathbf{#1}}
+\newcommand{\colvec}[1]{\begin{pmatrix}#1\end{pmatrix}}
+
+
+% operators
+\newcommand{\adj}[1]{#1^{\dagger}}
+\newcommand{\op}[1]{\hat{#1}}
+
+\newcommand{\vecnabla}{\vec{\nabla}}
+\newcommand{\grad}{\nabla}
+\newcommand{\diverg}{\vecnabla\cdot}
+\newcommand{\rot}{\vecnabla\times}
+
+
+% calculus
+\newcommand{\dif}{\mathrm{d}}
+\newcommand{\Dif}{\mathrm{D}}
+\newcommand{\postdif}[1]{\, \dif #1}
+\newcommand{\PostDif}[1]{\, \Dif #1}
+\newcommand{\predif}[1]{\dif #1 \,}
+\newcommand{\PreDif}[1]{\Dif #1 \,}
+
+% Lebesgue formalism
+\newcommand{\leb}{\ensuremath{\lambda}}
+
+% functions
+\newcommand{\func}[1]{\mathrm{#1}}
+\newcommand{\expp}[1]{\func{e}^{#1}}
+\newcommand{\expb}[1]{\exp\left(#1\right)}
+\newcommand{\deltaf}[1]{\func{\delta} (#1)}
+\newcommand{\asinh}{\func{asinh}}
+
+% Derivatives
+
+% TODO: consolidate \*deriv and \*derivn by making the order parameter optional
+\newcommand{\totderiv}[2]{\deriv{\dif}{#1}{#2}}
+\newcommand{\totderivn}[3]{\derivn{\dif}{#1}{#2}{#3}}
+\NewDocumentCommand{\totderivx}{o m >{\SplitList{;}}m}{%
+    \frac{\IfNoValueTF{#1}{\dif}{\dif^{#1}} #2}
+         {\ProcessList{#3}{\totderivxadd}}
+}
+\newcommand{\totderivxadd}[1]{\dif{#1}}
+
+\newcommand{\parderiv}[2]{\deriv{\partial}{#1}{#2}}
+\newcommand{\parderivn}[3]{\derivn{\partial}{#1}{#2}{#3}}
+\NewDocumentCommand{\parderivx}{o m >{\SplitList{;}}m}{%
+    \frac{\IfNoValueTF{#1}{\partial}{\partial^{#1}} #2}
+         {\ProcessList{#3}{\parderivxadd}}
+}
+\newcommand{\parderivxadd}[1]{\partial{#1}}
+
+\newcommand{\deriv}[3]{%
+    % #1 derivative sign
+    % #2 function
+    % #3 variables
+    \frac{#1 #2}{#1 #3}
+}
+\newcommand{\derivn}[4]{%
+    % #1 derivative sign
+    % #2 order
+    % #3 function
+    % #4 variables
+    \frac{#1^{#2} #3}{#1 #4^{#2}}
+}
+
+
+% equation numbering
+%http://tex.stackexchange.com/questions/42726/align-but-show-one-equation-number-at-the-end
+\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
+
+% vim: ts=4 sw=4 et :

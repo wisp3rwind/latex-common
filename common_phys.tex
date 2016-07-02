@@ -1,0 +1,26 @@
+% TODO: check other dependencies, i.e. xparse, ?, i.e. don't fail, if they're 
+% already loaded
+\usepackage{xparse}
+
+
+% symbols
+\newcommand{\lagr}{\mathcal{L}}
+\newcommand{\hmlt}{\mathcal{H}}
+
+
+% general quantum theory
+\newcommand{\comm}[2]{\left[ #1, #2 \right]}
+
+\newcommand{\paulimx}{\begin{pmatrix}0 & 1 \\ 1 & 0\end{pmatrix}}
+\newcommand{\paulimy}{\begin{pmatrix}-i & 0 \\ 0 & i\end{pmatrix}}
+\newcommand{\paulimz}{\begin{pmatrix}1 & 0 \\ 0 & -1\end{pmatrix}}
+
+
+% dirac notation
+\newcommand{\bra}[1]{\left\langle{} #1 \right|}
+\newcommand{\ket}[1]{\left| #1 \right\rangle}
+\newcommand{\braket}[2]{\left\langle{} #1 \middle| #2 \right\rangle}
+\newcommand{\matrixel}[3]{
+	\left\langle #1 \middle| #2 \middle| #3 \right\rangle
+	}
+\newcommand{\expval}[1]{\left\langle{} #1 \right\rangle}

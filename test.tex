@@ -1,0 +1,213 @@
+\documentclass[a4paper]{article}
+
+\usepackage[english]{babel}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+\input{common.tex}
+\input{common_math.tex}
+\input{common_phys.tex}
+\input{common_code.tex}
+
+
+\title{\LaTeX cheat sheet}
+\date{}
+
+
+% TODO: how to typeset clickable links
+
+
+\begin{document}
+
+\maketitle
+
+\section{Math}
+
+\begin{itemize}
+	\item \verb|\begin{cases}0:\quad f \\ 1:\quad g \end{cases}|
+\end{itemize}
+
+\subsection{Proofs}
+
+\begin{itemize}
+	\item \verb|qed|
+	\item \verb|\begin{proof} \qedhere \end{proof}|
+\end{itemize}
+
+\subsection{Derivatives}
+
+\begin{itemize}
+	\item \verb|\totderiv{f}{x}| $\totderiv{f}{x}$
+	\item \verb|\totderivn{4}{f}{x}| $\totderivn{4}{f}{x}$
+	\item \verb|\parderiv{f}{x}| $\parderiv{f}{x}$
+	\item \verb|\parderivn{4}{f}{x}| $\parderivn{4}{f}{x}$
+	\item \verb|\parderivx{4}{f}{x;y^2;z}| $\parderivx[4]{f}{x;y^2;z}$
+	\item \verb|\parderivx{2}{}{x;y}| $\totderivx[2]{}{x;y}$
+	% Testing internal commands
+	%\item \verb|\derivx{\partial}{4}{f}{x;y^2;z}| $\derivx{\partial}{4}{f}{x;y^2;z}$
+	%\[\deriv{\dif}{}{x}\]
+	%\[\deriv{\dif}{f}{x}\]
+	%\[\deriv{\dif}{f(x)}{x}\]
+	%\[\deriv{\dif}{f}{x;y}\]
+	%\[\deriv{\dif}{}{x^2}\]
+	%\[\deriv{\dif}{f}{x^2}\]
+	%\[\deriv{\dif}{}[3]{x^2}\]
+	%\[\deriv{\dif}{}[3]{x^2;y}\]
+\end{itemize}
+
+
+\subsection{Symbols}
+
+\subsubsection{Sets}
+
+\begin{itemize}
+	\item \verb|\setminus| \quad $A \setminus B$
+	\item \verb|\emptyset| \quad $\emptyset$
+	\item \verb|\subset| \quad $A \subset B$
+	\item \verb|\supset| \quad $A \supset B$
+	\item \verb|\subseteq| \quad $A \subseteq B$
+	\item \verb|\cap| \quad $A \cap B$
+	\item \verb|\cup| \quad $A \cup B$
+	\item \verb|\bigcap\limits_{i \in I}| \quad $\bigcap\limits_{i \in I} A_i$
+	\item \verb|\in| \quad $A \in B$
+\end{itemize}
+
+
+\subsubsection{Logic}
+
+\begin{itemize}
+	\item \verb|\exists| \quad $\exists$
+	\item \verb|\iff| \quad $\iff$
+	\item \verb|\forall| \quad $\forall$
+	\item \verb|\implies| \quad $\implies$
+	\item \verb|\neg| \quad $A \implies \neg B$
+\end{itemize}
+
+\subsubsection{Arrows}
+%math arrows
+
+
+\subsubsection{Limits etc.}
+
+\begin{itemize}
+	\item \verb|\inf| $\inf$
+	\item \verb|\sup| $\sup$
+	\item \verb|n \to \infty| $n \to \infty$
+%\sup
+%\to
+\end{itemize}
+
+
+\subsection{Stacked relations and braces}
+%\stackrel
+%\underbrace
+%\overset
+
+
+\subsection{Math fonts}
+
+
+\subsection{Text in math}
+% \text isn't plain latex but an ams addition
+% better than \textrm as it gets the font right
+% better than \textnormal as it gets the size right (e.g. for subscripts)(Is this true?)
+% subscripts that aren't variables should be upright and correctly spaced (i.e. not \mathrm): which do get this right?
+% ams \textup ?
+%\text
+%\textrm
+% See http://stefaanlippens.net/textnormal
+%\textnormal % prefer over \textrm, as the latter always uses a roman font, which in most cases, but not always is correct
+
+\subsection{math environments incl. IEEE}
+
+
+\section{Labels and references}
+
+\section{Physics}
+
+\subsection{General symbols}
+
+\begin{description}
+	\item[Lagrangian] \verb|\lagr| \quad $\lagr$
+	\item[Hamiltonian] \verb|\hmlt| \quad $\hmlt$
+\end{description}
+
+
+\subsection{Quantum mechanics: general}
+
+\begin{description}
+	\item[Commutator] \verb|\comm| \quad $\comm{A}{B}$
+	\item[Pauli matrices] \verb|\paulim[xyz]| \quad $\paulimx \quad \paulimy \quad \paulimz$
+\end{description}
+
+
+\subsection{Dirac Notation}
+
+\begin{description}
+	\item[bra] \verb|\bra{\varphi}| \quad $\bra{\varphi}$
+	\item[ket] \verb|\ket{\psi}| \quad $\ket{\psi}$
+	\item[braket] \verb|\braket{\varphi}{psi}| \quad $\braket{\varphi}{\psi}$
+	\item[matrix element] \verb|\matrixel{\varphi}{\hmlt}{\psi}| \quad $\matrixel{\varphi}{\hmlt}{\psi}$
+	\item[expectation value] \verb|\expval{\hmlt}| \quad $\expval{\hmlt}$
+\end{description}
+
+\section{Tables}
+
+\begin{table}
+	\begin{tabu}{rr}
+	\tabucline[1pt]{-}
+	\end{tabu}
+	\caption{The caption}
+\end{table}
+
+% TODO: booktabs
+
+\begin{sidewaystable}
+	\centering
+	\begin{tabular}{r|c|l}
+		%\hline
+		%\multirow{n}
+	\end{tabular}
+\end{sidewaystable}
+
+\section{Code}
+
+\begin{itemize}
+	\item \verb|inputminted{file.py}|
+	\item \verb|\begin{minted}{python}\n\t\t\ti = False if a == "foo" else "bar"\end{minted}|
+		\begin{minted}{python}
+			i = False if a == "foo" else "bar"
+		\end{minted}
+	\item \verb|\begin{minted}[autogobble]{python}\n\t\t\ti = False if a == "foo" else "bar"\end{minted}|
+			\begin{minted}[autogobble]{python}
+			i = False if a == "foo" else "bar"
+		\end{minted}
+	\item \verb+\mint{python}|import this|+ \mint{python}|import this|
+	\item \verb+\mintinline{python}|import this|+ \quad \mintinline{python}|import this|
+\end{itemize}
+
+\end{document}
+
+
+
+%==============================================================================
+
+%\clearpage
+
+%\noindent
+
+%\begin{flushleft}\end{flushleft}
+%\begin{enumerate}\end{enumerate}
+%\begin{enumerate}[label=...]\end{enumerate}
+%\begin{itemize}\end{itemize} % including inline!
+%\begin{description}\end{description}
+%labels on images, tables, \item, math, paragraph
+%\pagebreak[4]
+%\usepackage{marginnote}
+%%\renewcommand{\thefootnote}{\fnsymbol{footnote}}
+%\renewcommand*{\marginfont}{\footnotesize}
+%\usepackage{mchem}
+%tikz, cf. particle presentation
+%images
+%tikz-feynman

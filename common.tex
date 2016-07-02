@@ -1,0 +1,19 @@
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+%\usepackage{fullpage}
+%\usepackage[german]{babel}
+\usepackage{xparse}
+\usepackage[inline]{enumitem}
+\usepackage[bookmarks]{hyperref}
+\usepackage{microtype}
+
+% unnumbered section that shows up in the TOC
+\newcommand{\tocsection}[1]{\section*{#1}\addcontentsline{toc}{section}{#1}}
+
+% better tables
+% TODO: investigate the booktabs package and if possible use nothing else
+\usepackage{multirow}
+\usepackage{rotating}
+\usepackage{tabu}
+\usepackage{booktabs}
