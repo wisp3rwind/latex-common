@@ -1,6 +1,12 @@
 % TODO: check other dependencies, i.e. xparse, ?, i.e. don't fail, if they're 
 % already loaded
 \usepackage{xparse}
+\usepackage{siunitx}
+\sisetup{%
+  locale=DE,
+  separate-uncertainty=true,
+}
+\usepackage{isotope}
 
 
 % symbols
@@ -17,10 +23,11 @@
 
 
 % dirac notation
-\newcommand{\bra}[1]{\left\langle{} #1 \right|}
-\newcommand{\ket}[1]{\left| #1 \right\rangle}
-\newcommand{\braket}[2]{\left\langle{} #1 \middle| #2 \right\rangle}
-\newcommand{\matrixel}[3]{
-	\left\langle #1 \middle| #2 \middle| #3 \right\rangle
-	}
-\newcommand{\expval}[1]{\left\langle{} #1 \right\rangle}
+\usepackage{braket}
+%\newcommand{\bra}[1]{\left\langle{} #1 \right|}
+%\newcommand{\ket}[1]{\left| #1 \right\rangle}
+%\newcommand{\braket}[2]{\left\langle{} #1 \middle| #2 \right\rangle}
+%\newcommand{\matrixel}[3]{
+	%\left\langle #1 \middle| #2 \middle| #3 \right\rangle
+	%}
+%\newcommand{\expval}[1]{\left\langle{} #1 \right\rangle}
