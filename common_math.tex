@@ -6,6 +6,7 @@
 
 \usepackage{amsmath,amstext,amssymb,amsthm,amsfonts}
 \usepackage{mathtools}
+\usepackage{cancel}
 
 
 % symbols
@@ -93,6 +94,14 @@
          {\ProcessList{#3}{\parderivxadd}}
 }
 \newcommand{\parderivxadd}[1]{\partial{#1}}
+
+\newcommand{\funderiv}[2]{\deriv{\delta}{#1}{#2}}
+\newcommand{\funderivn}[3]{\derivn{\delta}{#1}{#2}{#3}}
+\NewDocumentCommand{\funderivx}{o m >{\SplitList{;}}m}{%
+    \frac{\IfNoValueTF{#1}{\delta}{\delta^{#1}} #2}
+         {\ProcessList{#3}{\funderivxadd}}
+}
+\newcommand{\funderivxadd}[1]{\delta{#1}}
 
 \newcommand{\deriv}[3]{%
     % #1 derivative sign
