@@ -38,22 +38,20 @@
 \subsection{Derivatives}
 
 \begin{itemize}
-	\item \verb|\totderiv{f}{x}| $\totderiv{f}{x}$
-	\item \verb|\totderivn{4}{f}{x}| $\totderivn{4}{f}{x}$
-	\item \verb|\parderiv{f}{x}| $\parderiv{f}{x}$
-	\item \verb|\parderivn{4}{f}{x}| $\parderivn{4}{f}{x}$
-	\item \verb|\parderivx{4}{f}{x;y^2;z}| $\parderivx[4]{f}{x;y^2;z}$
-	\item \verb|\parderivx{2}{}{x;y}| $\totderivx[2]{}{x;y}$
-	% Testing internal commands
-	%\item \verb|\derivx{\partial}{4}{f}{x;y^2;z}| $\derivx{\partial}{4}{f}{x;y^2;z}$
-	%\[\deriv{\dif}{}{x}\]
-	%\[\deriv{\dif}{f}{x}\]
-	%\[\deriv{\dif}{f(x)}{x}\]
-	%\[\deriv{\dif}{f}{x;y}\]
-	%\[\deriv{\dif}{}{x^2}\]
-	%\[\deriv{\dif}{f}{x^2}\]
-	%\[\deriv{\dif}{}[3]{x^2}\]
-	%\[\deriv{\dif}{}[3]{x^2;y}\]
+	\item \verb|\tderiv{f}{x}| $\tderiv{f}{x}$
+	\item \verb|\pderiv{f}{x}| $\pderiv{f}{x}$
+  \item \verb|\fderiv{A(\vecb{r})}{\del_i\del_j}| $\fderiv{A(\vecb{r})}{(\del_i\del_j A(\vecb{r}))}$
+\end{itemize}
+Testing internal commands:
+\begin{itemize}
+  \item \verb|\deriv{\dif}{}{x}| $\deriv{\dif}{}{x}$
+  \item \verb|\deriv{\dif}{f}{x}| $\deriv{\dif}{f}{x}$
+  \item \verb|\deriv{\dif}{f(x)}{x}| $\deriv{\dif}{f(x)}{x}$
+  \item \verb|\deriv{\dif}{f}{x;y}| $\deriv{\dif}{f}{x;y}$
+  \item \verb|\deriv{\dif}{}{x^2}| $\deriv{\dif}{}{x^2}$
+  \item \verb|\deriv{\dif}{f}{x^2}| $\deriv{\dif}{f}{x^2}$
+  \item \verb|\deriv{\dif}{}[3]{x^2}| $\deriv{\dif}{}[3]{x^2}$
+  \item \verb|\deriv{\dif}{}[3]{x^2;y}| $\deriv{\dif}{}[3]{x^2;y}$
 \end{itemize}
 
 

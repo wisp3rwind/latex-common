@@ -62,6 +62,7 @@
 \newcommand{\PostDif}[1]{\, \Dif #1}
 \newcommand{\predif}[1]{\dif #1 \,}
 \newcommand{\PreDif}[1]{\Dif #1 \,}
+\newcommand{\del}{\partial}
 
 % Lebesgue formalism
 \newcommand{\leb}{\ensuremath{\lambda}}
@@ -76,114 +77,53 @@
 % Derivatives
 
 % TODO: consolidate \*deriv and \*derivn by making the order parameter optional
-\newcommand{\totderiv}[2]{\deriv{\dif}{#1}{#2}}
-\newcommand{\totderivn}[3]{\derivn{\dif}{#1}{#2}{#3}}
-\NewDocumentCommand{\totderivx}{o m >{\SplitList{;}}m}{%
-    \frac{\IfNoValueTF{#1}{\dif}{\dif^{#1}} #2}
-         {\ProcessList{#3}{\totderivxadd}}
-}
-\newcommand{\totderivxadd}[1]{\dif{#1}}
-
-\newcommand{\parderiv}[2]{\deriv{\partial}{#1}{#2}}
-\newcommand{\parderivn}[3]{\derivn{\partial}{#1}{#2}{#3}}
-\NewDocumentCommand{\parderivx}{o m >{\SplitList{;}}m}{%
-    \frac{\IfNoValueTF{#1}{\partial}{\partial^{#1}} #2}
-         {\ProcessList{#3}{\parderivxadd}}
-}
-\newcommand{\parderivxadd}[1]{\partial{#1}}
-
-\newcommand{\deriv}[3]{%
-    % #1 derivative sign
-    % #2 function
-    % #3 variables
-    \frac{#1 #2}{#1 #3}
-}
-\newcommand{\derivn}[4]{%
-    % #1 derivative sign
-    % #2 order
-    % #3 function
-    % #4 variables
-    \frac{#1^{#2} #3}{#1 #4^{#2}}
-}
-
-
-%\NewDocumentCommand{\parderivx}{o m m}{\derivx{\partial}[#1]{#2}{#3}}
-\NewDocumentCommand{\derivx}{m o m >{\SplitList{;}}m}{%
-    % #1 derivative sign
-    % #2 order, optional
-    % #3 function
-    % #4 variables as a semicolon-separated list, e.g `x^2;y;z^3`
-    \frac{\IfNoValueTF{#2}{#1}{#1^{#2}} #3}
-         {\ProcessList{#4}{\derivxadd{#1}}}  % TODO: this doesn't work, fix
-}
-\newcommand{\derivxadd}[2]{#1 {#2}}
+\newcommand{\tderiv}[2]{\deriv{\dif}{#1}{#2}}
+\newcommand{\pderiv}[2]{\deriv{\del}{#1}{#2}}
+\newcommand{\fderiv}[2]{\deriv{\delta}{#1}{#2}}
 
 %------------------------------------------------------------
 
 % TODO: automatically count order (command should be backwards-compatible to the above \totderiv so it can completely replace it)
 \newcounter{derivordercounter}
-% example: \totderiv{f}{x}{x_exp}{y}{y_exp}
-% example: \totderiv{f}{x^2;y^3} -> more readable
-% optional argument to overwrite the count:
-%   \totderiv{f}[n+m]{x^n;y^m}
-%   -> needs to suppress \addtocounter calls which would fail
-%       -> maybe simply a starred version of the command?
-% TODO:
-% make \totderiv and \parderiv call a more general command by providing
-% the dif sign as parameter
-\NewDocumentCommand \derivnew {m m o >{\SplitList{;}}m} {%
+% example: \deriv{\dif}{f}{x^2;y^3}
+% example: \deriv{\partial}{f}{x^n;y^m}[n+m]  with an optional argument to overwrite the count
+\NewDocumentCommand \deriv {m m o >{\SplitList{;}}m} {%
     % #1 - deriv sign
     % #2 - function
     % #3 - exponent overwrite for non-numerical cases
     % list - semicolon-separated list of variables, exponents given as usual with ^
     \IfNoValueTF{#3}{%
-        % no \addtocounter overwrite
-        % determine order, no output yet
-        {\ProcessList{#4}{\derivcountingsplitter}}
+        % no \addtocounter overwrite: determine order, no output yet
+        \ProcessList{#4}{\derivcountingsplitter}
         \frac{%
-            #1^{%
-                \ifthenelse{\lessorequal{\derivordercounter}{1}}{%
-                    % nothing, i.e. do not show exponent if it is 1
-                }{%
-                    \thederivordercounter
-                }
-            } 
-            \IfNoValueTF{#2}{%
-                % nothing
-            }{%
-                #2
-            }
+            \ifnum\value{derivordercounter}>1%
+                % nothing, i.e. do not show exponent if it is 1
+                #1^{\thederivordercounter} #2
+            \else
+                #1 #2
+            \fi%
         }{%
-            \ProcessList{#4}{\derivaddingsplitter{#1}}
+            \let\derivsign#1
+            \ProcessList{#4}{\derivadd}
         }
-        \setcounter{\derivordercounter}{0}
+        \setcounter{derivordercounter}{0}
     }{%  else
-        \frac{%
-            \dif^{#3} #2
-        }{%
-            \ProcessList{#4}{\derivaddingsplitter{#1}}
+        \frac{\dif^{#3} #2 }{%
+            \let\derivsign#1
+            \ProcessList{#4}{\derivadd}
         }
     }
 }
 
-\NewDocumentCommand \derivcountingsplitter {>{\SplitArgument{2}{^}}m} {%
-    \derivcount #1
+\NewDocumentCommand \derivcountingsplitter {>{\SplitArgument{1}{^}}m} {%
+    \derivcount#1
 }
 \NewDocumentCommand \derivcount {m m} {%
-    \addtocounter{\derivordercounter}{\IfNoValueTF{#2}{1}{#2}}
-    %#1\IfNoValueTF{#2}{}{^#2}
+    %\addtocounter{derivordercounter}{\IfNoValueTF{#2}{1}{#2}}
 }
 
-\NewDocumentCommand \derivaddingsplitter {m >{\SplitArgument{2}{^}}m} {%
-    % SplitArgument already wraps the parts in #2 in braces
-    \derivadd{#1}#2
-}
-\NewDocumentCommand \derivadd {m m m} {%
-    % TODO: wrap everything but the exponent in parentheses if "long" (?)
-    % or better: if #2 is surround by (,),\left(,right) strip them and add
-    % again before the derivative sign #1
-    #1 #2\IfNoValueTF{#3}{}{^#3}
-}
+\NewDocumentCommand \derivadd {m} {\derivsign #1}
+
 
 % equation numbering
 %http://tex.stackexchange.com/questions/42726/align-but-show-one-equation-number-at-the-end
