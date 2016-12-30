@@ -9,6 +9,14 @@
 \usepackage{cancel}
 
 
+% helpers
+% TODO: use DeclarePairedDelimiter, also see
+% http://tex.stackexchange.com/questions/23178/swap-definition-of-starred-and-non-starred-command/23214#23214
+% http://tex.stackexchange.com/questions/278382/cause-declarepaireddelimiter-to-switch-starred-and-nonstarred-versions
+\newcommand{\parenthesize}[1]{{\left(#1\right)}}
+\newcommand{\bracketize}[1]{{\left[#1\right]}}
+
+
 % symbols
 % TODO: switch according to language, i.e. Spanish is cte.
 \newcommand{\const}{\mathrm{const}}
@@ -79,10 +87,21 @@
 
 % Derivatives
 
-% TODO: consolidate \*deriv and \*derivn by making the order parameter optional
+% TODO: automate these definitions for the various derivative commands \newcommand\defineDerivateCommand
 \newcommand{\tderiv}[2]{\deriv{\dif}{#1}{#2}}
 \newcommand{\pderiv}[2]{\deriv{\del}{#1}{#2}}
 \newcommand{\fderiv}[2]{\deriv{\delta}{#1}{#2}}
+
+% for convenience, wrap in parenthesis
+% TODO: or make starred versions that parenthesize?
+\newcommand{\ptderiv}[2]{\parenthesize{\deriv{\dif}{#1}{#2}}}
+\newcommand{\ppderiv}[2]{\parenthesize{\deriv{\del}{#1}{#2}}}
+\newcommand{\pfderiv}[2]{\parenthesize{\deriv{\delta}{#1}{#2}}}
+
+% for convenience, wrap in brackets
+\newcommand{\btderiv}[2]{\bracketize{\deriv{\dif}{#1}{#2}}}
+\newcommand{\bpderiv}[2]{\bracketize{\deriv{\del}{#1}{#2}}}
+\newcommand{\bfderiv}[2]{\bracketize{\deriv{\delta}{#1}{#2}}}
 
 %------------------------------------------------------------
 
