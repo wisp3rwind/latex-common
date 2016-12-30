@@ -11,7 +11,7 @@
 \input{common_code.tex}
 
 
-\title{\LaTeX cheat sheet}
+\title{\LaTeXe\ cheat sheet}
 \date{}
 
 
@@ -31,7 +31,7 @@
 \subsection{Proofs}
 
 \begin{itemize}
-	\item \verb|qed|
+	\item \verb|\qed|
 	\item \verb|\begin{proof} \qedhere \end{proof}|
 \end{itemize}
 
@@ -152,18 +152,11 @@ Testing internal commands:
 
 \section{Tables}
 
-\begin{table}
-	\begin{tabu}{rr}
-	\tabucline[1pt]{-}
-	\end{tabu}
-	\caption{The caption}
-\end{table}
-
 % TODO: booktabs
 
 \begin{sidewaystable}
 	\centering
-	\begin{tabular}{r|c|l}
+	\begin{tabular}{rcl}
 		%\hline
 		%\multirow{n}
 	\end{tabular}
@@ -172,16 +165,36 @@ Testing internal commands:
 \section{Code}
 
 \begin{itemize}
-	\item \verb|inputminted{file.py}|
-	\item \verb|\begin{minted}{python}\n\t\t\ti = False if a == "foo" else "bar"\end{minted}|
+	\item \verb|\inputminted{file.py}|
+
+  \item Keep all whitespace from the source file \begin{verbatim}
+    \begin{minted}{python}
+      i = False if a == "foo" else "bar"
+      for k in range(10):
+        print(k)
+    \end{minted}
+    \end{verbatim}
 		\begin{minted}{python}
-			i = False if a == "foo" else "bar"
+      i = False if a == "foo" else "bar"
+      for k in range(10):
+        print(k)
 		\end{minted}
-	\item \verb|\begin{minted}[autogobble]{python}\n\t\t\ti = False if a == "foo" else "bar"\end{minted}|
-			\begin{minted}[autogobble]{python}
-			i = False if a == "foo" else "bar"
-		\end{minted}
+
+  \item Remove additional whitespace \begin{verbatim}
+    \begin{minted}[autogobble]{python}
+      i = False if a == "foo" else "bar"
+      for k in range(10):
+        print(k)
+    \end{minted}
+    \end{verbatim}
+    \begin{minted}[autogobble]{python}
+      i = False if a == "foo" else "bar"
+      for k in range(10):
+        print(k)
+    \end{minted}
+
 	\item \verb+\mint{python}|import this|+ \mint{python}|import this|
+
 	\item \verb+\mintinline{python}|import this|+ \quad \mintinline{python}|import this|
 \end{itemize}
 
