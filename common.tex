@@ -1,26 +1,44 @@
+%\usepackage[german]{babel}
+
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+
+% Fonts -----------------------------------------------------------------------
+% Latin Modern: succeeds Computer Modern, more glyphs
 \usepackage{lmodern}
+
+% Futura: supposedly good for presentations, requires XeLaTeX or LuaLaTex
+%\usepackage{???}
+
+% Mozilla Fira Sans, requires XeLaTeX or LuaLaTex
+%\usepackage[sfdefault]{FiraSans}
+%\usepackage{FiraMono}
+
+% URW-Garamond: A free garamond font, supposedly good for books but to fragile
+%   for presentations. Math fonts provided by the mathdesign project
+%\usepackage[urw-garamond]{mathdesign}
+
 \usepackage{microtype}
-%\usepackage[german]{babel}
-\usepackage{xparse}
+
+
+% 
 \usepackage[inline]{enumitem}
+
 \usepackage[hyphens]{url}
 \usepackage[bookmarks]{hyperref}
 %\hypersetup{%
-
+  % hyperref has sensible defaults
 %}
 
-% unnumbered section that shows up in the TOC
-\newcommand{\tocsection}[1]{\section*{#1}\addcontentsline{toc}{section}{#1}}
 
-% better tables
-\usepackage{multirow}
+% Better tables ---------------------------------------------------------------
 \usepackage{rotating}
-%\usepackage{tabu}
 \usepackage{booktabs}
+%\usepackage{multirow}
+%\usepackage{tabu}
 
-% new packages to investigate
+
+% New packages to investigate -------------------------------------------------
 %\usepackage{float}
 %\usepackage{graphicx}
 %\usepackage{color}
@@ -36,5 +54,9 @@
 %\usepackage{footmisc}
 %\usepackage{epstopdf}
 %\usepackage{textcomp}
+%\usepackage{marginnote}
 
-% TODO: titlepage, beamer, bibliography, ... templates
+
+% New Commands ----------------------------------------------------------------
+% unnumbered section that shows up in the TOC
+\newcommand{\tocsection}[1]{\section*{#1}\addcontentsline{toc}{section}{#1}}
