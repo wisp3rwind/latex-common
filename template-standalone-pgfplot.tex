@@ -1,0 +1,35 @@
+\documentclass{standalone}
+
+% http://stackoverflow.com/questions/2701902/standalone-diagrams-with-tikz#2703707
+% also see texdoc tikz -> Externalizing graphics
+
+% Input in the main document like so:
+% \documentclass{whatever}
+% \usepackage{standalone}
+% %...
+% \begin{document}
+% %...
+% \input{pic.tex}
+% %...
+% \end{document}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.14}
+\usepgfplotslibrary{groupplots}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \begin{axis}[
+      %height=,
+      width=0.9\linewidth,
+      xlabel=,
+      ylabel=,
+      grid=both,
+      tick scale binop=\times,
+    ]
+    \addplot table[x=, y=] file;
+  \end{axis}
+\end{tikzpicture}
+
+\end{document}
