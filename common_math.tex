@@ -45,7 +45,7 @@
 % TODO: let these accept a variable number of initial values, e.g.
 % \idxrange{1}[1][2][3][5]{n}
 \newcommand{\idxrange}[3]{{#1}_{#2}\dots{#1}_{#3}}
-\newcommand{\idxrangec}[3]{{#1}_{#2},\dots{#1}_{#3}}  % comma-separated
+\newcommand{\idxrangec}[3]{{#1}_{#2},\dots,{#1}_{#3}}  % comma-separated
 
 % complex numbers
 \newcommand{\conj}[1]{#1^{\ast}}
@@ -54,6 +54,10 @@
 % vectors etc.
 \newcommand{\vecb}[1]{\mathbf{#1}}
 \newcommand{\colvec}[1]{\begin{pmatrix}#1\end{pmatrix}}
+
+% combinatorics
+% \bincoef{N \\ k}
+\newcommand{\bincoef}[1]{\ensuremath{\begin{pmatrix} #1 \end{pmatrix}}}
 
 
 % operators
