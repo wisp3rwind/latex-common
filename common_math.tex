@@ -194,7 +194,7 @@
 }
 
 \NewDocumentCommand \derivcount {m m} {%
-    %\addtocounter{derivordercounter}{\IfNoValueTF{#2}{1}{#2}}
+    \addtocounter{derivordercounter}{\IfNoValueTF{#2}{1}{#2}}
 }
 
 \NewDocumentCommand \derivadd {m} {\derivsign #1}
