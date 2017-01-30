@@ -7,6 +7,7 @@
 \usepackage{amsmath,amstext,amssymb,amsthm,amsfonts}
 \usepackage{mathtools}
 \usepackage{cancel}
+\usepackage{bm}
 
 
 % helpers
@@ -27,6 +28,7 @@
 \newcommand{\Z}{\ensuremath{\mathbb{Z}}}
 \newcommand{\R}{\ensuremath{\mathbb{R}}}
 \newcommand{\Q}{\ensuremath{\mathbb{Q}}}
+\newcommand{\C}{\ensuremath{\mathbb{C}}}
 
 \newcommand{\nats}{\N} % natural numbers
 \newcommand{\natsz}{\ensuremath{\nats_{\mathrm{0}}}} % natural numbers incl. zero
@@ -52,7 +54,10 @@
 
 
 % vectors etc.
-\newcommand{\vecb}[1]{\mathbf{#1}}
+% use \renewcommand{\vc}{\vec} in order to use over-arrows instead of a bold
+% font
+\newcommand{\vecb}[1]{\bm{#1}}  % bold vector
+\newcommand{\vc}{\vecb}  % shorthand
 \newcommand{\colvec}[1]{\begin{pmatrix}#1\end{pmatrix}}
 
 % combinatorics
@@ -64,10 +69,13 @@
 \newcommand{\adj}[1]{#1^{\dagger}}
 \newcommand{\op}[1]{\hat{#1}}
 
-\newcommand{\vecnabla}{\vec{\nabla}}
+% vector calculus
+\newcommand{\vecnabla}{\vc{\nabla}}
 \newcommand{\grad}{\nabla}
-\newcommand{\diverg}{\vecnabla\cdot}
-\newcommand{\rot}{\vecnabla\times}
+\renewcommand{\div}{\vecnabla\cdot}
+\newcommand{\curl}{\vecnabla\times}
+\newcommand{\laplacian}{\nabla^2}  % not a vector! -> non-bold
+%\newcommand{\laplacian}{\Delta}
 
 
 % calculus
@@ -87,7 +95,7 @@
 \newcommand{\expp}[1]{\func{e}^{#1}}
 \newcommand{\expb}[1]{\exp\left(#1\right)}
 \newcommand{\deltaf}[1]{\func{\delta} (#1)}
-\newcommand{\asinh}{\func{asinh}}
+\DeclareMathOperator{\asinh}{asinh}
 
 % Derivatives
 
