@@ -10,7 +10,7 @@
 \usepackage{bm}
 
 
-% helpers
+% helpers [[[1
 % TODO: use DeclarePairedDelimiter, also see
 % http://tex.stackexchange.com/questions/23178/swap-definition-of-starred-and-non-starred-command/23214#23214
 % http://tex.stackexchange.com/questions/278382/cause-declarepaireddelimiter-to-switch-starred-and-nonstarred-versions
@@ -29,14 +29,14 @@
         {\aftergroup\egroup\right}
 }
 
-% symbols
+% symbols [[[1
 % TODO: switch according to language, i.e. Spanish is cte.
 \newcommand{\diffd}{\mathrm{d}}
 \newcommand{\diffD}{\mathrm{D}}
 \newcommand{\const}{\mathrm{const}}
 
 
-% sets
+% sets [[[1
 \newcommand{\N}{\ensuremath{\mathbb{N}}}
 \newcommand{\Z}{\ensuremath{\mathbb{Z}}}
 \newcommand{\R}{\ensuremath{\mathbb{R}}}
@@ -49,40 +49,39 @@
 \newcommand{\Pset}[1]{\ensuremath{\mathcal{P}\left(#1\right)}}
 
 
-% norms etc.
+% norms etc. [[[1
 \DeclarePairedDelimiter\abs{\lvert}{\rvert}
 \DeclarePairedDelimiter\Abs{\left\lvert}{\right\rvert}
 \DeclarePairedDelimiter\norm{\lVert}{\rVert}
 \DeclarePairedDelimiter\Norm{\left\lVert}{\right\rVert}
 
 
-% ranges
+% ranges [[[1
 % TODO: let these accept a variable number of initial values, e.g.
 % \idxrange{1}[1][2][3][5]{n}
 \newcommand{\idxrange}[3]{{#1}_{#2}\dots{#1}_{#3}}
 \newcommand{\idxrangec}[3]{{#1}_{#2},\dots,{#1}_{#3}}  % comma-separated
 
-% complex numbers
+% complex numbers [[[1
 \newcommand{\conj}[1]{#1^{\ast}}
 
 
-% vectors etc.
+% vectors etc. [[[1
 % use \renewcommand{\vc}{\vec} in order to use over-arrows instead of a bold
 % font
 \newcommand{\vecb}[1]{\bm{#1}}  % bold vector
 \newcommand{\vc}{\vecb}  % shorthand
 \newcommand{\colvec}[1]{\begin{pmatrix}#1\end{pmatrix}}
 
-% combinatorics
+% combinatorics [[[1
 % \bincoef{N \\ k}
 \newcommand{\bincoef}[1]{\ensuremath{\begin{pmatrix} #1 \end{pmatrix}}}
 
-
-% operators
+% operators [[[1
 \newcommand{\adj}[1]{#1^{\dagger}}
 \newcommand{\op}[1]{\hat{#1}}
 
-% vector calculus
+% vector calculus [[[1
 \newcommand{\vecnabla}{\vc{\nabla}}
 \newcommand{\grad}{\nabla}
 \renewcommand{\div}{\vecnabla\cdot}
@@ -91,7 +90,7 @@
 %\newcommand{\laplacian}{\Delta}
 
 
-% calculus %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% calculus [[[1
 
 % no-op helper
 \NewDocumentCommand\nodifspacing{m}{#1}
@@ -130,14 +129,14 @@
 % Lebesgue formalism
 \newcommand{\leb}{\ensuremath{\lambda}}
 
-% functions
+% functions [[[1
 \newcommand{\func}[1]{\mathrm{#1}}
 \newcommand{\expp}[1]{\func{e}^{#1}}
 \newcommand{\expb}[1]{\exp\left(#1\right)}
 \newcommand{\deltaf}[1]{\func{\delta} (#1)}
 \DeclareMathOperator{\asinh}{asinh}
 
-% Derivatives
+% Derivatives [[[1
 
 % TODO: automate these definitions for the various derivative commands \newcommand\defineDerivateCommand
 \newcommand{\tderiv}[2]{\deriv{\dif}{#1}{#2}}
@@ -200,8 +199,39 @@
 \NewDocumentCommand \derivadd {m} {\derivsign #1}
 
 
-% equation numbering
+% equation numbering [[[1
 %http://tex.stackexchange.com/questions/42726/align-but-show-one-equation-number-at-the-end
 \newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
 
-% vim: ts=4 sw=4 et :
+
+% Quick quad text (math-mode text with \quad spacing). [[[1
+% Stolen from the physics package.
+\DeclareDocumentCommand\qqtextinternal{ m m }{\IfBooleanTF{#1}{}{\quad}\textnormal{#2}\quad}
+\DeclareDocumentCommand\qqtext{s m}{\qqtext{#1}{#2}}
+\DeclareDocumentCommand\qq{}{\qqtext}
+
+\DeclareDocumentCommand\qcomma{}{,\quad}
+\DeclareDocumentCommand\qc{}{\qcomma}
+
+\DeclareDocumentCommand\qif{s}{\qqtextinternal{#1}{if}}
+\DeclareDocumentCommand\qthen{s}{\qqtextinternal{#1}{then}}
+\DeclareDocumentCommand\qelse{s}{\qqtextinternal{#1}{else}}
+\DeclareDocumentCommand\qotherwise{s}{\qqtextinternal{#1}{otherwise}}
+\DeclareDocumentCommand\qunless{s}{\qqtextinternal{#1}{unless}}
+\DeclareDocumentCommand\qgiven{s}{\qqtextinternal{#1}{given}}
+\DeclareDocumentCommand\qusing{s}{\qqtextinternal{#1}{using}}
+\DeclareDocumentCommand\qassume{s}{\qqtextinternal{#1}{assume}}
+\DeclareDocumentCommand\qsince{s}{\qqtextinternal{#1}{since}}
+\DeclareDocumentCommand\qlet{s}{\qqtextinternal{#1}{let}}
+\DeclareDocumentCommand\qfor{s}{\qqtextinternal{#1}{for}}
+\DeclareDocumentCommand\qall{s}{\qqtextinternal{#1}{all}}
+\DeclareDocumentCommand\qeven{s}{\qqtextinternal{#1}{even}}
+\DeclareDocumentCommand\qodd{s}{\qqtextinternal{#1}{odd}}
+\DeclareDocumentCommand\qinteger{s}{\qqtextinternal{#1}{integer}}
+\DeclareDocumentCommand\qand{s}{\qqtextinternal{#1}{and}}
+\DeclareDocumentCommand\qor{s}{\qqtextinternal{#1}{or}}
+\DeclareDocumentCommand\qas{s}{\qqtextinternal{#1}{as}}
+\DeclareDocumentCommand\qin{s}{\qqtextinternal{#1}{in}}
+\DeclareDocumentCommand\qcc{s}{\qqtextinternal{#1}{c.c.}}
+
+% vim: ts=4 sw=4 et fdm=marker fmr="[[[,]]]":
