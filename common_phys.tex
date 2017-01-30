@@ -3,32 +3,38 @@
 % be a good idea to reimplement sane version of them here.
 
 \usepackage{xparse}
+
+% Don't rewrite things that already exist [[[1
+% Use \verb|siunitx| to properly format numerical quantities.
 \usepackage{siunitx}
 \sisetup{%
   %locale=DE,
   separate-uncertainty=true,
 }
+
+% Typeset istope symbols
 \usepackage{isotope}
 
+% dirac notation
+\usepackage{braket}
 
-% Electrodynamics
+
+% Electrodynamics [[[1
 \newcommand{\epz}{\epsilon_0}
 \newcommand{\muz}{\mu_0}
 \newcommand{\epr}{\epsilon_r}
 \newcommand{\mur}{\mu_r}
 
-% Lagrange and Hamilton formalism
+% Lagrange and Hamilton formalism [[[1
 \newcommand{\lagr}{\mathcal{L}}
 \newcommand{\hmlt}{\mathcal{H}}
 
 
-% general quantum theory
+% general quantum theory [[[1
 \newcommand{\comm}[2]{\left[ #1, #2 \right]}
 
 \newcommand{\paulimx}{\begin{pmatrix}0 & 1 \\ 1 & 0\end{pmatrix}}
 \newcommand{\paulimy}{\begin{pmatrix}-i & 0 \\ 0 & i\end{pmatrix}}
 \newcommand{\paulimz}{\begin{pmatrix}1 & 0 \\ 0 & -1\end{pmatrix}}
 
-
-% dirac notation
-\usepackage{braket}
+% vim: ts=4 sw=4 et fdm=marker fmr=[[[,]]]:
