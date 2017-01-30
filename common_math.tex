@@ -17,9 +17,22 @@
 \newcommand{\parenthesize}[1]{{\left(#1\right)}}
 \newcommand{\bracketize}[1]{{\left[#1\right]}}
 
+% stolen from the physics package. Starred versions resize the delimiters
+\DeclareDocumentCommand \argopen {s}{%
+    \IfBooleanTF{#1}
+        {\mathopen{}\mathclose\bgroup}
+        {\mathopen{}\mathclose\bgroup\left}
+}
+\DeclareDocumentCommand \argclose {s}{%
+    \IfBooleanTF{#1}
+        {\egroup}
+        {\aftergroup\egroup\right}
+}
 
 % symbols
 % TODO: switch according to language, i.e. Spanish is cte.
+\newcommand{\diffd}{\mathrm{d}}
+\newcommand{\diffD}{\mathrm{D}}
 \newcommand{\const}{\mathrm{const}}
 
 
@@ -78,12 +91,39 @@
 %\newcommand{\laplacian}{\Delta}
 
 
-% calculus
-\newcommand{\dif}{\mathrm{d}}
-\newcommand{\Dif}{\mathrm{D}}
-\newcommand{\postdif}[1]{\, \dif #1}
-\newcommand{\PostDif}[1]{\, \Dif #1}
-\newcommand{\predif}[1]{\dif #1 \,}
+% calculus %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% no-op helper
+\NewDocumentCommand\nodifspacing{m}{#1}
+
+% Differential symbol for use in integrals or in differential forms
+\NewDocumentCommand\difsymbol{m m o g d()}{%
+    % {#1} - boolean: whether to disable automatic spacing
+    % {#2} - the symbol
+    % [#3] - optional exponent, e.g. d^3 r
+    % {#4} - the variable
+    % (#5) - long form, e.g. d(cos x)
+    \IfBooleanTF{#1}{\let\difspacing\nodifspacing}{\let\difspacing\mathinner}
+    \IfNoValueTF{#4}{%
+        \IfNoValueTF{#5}{%
+% Never apply spacing if no argument is given
+            #2 \IfValueT{#3}{^{#3}}
+        }{%
+% long form
+            \difspacing{#2 \IfValueT{#3}{^{#3}} \argopen(#5\argclose)}
+        }
+    }{%
+% normal form
+        \difspacing{#2 \IfValueT{#3}{^{#3}} #4}
+    }
+}
+\DeclareDocumentCommand\dif{s}{\difsymbol{#1}{\diffd}}
+\DeclareDocumentCommand\Dif{s}{\difsymbol{#1}{\diffD}}
+\DeclareDocumentCommand\var{s}{\difsymbol{#1}{\delta}}
+
+
+
+
 \newcommand{\PreDif}[1]{\Dif #1 \,}
 \newcommand{\del}{\partial}
 

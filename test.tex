@@ -52,6 +52,15 @@ Testing internal commands:
   \item \verb|\deriv{\dif}{}[3]{x^2;y}| $\deriv{\dif}{}[3]{x^2;y}$
 \end{itemize}
 
+\subsection{Integrals and differential forms}
+\begin{itemize}
+  \item \verb|\int\dif{x} x^2| \begin{displaymath} \int\dif{x} x^2 \end{displaymath}
+  \item \verb|\int x^2 \dif{x}| \begin{displaymath} \int x^2 \dif{x} \end{displaymath}
+  \item \verb|\int \dif(\cos\theta) x^2| \begin{displaymath} \int \dif(\cos\theta) f(\theta) \end{displaymath}
+  \item \verb|\int x^2 \dif(\cos\theta)| \begin{displaymath} \int f(\theta) \dif(\cos\theta) \end{displaymath}
+  \item \verb|\dif{f} = \pderiv{f}{x} \dif{x} + \pderiv{f}{y} \dif y| (note the incorrect spacing of $\dif y$) \begin{displaymath} \dif{f} = \pderiv{f}{x} \dif{x} + \pderiv{f}{y} \dif y \end{displaymath}
+\end{itemize}
+
 
 \subsection{Symbols}
 
