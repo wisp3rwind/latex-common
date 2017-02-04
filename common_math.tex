@@ -156,7 +156,6 @@
 
 %------------------------------------------------------------
 
-% TODO: automatically count order (command should be backwards-compatible to the above \totderiv so it can completely replace it)
 \newcounter{derivordercounter}
 % example: \deriv{\dif}{f}{x^2;y^3}
 % example: \deriv{\partial}{f}{x^n;y^m}[n+m]  with an optional argument to overwrite the count
@@ -206,7 +205,7 @@
 
 % Quick quad text (math-mode text with \quad spacing). [[[1
 % Stolen from the physics package.
-\DeclareDocumentCommand\qqtextinternal{ m m }{\IfBooleanTF{#1}{}{\quad}\textnormal{#2}\quad}
+\DeclareDocumentCommand\qqtextinternal{m m}{\IfBooleanTF{#1}{}{\quad}\textnormal{#2}\quad}
 \DeclareDocumentCommand\qqtext{s m}{\qqtext{#1}{#2}}
 \DeclareDocumentCommand\qq{}{\qqtext}
 
