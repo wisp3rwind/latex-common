@@ -3,6 +3,8 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 
+\usepackage{csquotes}  % context-sensitive quotes
+
 % Fonts [[[1
 % Latin Modern: succeeds Computer Modern, more glyphs
 \usepackage{lmodern}
@@ -23,10 +25,33 @@
 
 % Misc [[[1
 \usepackage[inline]{enumitem}
+\usepackage{float}  %
+\usepackage{fancyhdr}  %
 
+
+% Colors [[[1
+\usepackage{xcolor}
+% define a few highlighting colors, from https://personal.sron.nl/~pault/
+\definecolor{marklightblue}{HTML}{BBCCEE}
+\definecolor{marklightteal}{HTML}{CCEEFF}
+\definecolor{marklightgreen}{HTML}{CCDDAA}
+\definecolor{marklightsand}{HTML}{EEEEBB}
+\definecolor{marklightred}{HTML}{FFCCCC}
+\definecolor{markdarkblue}{HTML}{222255}
+\definecolor{markdarkteal}{HTML}{225555}
+\definecolor{markdarkgreen}{HTML}{225522}
+\definecolor{markdarksand}{HTML}{666633}
+\definecolor{markdarkred}{HTML}{663333}
 % Hyperlinks [[[1
 \usepackage[hyphens]{url}
-\usepackage[bookmarks]{hyperref}
+\usepackage[
+    colorlinks=true,
+    linkcolor=black,  % for internal links, color is just too much
+    citecolor=markdarkteal,
+    filecolor=markdarkgreen,
+    urlcolor=markdarkblue,
+    bookmarksopen=true,
+    bookmarksopenlevel=3]{hyperref}
 %\hypersetup{%
   % hyperref has sensible defaults
 %}
@@ -39,9 +64,15 @@
 %\usepackage{tabu}
 
 
+% Graphics [[[1
+\usepackage{graphicx}  % advanced key=value arguments for \includegraphics
+
+
+% Bibliography [[[1
+\usepackage{biblatex}
+
 % New packages to investigate [[[1
 %\usepackage{float}
-%\usepackage{graphicx}
 %\usepackage{color}
 %\usepackage{subfigure}
 %\usepackage{fancyhdr}
