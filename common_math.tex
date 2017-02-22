@@ -118,9 +118,8 @@
 }
 \DeclareDocumentCommand\dif{s}{\difsymbol{#1}{\diffd}}
 \DeclareDocumentCommand\Dif{s}{\difsymbol{#1}{\diffD}}
+\DeclareDocumentCommand\del{s}{\difsymbol{#1}{\partial}}
 \DeclareDocumentCommand\var{s}{\difsymbol{#1}{\delta}}
-
-\newcommand{\del}{\partial}
 
 % Lebesgue formalism
 \newcommand{\leb}{\ensuremath{\lambda}}
@@ -135,20 +134,21 @@
 % Derivatives [[[1
 
 % TODO: automate these definitions for the various derivative commands \newcommand\defineDerivateCommand
-\newcommand{\tderiv}[2]{\deriv{\dif}{#1}{#2}}
-\newcommand{\pderiv}[2]{\deriv{\del}{#1}{#2}}
-\newcommand{\fderiv}[2]{\deriv{\delta}{#1}{#2}}
+\newcommand{\tderiv}{\deriv{\dif}}
+\newcommand{\pderiv}{\deriv{\del}}
+\newcommand{\fderiv}{\deriv{\delta}}
 
 % for convenience, wrap in parenthesis
 % TODO: or make starred versions that parenthesize?
-\newcommand{\ptderiv}[2]{\parenthesize{\deriv{\dif}{#1}{#2}}}
-\newcommand{\ppderiv}[2]{\parenthesize{\deriv{\del}{#1}{#2}}}
-\newcommand{\pfderiv}[2]{\parenthesize{\deriv{\delta}{#1}{#2}}}
+% TODO: doesn't work in this form, the parenthesize/bracketize hides the remaining arguments
+%\newcommand{\ptderiv}{\parenthesize{\deriv{\dif}{#1}{#2}}}
+%\newcommand{\ppderiv}{\parenthesize{\deriv{\del}{#1}{#2}}}
+%\newcommand{\pfderiv}{\parenthesize{\deriv{\delta}{#1}{#2}}}
 
 % for convenience, wrap in brackets
-\newcommand{\btderiv}[2]{\bracketize{\deriv{\dif}{#1}{#2}}}
-\newcommand{\bpderiv}[2]{\bracketize{\deriv{\del}{#1}{#2}}}
-\newcommand{\bfderiv}[2]{\bracketize{\deriv{\delta}{#1}{#2}}}
+%\newcommand{\btderiv}{\bracketize{\deriv{\dif}{#1}{#2}}}
+%\newcommand{\bpderiv}{\bracketize{\deriv{\del}{#1}{#2}}}
+%\newcommand{\bfderiv}{\bracketize{\deriv{\delta}{#1}{#2}}}
 
 %------------------------------------------------------------
 
