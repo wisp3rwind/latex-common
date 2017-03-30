@@ -202,7 +202,7 @@
 % Quick quad text (math-mode text with \quad spacing). [[[1
 % Stolen from the physics package.
 \DeclareDocumentCommand\qqtextinternal{m m}{\IfBooleanTF{#1}{}{\quad}\textnormal{#2}\quad}
-\DeclareDocumentCommand\qqtext{s m}{\qqtext{#1}{#2}}
+\DeclareDocumentCommand\qqtext{s m}{\qqtextinternal{#1}{#2}}
 \DeclareDocumentCommand\qq{}{\qqtext}
 
 \DeclareDocumentCommand\qcomma{}{,\quad}
