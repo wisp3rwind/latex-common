@@ -97,5 +97,10 @@
 % New Commands [[[1
 % unnumbered section that shows up in the TOC
 \newcommand{\tocsection}[1]{\section*{#1}\addcontentsline{toc}{section}{#1}}
+% non-numbered subsection that works properly with hyperref
+\newcommand{\nonumchapter}[1]{\phantomsection\addcontentsline{toc}{chapter}{#1}}
+\newcommand{\nonumsection}[1]{\phantomsection\addcontentsline{toc}{section}{#1}}
+\newcommand{\nonumsubsection}[1]{\phantomsection\addcontentsline{toc}{subsection}{#1}}
+\newcommand{\nonumsubsubsection}[1]{\phantomsection\addcontentsline{toc}{subsubsection}{#1}}
 
 % vim: ts=4 sw=4 et fdm=marker fmr=[[[,]]]:
