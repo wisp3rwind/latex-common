@@ -133,52 +133,49 @@
 
 % Derivatives [[[1
 
-% TODO: automate these definitions for the various derivative commands \newcommand\defineDerivateCommand
-\newcommand{\tderiv}{\deriv{\dif}}
-\newcommand{\pderiv}{\deriv{\del}}
-\newcommand{\fderiv}{\deriv{\delta}}
-
-% for convenience, wrap in parenthesis
-% TODO: or make starred versions that parenthesize?
-% TODO: doesn't work in this form, the parenthesize/bracketize hides the remaining arguments
-%\newcommand{\ptderiv}{\parenthesize{\deriv{\dif}{#1}{#2}}}
-%\newcommand{\ppderiv}{\parenthesize{\deriv{\del}{#1}{#2}}}
-%\newcommand{\pfderiv}{\parenthesize{\deriv{\delta}{#1}{#2}}}
-
-% for convenience, wrap in brackets
-%\newcommand{\btderiv}{\bracketize{\deriv{\dif}{#1}{#2}}}
-%\newcommand{\bpderiv}{\bracketize{\deriv{\del}{#1}{#2}}}
-%\newcommand{\bfderiv}{\bracketize{\deriv{\delta}{#1}{#2}}}
+\newcommand\defineDerivateCommand[2]{%
+    \expandafter\newcommand\csname #1\endcsname{\deriv{#2}}
+    % for convenience, wrap in parenthesis
+    \expandafter\newcommand\csname p#1\endcsname{\deriv[\parenthesize]{#2}}
+    % for convenience, wrap in brackets
+    \expandafter\newcommand\csname b#1\endcsname{\deriv[\bracketize]{#2}}
+}
+\defineDerivateCommand{tderiv}{\dif}
+\defineDerivateCommand{pderiv}{\del}
+\defineDerivateCommand{fderiv}{\delta}
 
 %------------------------------------------------------------
 
 \newcounter{derivordercounter}
 % example: \deriv{\dif}{f}{x^2;y^3}
 % example: \deriv{\partial}{f}{x^n;y^m}[n+m]  with an optional argument to overwrite the count
-\NewDocumentCommand \deriv {m m o >{\SplitList{;}}m} {%
-    % #1 - deriv sign
-    % #2 - function
-    % #3 - exponent overwrite for non-numerical cases
-    % list - semicolon-separated list of variables, exponents given as usual with ^
-    \IfNoValueTF{#3}{%
-        % no \addtocounter overwrite: determine order, no output yet
-        \ProcessList{#4}{\derivcountingsplitter}
-        \frac{%
-            \ifnum\value{derivordercounter}>1%
-                % nothing, i.e. do not show exponent if it is 1
-                #1^{\thederivordercounter} #2
-            \else
-                #1 #2
-            \fi%
-        }{%
-            \let\derivsign#1
-            \ProcessList{#4}{\derivadd}
-        }
-        \setcounter{derivordercounter}{0}
-    }{%  else
-        \frac{\dif^{#3} #2 }{%
-            \let\derivsign#1
-            \ProcessList{#4}{\derivadd}
+\NewDocumentCommand \deriv {o m m o >{\SplitList{;}}m} {%
+    % #1 - command to wrap the result in (i.e. parenthesis, ...)
+    % #2 - deriv sign
+    % #3 - function
+    % #4 - exponent overwrite for non-numerical cases
+    % #5 - semicolon-separated list of variables, exponents given as usual with ^
+    \IfValueT{#1}{#1}{%
+        \IfNoValueTF{#4}{%
+            % no \addtocounter overwrite: determine order, no output yet
+            \ProcessList{#5}{\derivcountingsplitter}
+            \frac{%
+                \ifnum\value{derivordercounter}>1%
+                    % nothing, i.e. do not show exponent if it is 1
+                    #2^{\thederivordercounter} #3
+                \else
+                    #2 #3
+                \fi%
+            }{%
+                \let\derivsign#2
+                \ProcessList{#5}{\derivadd}
+            }
+            \setcounter{derivordercounter}{0}
+        }{%  else
+            \frac{\dif^{#4} #3 }{%
+                \let\derivsign#2
+                \ProcessList{#5}{\derivadd}
+            }
         }
     }
 }

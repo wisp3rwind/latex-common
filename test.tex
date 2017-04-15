@@ -62,6 +62,12 @@ Bold vectors usually look better, \verb|\vc| is a shorthand:
   \item \verb|\pderiv{f}[n+m+1]{x^n;y;z^m}| \begin{displaymath} \pderiv{f}[n+m+1]{x^n;y;z^m} \end{displaymath}
 \end{itemize}
 
+\paragraph{Shorthands for wrapping in parenthesis or brackets}
+\begin{itemize}
+  \item \verb|\ppderiv{f}{x^2;y;z^2}| \begin{displaymath} \ppderiv{f}{x^2;y;z^2} \end{displaymath}
+  \item \verb|\bpderiv{f}[n+m+1]{x^n;y;z^m}| \begin{displaymath} \bpderiv{f}[n+m+1]{x^n;y;z^m} \end{displaymath}
+\end{itemize}
+
 \iftesting
 \paragraph{Internal commands, for testing}
 \begin{itemize}
@@ -73,6 +79,7 @@ Bold vectors usually look better, \verb|\vc| is a shorthand:
   \item \verb|\deriv{\dif}{f}{x^2}| $\deriv{\dif}{f}{x^2}$
   \item \verb|\deriv{\dif}{}[3]{x^2}| $\deriv{\dif}{}[3]{x^2}$
   \item \verb|\deriv{\dif}{}[3]{x^2;y}| $\deriv{\dif}{}[3]{x^2;y}$
+  \item $\deriv[\parenthesize]{\dif}{}{x}$
 \end{itemize}
 \fi
 
