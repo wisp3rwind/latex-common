@@ -50,6 +50,7 @@
 
 
 % norms etc. [[[1
+\let\Abs\undefined
 \DeclarePairedDelimiter\abs{\lvert}{\rvert}
 \DeclarePairedDelimiter\Abs{\left\lvert}{\right\rvert}
 \DeclarePairedDelimiter\norm{\lVert}{\rVert}
@@ -133,12 +134,16 @@
 
 % Derivatives [[[1
 
+% Use renewcommand since `cool` already defines a \pderiv macro
 \newcommand\defineDerivateCommand[2]{%
-    \expandafter\newcommand\csname #1\endcsname{\deriv{#2}}
+    \expandafter\providecommand\csname #1\endcsname{\deriv{#2}}
+    \expandafter\renewcommand\csname #1\endcsname{\deriv{#2}}
     % for convenience, wrap in parenthesis
-    \expandafter\newcommand\csname p#1\endcsname{\deriv[\parenthesize]{#2}}
+    \expandafter\providecommand\csname p#1\endcsname{\deriv[\parenthesize]{#2}}
+    \expandafter\renewcommand\csname p#1\endcsname{\deriv[\parenthesize]{#2}}
     % for convenience, wrap in brackets
-    \expandafter\newcommand\csname b#1\endcsname{\deriv[\bracketize]{#2}}
+    \expandafter\providecommand\csname b#1\endcsname{\deriv[\bracketize]{#2}}
+    \expandafter\renewcommand\csname b#1\endcsname{\deriv[\bracketize]{#2}}
 }
 \defineDerivateCommand{tderiv}{\dif}
 \defineDerivateCommand{pderiv}{\del}
@@ -146,6 +151,9 @@
 
 %------------------------------------------------------------
 
+% TODO: in non-numeric cases, add the integer exponents and join everything with '+'
+%   keep the overwrite though (the order might not turn out as intended for example)
+%   Also add single-character exponents, i.e {x^n;y^n} -> d^{2n}
 \newcounter{derivordercounter}
 % example: \deriv{\dif}{f}{x^2;y^3}
 % example: \deriv{\partial}{f}{x^n;y^m}[n+m]  with an optional argument to overwrite the count
