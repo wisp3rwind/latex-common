@@ -8,6 +8,7 @@
 \usepackage{cancel}
 \usepackage{bm}
 \usepackage{cool}
+\usepackage{tikz}
 
 
 % helpers [[[1
@@ -68,10 +69,75 @@
 
 
 % vectors etc. [[[1
-% use \renewcommand{\vc}{\vec} in order to use over-arrows instead of a bold
-% font
-\newcommand{\vecb}[1]{\bm{#1}}  % bold vector
-\newcommand{\vc}{\vecb}  % shorthand
+
+
+% From https://tex.stackexchange.com/questions/44017/dot-notation-for-derivative-of-a-vector/44071#44071
+% --- Macro \xvec
+\makeatletter
+\newlength\xvec@height%
+\newlength\xvec@depth%
+\newlength\xvec@width%
+\newcommand{\xvec}[2][]{%
+    \ifmmode%
+        \settoheight{\xvec@height}{$#2$}%
+        \settodepth{\xvec@depth}{$#2$}%
+        \settowidth{\xvec@width}{$#2$}%
+    \else%
+        \settoheight{\xvec@height}{#2}%
+        \settodepth{\xvec@depth}{#2}%
+        \settowidth{\xvec@width}{#2}%
+    \fi%
+    \def\xvec@arg{#1}%
+    \def\xvec@dd{:}%
+    \def\xvec@d{.}%
+    \raisebox{.2ex}{\raisebox{\xvec@height}{\rlap{%
+        \kern.05em%  (Because left edge of drawing is at .05em)
+        \begin{tikzpicture}[scale=1]
+            \pgfsetroundcap
+            \draw (.05em,0)--(\xvec@width-.05em,0);
+            \draw (\xvec@width-.05em,0)--(\xvec@width-.15em, .075em);
+            \draw (\xvec@width-.05em,0)--(\xvec@width-.15em,-.075em);
+            \ifx\xvec@arg\xvec@d%
+                \fill(\xvec@width*.45,.5ex) circle (.5pt);%
+            \else\ifx\xvec@arg\xvec@dd%
+                \fill(\xvec@width*.30,.5ex) circle (.5pt);%
+                \fill(\xvec@width*.65,.5ex) circle (.5pt);%
+            \fi\fi%
+        \end{tikzpicture}%
+    }}}%
+    #2%
+}
+\makeatother
+
+% Bold vectors
+\newcommand{\bvec}[1]{\bm{#1}}
+
+% Override \vec with an either invocation of \xvec or \bm
+\def\VectorStylenameStd{std}
+\def\VectorStylenameBold{bold}
+\def\VectorStylenameArrow{arrow}
+\let\stdvec\vec
+\NewDocumentCommand\SetVectorStyle{m}{%
+    \def\name{#1}
+    \ifx\name\VectorStylenameArrow
+        \renewcommand{\vec}[1]{\xvec[]{#1}}
+        % Define \dvec and \ddvec for dotted and double-dotted vectors.
+        \newcommand{\dvec}[1]{\xvec[.]{#1}}
+        \newcommand{\ddvec}[1]{\xvec[:]{#1}}
+    \else\ifx\tmp\VectorStylenameBold
+        \renewcommand{\vec}[1]{\vecb{#1}}
+        % Define \dvec and \ddvec for dotted and double-dotted vectors.
+        \newcommand{\dvec}[1]{\dot{\vecb{#1}}}
+        \newcommand{\ddvec}[1]{\ddot{\vecb{#1}}}
+    \else\ifx\tmp\VectorStylenameStd
+        \renewcommand{\vec}[1]{\stdvec{#1}}
+        % Define \dvec and \ddvec for dotted and double-dotted vectors.
+        \newcommand{\dvec}[1]{\dot{\stdvec{#1}}}
+        \newcommand{\ddvec}[1]{\ddot{\stdvec{#1}}}
+    \fi\fi\fi
+}
+\SetVectorStyle{arrow}
+
 \newcommand{\colvec}[1]{\begin{pmatrix}#1\end{pmatrix}}
 
 % combinatorics [[[1
