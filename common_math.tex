@@ -192,7 +192,7 @@
             #2 \IfValueT{#3}{^{#3}}
         }{%
 % long form
-            \difspacing{#2 \IfValueT{#3}{^{#3}} \argopen(#5\argclose)}
+            \difspacing{#2 \IfValueT{#3}{^{#3}} (#5)}
         }
     }{%
 % normal form
@@ -252,7 +252,7 @@
             \frac{%
                 \ifnum\value{derivordercounter}>1%
                     % nothing, i.e. do not show exponent if it is 1
-                    #2^{\thederivordercounter} #3
+                    #2^{\thederivordercounter}\!#3
                 \else
                     #2 #3
                 \fi%
@@ -262,7 +262,7 @@
             }
             \setcounter{derivordercounter}{0}
         }{%  else
-            \frac{\dif^{#4} #3 }{%
+            \frac{#2[#4]\!#3 }{%
                 \let\derivsign#2
                 \ProcessList{#5}{\derivadd}
             }
@@ -278,7 +278,7 @@
     \addtocounter{derivordercounter}{\IfNoValueTF{#2}{1}{#2}}
 }
 
-\NewDocumentCommand \derivadd {m} {\derivsign #1}
+\NewDocumentCommand \derivadd {m} {\mathop{}\!\derivsign #1}
 
 
 % equation numbering [[[1
