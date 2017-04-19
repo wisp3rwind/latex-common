@@ -9,6 +9,7 @@
 \usepackage{bm}
 \usepackage{cool}
 \usepackage{tikz}
+\usetikzlibrary{arrows.meta}
 \usepackage{pgfkeys}
 
 
@@ -94,18 +95,21 @@
     \def\xvec@arg{#1}%
     \def\xvec@dd{:}%
     \def\xvec@d{.}%
-    \raisebox{.2ex}{\raisebox{\xvec@height}{\rlap{%
+    \raisebox{.1ex}{\raisebox{\xvec@height}{\rlap{%
         \kern.05em%  (Because left edge of drawing is at .05em)
         \begin{tikzpicture}[scale=1]
             \pgfsetroundcap
-            \draw (.05em,0)--(\xvec@width-.05em,0);
-            \draw (\xvec@width-.05em,0)--(\xvec@width-.15em, .075em);
-            \draw (\xvec@width-.05em,0)--(\xvec@width-.15em,-.075em);
+            %\draw[-{Stealth[width=0.1em, length=0.075em, slant=.3]}] (.05em,0)--(\xvec@width-.05em,0);
+            %\draw[-{Straight Barb[left,width=0.1em, length=0.075em, slant=.3]}] (.05em,0)--(\xvec@width-.05em,0);
+            \draw[-{Classical TikZ Rightarrow[width=0.2em, length=0.15em, slant=.3]}] (.05em,0)--(\xvec@width-.05em,0);
+            %\draw[-{Classical TikZ Rightarrow[left, width=0.2em, length=0.1em, slant=.3]}] (.05em,0)--(\xvec@width-.05em,0);
+            %\draw (\xvec@width-.05em,0)--(\xvec@width-.15em, .075em);
+            %\draw (\xvec@width-.05em,0)--(\xvec@width-.15em,-.075em);
             \ifx\xvec@arg\xvec@d%
-                \fill(\xvec@width*.45,.5ex) circle (.5pt);%
+                \fill(\xvec@width*.45,.5ex) circle (.6pt);%
             \else\ifx\xvec@arg\xvec@dd%
-                \fill(\xvec@width*.30,.5ex) circle (.5pt);%
-                \fill(\xvec@width*.65,.5ex) circle (.5pt);%
+                \fill(\xvec@width*.30,.5ex) circle (.6pt);%
+                \fill(\xvec@width*.65,.5ex) circle (.6pt);%
             \fi\fi%
         \end{tikzpicture}%
     }}}%
@@ -115,17 +119,20 @@
 
 % Override \vec with an either invocation of \xvec or \bm
 \let\stdvec\vec
+\newcommand\uvec{}  % dummy
 \newcommand\dvec{}  % dummy
 \newcommand\ddvec{}  % dummy
 \MathStyle{%
     vecdisplay/.is choice,
     vecdisplay/std/.code={%
         \renewcommand{\vec}[1]{\stdvec{##1}}
+        \renewcommand{\uvec}[1]{\hat{\vec{##1}}}
         \renewcommand{\dvec}[1]{\dot{\stdvec{##1}}}
         \renewcommand{\ddvec}[1]{\ddot{\stdvec{##1}}}
     },
     vecdisplay/xvec/.code={%
         \renewcommand{\vec}[1]{\xvec[]{##1}}
+        \renewcommand{\uvec}[1]{\hat{\vec{##1}}}
         \renewcommand{\dvec}[1]{\xvec[.]{##1}}
         \renewcommand{\ddvec}[1]{\xvec[:]{##1}}
     },
@@ -138,11 +145,13 @@
     },
     vecdisplay/bm/.code={%
         \renewcommand{\vec}[1]{\bm{##1}}
+        \renewcommand{\uvec}[1]{\bm{\hat{##1}}}
         \renewcommand{\dvec}[1]{\dot{\bm{##1}}}
         \renewcommand{\ddvec}[1]{\ddot{\bm{##1}}}
     },
     vecdisplay/mathbold/.code={%
         \renewcommand{\vec}[1]{\mathbold{##1}}
+        \renewcommand{\uvec}[1]{\mathbold{\hat{##1}}}
         \renewcommand{\dvec}[1]{\dot{\mathbold{##1}}}
         \renewcommand{\ddvec}[1]{\ddot{\mathbold{##1}}}
     },
@@ -153,8 +162,38 @@
 \newcommand\vc{\vec}
 \newcommand\dvc{\dvec}
 \newcommand\ddvc{\ddvec}
+\newcommand\uvc{\uvec}
 
 \newcommand{\colvec}[1]{\begin{pmatrix}#1\end{pmatrix}}
+
+\MathStyle{%
+    integrate/displayfunc/.is choice,
+    integrate/displayfunc/inset/.style={%
+        integrate/integrand/.code n args={3}{##1 \dif[##3]{##2}}
+    },
+    integrate/displayfunc/outset/.style={%
+        integrate/integrand/.code n args={3}{\!\dif[##3]{##2} ##1}
+    },
+}
+\MathStyle{integrate/displayfunc=inset}
+\NewDocumentCommand\IntegrateInternalIntegrand{m m m}{%
+    \MathStyle{integrate/integrand={#1}{#2}{#3}}
+}
+\NewDocumentCommand\IntegrateInternal{m >{\SplitArgument{1}{^}}m m m}{%
+    \IfNoValueTF{#3}
+        {\int}
+        {\IfNoValueTF{#4}%
+            {\int_{#3}}
+            {\int_{#3}^{#4}}
+        }
+    \IntegrateInternalIntegrand{#1}#2
+}
+\DeclareDocumentCommand\Integrate{m >{\SplitArgument{2}{,}}m}{%
+    \IntegrateInternal{#1}#2
+}
+
+\DeclareDocumentCommand\Int{}{\Integrate}
+
 
 % combinatorics [[[1
 % \bincoef{N \\ k}
