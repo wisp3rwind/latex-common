@@ -9,7 +9,11 @@
 \usepackage{bm}
 \usepackage{cool}
 \usepackage{tikz}
+\usepackage{pgfkeys}
 
+
+% Use pgfkeys to configure style (cf. \Style from the cool package) [[[1
+\newcommand{\MathStyle}[1]{\pgfqkeys{/math/notation}{#1}}
 
 % helpers [[[1
 % TODO: use DeclarePairedDelimiter, also see
@@ -109,34 +113,46 @@
 }
 \makeatother
 
-% Bold vectors
-\newcommand{\bvec}[1]{\bm{#1}}
-
 % Override \vec with an either invocation of \xvec or \bm
-\def\VectorStylenameStd{std}
-\def\VectorStylenameBold{bold}
-\def\VectorStylenameArrow{arrow}
 \let\stdvec\vec
-\NewDocumentCommand\SetVectorStyle{m}{%
-    \def\name{#1}
-    \ifx\name\VectorStylenameArrow
-        \renewcommand{\vec}[1]{\xvec[]{#1}}
-        % Define \dvec and \ddvec for dotted and double-dotted vectors.
-        \newcommand{\dvec}[1]{\xvec[.]{#1}}
-        \newcommand{\ddvec}[1]{\xvec[:]{#1}}
-    \else\ifx\tmp\VectorStylenameBold
-        \renewcommand{\vec}[1]{\vecb{#1}}
-        % Define \dvec and \ddvec for dotted and double-dotted vectors.
-        \newcommand{\dvec}[1]{\dot{\vecb{#1}}}
-        \newcommand{\ddvec}[1]{\ddot{\vecb{#1}}}
-    \else\ifx\tmp\VectorStylenameStd
-        \renewcommand{\vec}[1]{\stdvec{#1}}
-        % Define \dvec and \ddvec for dotted and double-dotted vectors.
-        \newcommand{\dvec}[1]{\dot{\stdvec{#1}}}
-        \newcommand{\ddvec}[1]{\ddot{\stdvec{#1}}}
-    \fi\fi\fi
+\newcommand\dvec{}  % dummy
+\newcommand\ddvec{}  % dummy
+\MathStyle{%
+    vecdisplay/.is choice,
+    vecdisplay/std/.code={%
+        \renewcommand{\vec}[1]{\stdvec{##1}}
+        \renewcommand{\dvec}[1]{\dot{\stdvec{##1}}}
+        \renewcommand{\ddvec}[1]{\ddot{\stdvec{##1}}}
+    },
+    vecdisplay/xvec/.code={%
+        \renewcommand{\vec}[1]{\xvec[]{##1}}
+        \renewcommand{\dvec}[1]{\xvec[.]{##1}}
+        \renewcommand{\ddvec}[1]{\xvec[:]{##1}}
+    },
+    vecdisplay/bold/.style={%
+        % for some fonts, \bm doesn't do the right thing
+        % Maybe \bm does do the right thing after all, the problem was likely due
+        % to a messed-up preamble
+        % TODO: Automatically select the correct command based on the font
+        vecdisplay/bm
+    },
+    vecdisplay/bm/.code={%
+        \renewcommand{\vec}[1]{\bm{##1}}
+        \renewcommand{\dvec}[1]{\dot{\bm{##1}}}
+        \renewcommand{\ddvec}[1]{\ddot{\bm{##1}}}
+    },
+    vecdisplay/mathbold/.code={%
+        \renewcommand{\vec}[1]{\mathbold{##1}}
+        \renewcommand{\dvec}[1]{\dot{\mathbold{##1}}}
+        \renewcommand{\ddvec}[1]{\ddot{\mathbold{##1}}}
+    },
 }
-\SetVectorStyle{arrow}
+\MathStyle{vecdisplay=bold}
+
+% shorthand
+\newcommand\vc{\vec}
+\newcommand\dvc{\dvec}
+\newcommand\ddvc{\ddvec}
 
 \newcommand{\colvec}[1]{\begin{pmatrix}#1\end{pmatrix}}
 
@@ -149,8 +165,8 @@
 \newcommand{\op}[1]{\hat{#1}}
 
 % vector calculus [[[1
-\newcommand{\vecnabla}{\vc{\nabla}}
-\newcommand{\grad}{\nabla}
+\newcommand{\vecnabla}{\vec{\nabla}}
+\newcommand{\grad}{\nabla}  % not a vector! -> non-bold
 \renewcommand{\div}{\vecnabla\cdot}
 \newcommand{\curl}{\vecnabla\times}
 \newcommand{\laplacian}{\nabla^2}  % not a vector! -> non-bold
