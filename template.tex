@@ -1,13 +1,31 @@
-\documentclass[english, draft, a4paper]{article}
+\documentclass[english, ngerman, draft, a4paper]{article}
 %\documentclass[english, final, a4paper]{article}
 
-\usepackage[ngerman, main=english]{babel}
+\usepackage[main=english]{babel}
+
+% Fonts [[[1
+% Latin Modern: succeeds Computer Modern, more glyphs
+%\usepackage{lmodern}
+
+% Futura: supposedly good for presentations, requires XeLaTeX or LuaLaTex
+%\usepackage{???}
+
+% Mozilla Fira Sans, requires XeLaTeX or LuaLaTex
+%\usepackage[sfdefault]{FiraSans}
+%\usepackage{FiraMono}
+
+% URW-Garamond: A free garamond font, supposedly good for books but to fragile
+%   for presentations. Math fonts provided by the mathdesign project
+%\usepackage[urw-garamond]{mathdesign}
+
+% Palatino + math
+%\usepackage[osf]{mathpazo}
 
 \input{common.tex}
 \input{common_math.tex}
 \input{common_phys.tex}
 \input{common_code.tex}
-\input{common-late.tex}
+\input{common_late.tex}
 
 
 \title{}
