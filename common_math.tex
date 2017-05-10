@@ -169,10 +169,10 @@
 \MathStyle{%
     integrate/displayfunc/.is choice,
     integrate/displayfunc/inset/.style={%
-        integrate/integrand/.code n args={3}{##1 \dif[##3]{##2}}
+        integrate/integrand/.code n args={3}{##1 \mathop{}\!\expandafter\dif\IfValueT{##3}{[##3]}{##2}}
     },
     integrate/displayfunc/outset/.style={%
-        integrate/integrand/.code n args={3}{\!\dif[##3]{##2} ##1}
+        integrate/integrand/.code n args={3}{\!\expandafter\dif\IfValueT{##3}{[##3]}{##2}\mathop{}\! ##1}
     },
 }
 \MathStyle{integrate/displayfunc=inset}
@@ -193,6 +193,9 @@
 }
 
 \DeclareDocumentCommand\Int{}{\Integrate}
+% TODO: port \Sum and \Prod, too, and write starred versions that use \limits
+% TODO: \Int{f}{x,1,3;y,0,10}
+% TODO: \Iint, \Iiint, \Iiiint, \Idotsint{f(x_1,\ldots,x_n)}{x_1,0,\infty;...;x_j,\R;...;x_n,0,\infty}
 
 
 % combinatorics [[[1
