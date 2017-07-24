@@ -1,23 +1,6 @@
 % This file should only contain things that can go into any kind of document.
 
-%\usepackage[german]{babel}
-
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-
-\usepackage{csquotes}  % context-sensitive quotes
-
-\usepackage{microtype}
-
-
-% Misc [[[1
-\usepackage[inline]{enumitem}
-\usepackage{float}  %
-%\usepackage{fancyhdr}  %
-
-
 % Colors [[[1
-\usepackage{xcolor}
 % define a few highlighting colors, from https://personal.sron.nl/~pault/
 \definecolor{marklightblue}{HTML}{BBCCEE}
 \definecolor{marklightteal}{HTML}{CCEEFF}
@@ -32,49 +15,18 @@
 
 
 % Hyperlinks [[[1
-\usepackage[hyphens]{url}
-\usepackage[
+\hypersetup{%
     colorlinks=true,
     linkcolor=black,  % for internal links, color is just too much
     citecolor=markdarkteal,
     filecolor=markdarkgreen,
     urlcolor=markdarkblue,
     bookmarksopen=true,
-    bookmarksopenlevel=3]{hyperref}
-%\hypersetup{%
-  % hyperref has sensible defaults
-%}
-
-
-% Better tables [[[1
-\usepackage{rotating}
-\usepackage{booktabs}
-%\usepackage{multirow}
-%\usepackage{tabu}
-
-
-% Graphics [[[1
-\usepackage{graphicx}  % advanced key=value arguments for \includegraphics
+    bookmarksopenlevel=3
+}
 
 
 % Bibliography [[[1
-\usepackage{biblatex}
-
-% New packages to investigate [[[1
-%\usepackage{float}
-%\usepackage{color}
-%\usepackage{subfigure}
-%\usepackage{geometry}
-%\usepackage{pdfpages}
-%\usepackage{cite}  % better support for numeric citations
-%\usepackage{caption}
-%\usepackage{longtable}  % wrap tables at page boundaries, succeeds supertabular
-%\usepackage{supertabular}  % wrap tables at page boundaries
-%\usepackage{wrapfig}
-%\usepackage{footmisc}
-%\usepackage{epstopdf}
-%\usepackage{textcomp}
-%\usepackage{marginnote}
 
 
 % New Commands [[[1
@@ -85,5 +37,11 @@
 \newcommand{\nonumsection}[1]{\phantomsection\addcontentsline{toc}{section}{#1}}
 \newcommand{\nonumsubsection}[1]{\phantomsection\addcontentsline{toc}{subsection}{#1}}
 \newcommand{\nonumsubsubsection}[1]{\phantomsection\addcontentsline{toc}{subsubsection}{#1}}
+
+% Draft mode [[[1
+\renewcommand{\showlabelfont}{\tiny\ttfamily}
+%\showlabels{cite}
+%\showlabels{ref}
+%\showlabels{begin}
 
 % vim: ts=4 sw=4 et fdm=marker fmr=[[[,]]]:
