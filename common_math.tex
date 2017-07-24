@@ -251,6 +251,11 @@
 \newcommand{\deltaf}[1]{\func{\delta} (#1)}
 \DeclareMathOperator{\asinh}{asinh}
 
+% replace the useless Max{} from the `cool` package
+\RenewDocumentCommand\Max{m m}{%
+    \max_{#2} \; {#1}%
+}
+
 % Derivatives [[[1
 
 % Use renewcommand since `cool` already defines a \pderiv macro
