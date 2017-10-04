@@ -262,11 +262,11 @@ From the \verb|braket| package.
         print(k)
     \end{minted}
     \end{verbatim}
-		\begin{minted}{python}
+    \begin{minted}{python}
       i = False if a == "foo" else "bar"
       for k in range(10):
         print(k)
-		\end{minted}
+    \end{minted}
 
   \item Remove additional whitespace \begin{verbatim}
     \begin{minted}[autogobble]{python}
@@ -281,10 +281,44 @@ From the \verb|braket| package.
         print(k)
     \end{minted}
 
-	\item \verb+\mint{python}|import this|+ \mint{python}|import this|
+  \item \verb+\mint{python}|import this|+ \mint{python}|import this|
 
-	\item \verb+\mintinline{python}|import this|+ \quad \mintinline{python}|import this|
+  \item \verb+\mintinline{python}|import this|+ \quad \mintinline{python}|import this|
 \end{itemize}
+
+\paragraph{Styles} Pygments comes with a number of built-in styles that can
+be used with \verb|\usemintedstyle[language]{style}|.
+\begin{description}
+  \item[default] \usemintedstyle{default} \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[emacs] \usemintedstyle{emacs}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[friendly] \usemintedstyle{friendly}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[colorful] \usemintedstyle{colorful}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[autumn] \usemintedstyle{autumn}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[murphy] \usemintedstyle{murphy}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[manni] \usemintedstyle{manni}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[monokai] \usemintedstyle{monokai}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[perldoc] \usemintedstyle{perldoc}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[pastie] \usemintedstyle{pastie}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[borland] \usemintedstyle{borland}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[trac] \usemintedstyle{trac}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[native] \usemintedstyle{native}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[fruity] \usemintedstyle{fruity}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[bw] \usemintedstyle{bw}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[vim] \usemintedstyle{vim}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[vs] \usemintedstyle{vs}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[tango] \usemintedstyle{tango}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[rrt] \usemintedstyle{rrt}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[xcode] \usemintedstyle{xcode}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[igor] \usemintedstyle{igor}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[paraiso-light] \usemintedstyle{paraiso-light}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[paraiso-dark] \usemintedstyle{paraiso-dark}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[lovelace] \usemintedstyle{lovelace}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[algol] \usemintedstyle{algol}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[algol\_nu] \usemintedstyle{algol_nu}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[arduino] \usemintedstyle{arduino}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[rainbow\_dash] \usemintedstyle{rainbow_dash}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+  \item[abap] \usemintedstyle{abap}  \mintinline{python}|a = [v for i, (k, v) in enumerate(d) if k in selection]  # Whatever.|
+\end{description}
 
 
 \section{Scratch space}
