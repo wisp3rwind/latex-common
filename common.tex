@@ -75,7 +75,57 @@
 
 \usepackage[english]{babel}
 \usepackage[T1]{fontenc}
-\usepackage{lmodern}
+
+% Font handling [[[1
+\ExplSyntaxOn
+
+\__wisper_doc_style:n
+  {
+    font/preset/.cd,
+    .is~choice,
+
+    lmodern/.style={
+      internal/load~font/.code={
+      }
+    },
+
+    fira/.style={
+      internal/load~font/.code={
+        % Mozilla Fira Sans, requires XeLaTeX or LuaLaTex TODO: raise error
+        \usepackage[sfdefault]{FiraSans}
+        \usepackage{FiraMono}
+      }
+    },
+
+    garamond/.style={
+      internal/load~font/.code={
+        % URW-Garamond: A free garamond font, supposedly good for books but to fragile
+        %   for presentations. Math fonts provided by the mathdesign project
+        \usepackage[urw-garamond]{mathdesign}
+        % FIXME: maybe drop this? PagellaX is better anyway. At least give a
+        % warning.
+        % TODO: matching sans font
+      }
+    },
+
+    palatino/.style={
+      internal/load~font/.code={
+        \usepackage[osf]{mathpazo}
+      }
+    },
+
+    TexGyre/.style={
+      internal/load~font/.code={
+        \usepackage{lmodern}
+      }
+    },
+
+  }
+
+\__wisper_doc_style:n {font/preset=TexGyre}
+\__wisper_doc_style:n {internal/load~font}
+
+\ExplSyntaxOff
 
 % Load packages [[[1
 \input{common_packages.tex}
