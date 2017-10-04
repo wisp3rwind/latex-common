@@ -1,6 +1,88 @@
 % This file should only contain things that can go into any kind of document.
 
-% Colors [[[1
+% Use pgfkeys for everything [[[1
+% Early packages loads required for handling the configuration.
+\RequirePackage{pgfkeys}
+\RequirePackage{xparse}
+% TODO: ifs for: luatex, xelatex, beamer
+
+% Key-value interface: convenient access to the namespace
+\ExplSyntaxOn
+
+\cs_new:Npn \__wisper_keys:n #1 { \pgfkeys{/wisper/.cd,#1} }
+\cs_new:Npn \__wisper_doc_style:n #1 { \pgfkeys{/wisper/document/.cd,#1} }
+
+\cs_new_eq:NN \DocumentStyle \__wisper_keys:n
+
+% Document class [[[1
+% Conditionals and switches [[[2
+% should accept article, book, presentation, letter
+\__wisper_doc_style:n {type/.initial=article}
+\prg_new_conditional:Npnn \__wisper_if_document_type:n #1
+  { T, F, TF}
+  { 
+    \__wisper_doc_style:n {type/.get=\tempa}
+    \str_if_eq:nVTF {#1} \tempa
+      { \prg_return_true: }
+      { \prg_return_false: }
+  }
+
+\cs_new_eq:NN \IfDocTypeT \__wisper_if_document_type:nT
+\cs_new_eq:NN \IfDocTypeF \__wisper_if_document_type:nF
+\cs_new_eq:NN \IfDocTypeTF \__wisper_if_document_type:nTF
+
+% TODO: automate the following definitions
+\cs_new:Npn \IfPresentationT #1 { \__wisper_if_document_type:nT {presentation} {#1} }
+\cs_new:Npn \IfPresentationF #1 { \__wisper_if_document_type:nF {presentation} {#1} }
+\cs_new:Npn \IfPresentationTF #1#2 { \__wisper_if_document_type:nTF {presentation} {#1} {#2} }
+
+\cs_new:Npn \IfLetterT #1 { \__wisper_if_document_type:nT {letter} {#1} }
+\cs_new:Npn \IfLetterF #1 { \__wisper_if_document_type:nF {letter} {#1} }
+\cs_new:Npn \IfLetterTF #1#2 { \__wisper_if_document_type:nTF {letter} {#1} {#2} }
+
+\cs_new:Npn \IfArticleT #1 { \__wisper_if_document_type:nT {article} {#1} }
+\cs_new:Npn \IfArticleF #1 { \__wisper_if_document_type:nF {article} {#1} }
+\cs_new:Npn \IfArticleTF #1#2 { \__wisper_if_document_type:nTF {article} {#1} {#2} }
+
+\cs_new:Npn \IfBookT #1 { \__wisper_if_document_type:nT {book} {#1} }
+\cs_new:Npn \IfBookF #1 { \__wisper_if_document_type:nF {book} {#1} }
+\cs_new:Npn \IfBookTF #1#2 { \__wisper_if_document_type:nTF {book} {#1} {#2} }
+
+\cs_new:Npn \SwitchDocType #1#2
+  { 
+    \__wisper_doc_style:n {type/.get=\tempa}
+    \str_case:onF \tempa
+    { #1 }  % should contain lines of {type}{code} pairs
+    { #2 }
+  }
+
+\ExplSyntaxOff
+
+% Load the class [[[2
+\SwitchDocType
+  {
+    {article}{\documentclass[a4paper]{article}}
+    {presentation}{\documentclass{beamer}}
+    {letter}{\documentclass{scrlttr2}}
+    {book}{\documentclass{book}}
+  }
+  {
+    % Invalid document type
+    % TODO: use the .is choice handler to prevent this in the first place
+  }
+
+% Early Package loads [[[1
+
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+% Load packages [[[1
+\input{common_packages.tex}
+\input{common_packages_late.tex}
+
+% Configure packages, define commands [[[1
+% Colors [[[2
 % define a few highlighting colors, from https://personal.sron.nl/~pault/
 \definecolor{marklightblue}{HTML}{BBCCEE}
 \definecolor{marklightteal}{HTML}{CCEEFF}
@@ -14,7 +96,7 @@
 \definecolor{markdarkred}{HTML}{663333}
 
 
-% Tables [[[1
+% Tables [[[2
 % https://tex.stackexchange.com/a/2442/111880
 % https://tex.stackexchange.com/a/12712/111880
 \newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
@@ -22,7 +104,7 @@
 \newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
 
 
-% Hyperlinks [[[1
+% Hyperlinks [[[2
 \hypersetup{%
     colorlinks=true,
     linkcolor=black,  % for internal links, color is just too much
@@ -34,7 +116,7 @@
 }
 
 
-% Bibliography [[[1
+% Bibliography [[[2
 % From http://www.khirevich.com/latex/footnote_citation/
 % new command \sjcitep prints footnote citation above punctuation
 \newlength{\spc} % declare a variable to save spacing value
@@ -52,7 +134,7 @@
     }% print (cite) the mandatory argument
 
 
-% New Commands [[[1
+% New Commands [[[2
 % unnumbered section that shows up in the TOC
 \newcommand{\tocsection}[1]{\section*{#1}\addcontentsline{toc}{section}{#1}}
 % non-numbered subsection that works properly with hyperref
@@ -61,10 +143,10 @@
 \newcommand{\nonumsubsection}[1]{\phantomsection\addcontentsline{toc}{subsection}{#1}}
 \newcommand{\nonumsubsubsection}[1]{\phantomsection\addcontentsline{toc}{subsubsection}{#1}}
 
-% Draft mode [[[1
+% Draft mode [[[2
 %\renewcommand{\showlabelfont}{\tiny\ttfamily}
 %\showlabels{cite}
 %\showlabels{ref}
 %\showlabels{begin}
 
-% vim: ts=4 sw=4 et fdm=marker fmr=[[[,]]]:
+% vim: ts=2 sw=2 et fdm=marker fmr=[[[,]]]:

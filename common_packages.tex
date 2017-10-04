@@ -22,7 +22,7 @@
 
 
 % Misc [[[1
-\ifnotbeamer{\usepackage[inline]{enumitem}}  % doesn't play well with overlay specifications
+\IfPresentationF{\usepackage[inline]{enumitem}}  % doesn't play well with overlay specifications
 \usepackage{float}  %
 %\usepackage{xparse}
 \usepackage{calc}
@@ -35,7 +35,7 @@
 
 
 % Hyperlinks [[[1
-\ifnotbeamer{\usepackage[hyphens]{url}}  % loaded early by hyperref which is loaded way to early by beamer...
+\IfPresentationF{\usepackage[hyphens]{url}}  % loaded early by hyperref which is loaded way to early by beamer...
 %\usepackage{hyperref}
 
 
@@ -55,29 +55,28 @@
 
 % Bibliography [[[1
 % many of these options can only be given in \usepackage and not later, unfortunately..
-\ifnotbeamer{\usepackage[hyperref=true,
-            backref=true,
-            %bibstyle=authoryear,
-            bibstyle=numeric,
-            %bibstyle=alphabetic,
-            citestyle=custom-numeric-comp,
-            %citestyle=numeric-comp,
-            %citestyle=custom-alphabetic,
-            citereset=section,
-            url=false,
-            isbn=false,%  DOI only
-            maxcitenames=3,
-            maxbibnames=3]{biblatex}
-        }
-\ifbeamer{\usepackage[hyperref=true,
-            backref=true,
-            style=alphabetic,
-            citereset=section,
-            url=false,
-            isbn=false,%  DOI only
-            maxcitenames=3,
-            maxbibnames=3]{biblatex}
-        }
+\IfPresentationTF
+    {\usepackage[hyperref=true,
+                 backref=true,
+                 style=alphabetic,
+                 citereset=section,
+                 url=false,
+                 isbn=false,%  DOI only
+                 maxcitenames=3,
+                 maxbibnames=3]{biblatex}}
+    {\usepackage[hyperref=true,
+                 backref=true,
+                 %bibstyle=authoryear,
+                 bibstyle=numeric,
+                 %bibstyle=alphabetic,
+                 citestyle=custom-numeric-comp,
+                 %citestyle=numeric-comp,
+                 %citestyle=custom-alphabetic,
+                 citereset=section,
+                 url=false,
+                 isbn=false,%  DOI only
+                 maxcitenames=3,
+                 maxbibnames=3]{biblatex}}
 
 
 % New packages to investigate [[[1
