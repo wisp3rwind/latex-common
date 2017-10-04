@@ -1,9 +1,7 @@
 % TODO: add ensuremath everywhere where appropriate
 % TODO: Remove macros already provided by the cool package
-\usepackage{xparse}
-\usepackage{calc}
 
-\usepackage{amsmath,amstext,amssymb,amsthm,amsfonts}
+\usepackage{amsmath,amssymb,amsthm}
 \usepackage{mathtools}
 \usepackage{cancel}
 \usepackage{bm}
@@ -198,6 +196,22 @@
 % TODO: \Int{f}{x,1,3;y,0,10}
 % TODO: \Iint, \Iiint, \Iiiint, \Idotsint{f(x_1,\ldots,x_n)}{x_1,0,\infty;...;x_j,\R;...;x_n,0,\infty}
 
+% COOL prints the '=' also if the second argument is empty...
+\NewDocumentCommand\SumInternal{m m m m}{%
+    \sum%
+    \IfValueT{#2}{_%
+        {#2\IfValueT{#3}{%
+            \if\relax\detokenize{#3}\relax%
+            \else%
+                = #3%
+            \fi}}%
+        }%
+    \IfValueT{#4}{^{#4}}%
+    #1%
+}
+\DeclareDocumentCommand\Sum{m >{\SplitArgument{2}{,}}m}{%
+    \SumInternal{#1}#2
+}
 
 % combinatorics [[[1
 % \bincoef{N \\ k}
@@ -256,6 +270,11 @@
 \newcommand{\expb}[1]{\exp\left(#1\right)}
 \newcommand{\deltaf}[1]{\func{\delta} (#1)}
 \DeclareMathOperator{\asinh}{asinh}
+
+% replace the useless Max{} from the `cool` package
+\RenewDocumentCommand\Max{m m}{%
+    \max_{#2} \; {#1}%
+}
 
 % Derivatives [[[1
 
@@ -329,14 +348,23 @@
 \newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
 
 
+% boxes, highlighting, ... [[[1
+% https://tex.stackexchange.com/questions/20575/attractive-boxed-equations
+
+
 % Quick quad text (math-mode text with \quad spacing). [[[1
 % Stolen from the physics package.
-\DeclareDocumentCommand\qqtextinternal{m m}{\IfBooleanTF{#1}{}{\quad}\textnormal{#2}\quad}
+\DeclareDocumentCommand\qqmathinternal{m m}{\IfBooleanTF{#1}{}{\quad}{#2}\quad}
+\DeclareDocumentCommand\qqtextinternal{m m}{\qqmathinternal{#1}{\textnormal{#2}}}
 \DeclareDocumentCommand\qqtext{s m}{\qqtextinternal{#1}{#2}}
+\DeclareDocumentCommand\qqmath{s m}{\qqmathinternal{#1}{#2}}
+
 \DeclareDocumentCommand\qq{}{\qqtext}
 
 \DeclareDocumentCommand\qcomma{}{,\quad}
 \DeclareDocumentCommand\qc{}{\qcomma}
+
+\DeclareDocumentCommand\qimplies{s}{\qqmathinternal{#1}{\implies}}
 
 \DeclareDocumentCommand\qif{s}{\qqtextinternal{#1}{if}}
 \DeclareDocumentCommand\qthen{s}{\qqtextinternal{#1}{then}}

@@ -1,0 +1,98 @@
+% This file should only contain things that can go into any kind of document.
+
+%\usepackage[german]{babel}
+
+\newif\ifloadcode\loadcodetrue
+\newif\ifloadmath\loadmathtrue
+\newif\ifloadphys\loadphystrue
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+
+% load minted before csquotes to suppress a warning due to a common package
+% they load
+\ifloadcode
+  \usepackage{minted}
+\fi
+
+\usepackage{csquotes}  % context-sensitive quotes
+
+\usepackage{microtype}
+
+
+% Misc [[[1
+\ifnotbeamer{\usepackage[inline]{enumitem}}  % doesn't play well with overlay specifications
+\usepackage{float}  %
+%\usepackage{xparse}
+\usepackage{calc}
+%\usepackage{fancyhdr}  %
+\usepackage{ragged2e}
+
+
+% Colors [[[1
+\usepackage{xcolor}
+
+
+% Hyperlinks [[[1
+\ifnotbeamer{\usepackage[hyphens]{url}}  % loaded early by hyperref which is loaded way to early by beamer...
+%\usepackage{hyperref}
+
+
+% Better tables [[[1
+\usepackage{rotating}
+\usepackage{booktabs}
+\usepackage{array}
+%\usepackage{multirow}
+%\usepackage{tabu}
+
+
+% Graphics [[[1
+\usepackage{graphicx}  % advanced key=value arguments for \includegraphics
+\usepackage{caption}
+\usepackage{subcaption}
+
+
+% Bibliography [[[1
+% many of these options can only be given in \usepackage and not later, unfortunately..
+\ifnotbeamer{\usepackage[hyperref=true,
+            backref=true,
+            %bibstyle=authoryear,
+            bibstyle=numeric,
+            %bibstyle=alphabetic,
+            citestyle=custom-numeric-comp,
+            %citestyle=numeric-comp,
+            %citestyle=custom-alphabetic,
+            citereset=section,
+            url=false,
+            isbn=false,%  DOI only
+            maxcitenames=3,
+            maxbibnames=3]{biblatex}
+        }
+\ifbeamer{\usepackage[hyperref=true,
+            backref=true,
+            style=alphabetic,
+            citereset=section,
+            url=false,
+            isbn=false,%  DOI only
+            maxcitenames=3,
+            maxbibnames=3]{biblatex}
+        }
+
+
+% New packages to investigate [[[1
+%\usepackage{float}
+%\usepackage{color}
+%\usepackage{subfigure}
+%\usepackage{geometry}
+%\usepackage{pdfpages}
+%\usepackage{cite}  % better support for numeric citations
+%\usepackage{longtable}  % wrap tables at page boundaries, succeeds supertabular
+%\usepackage{supertabular}  % wrap tables at page boundaries
+%\usepackage{wrapfig}
+%\usepackage{footmisc}
+%\usepackage{epstopdf}
+%\usepackage{textcomp}
+%\usepackage{marginnote}
+
+% vim: ts=4 sw=4 et fdm=marker fmr=[[[,]]]:
