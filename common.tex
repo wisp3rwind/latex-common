@@ -3,12 +3,14 @@
 % TODO: keyvals: draft (obvious), debug (load blind text packages), strict (whether to fail or fallback, e.g. for luatex-only features like specific fonts)
 % TODO: math: automatically replace i/j i/jmath (have an option to prevent that)
 % TODO: support passing style options to most of the commands, 
-        e.g. \vc[vecdisplay=bm]{x}
+%       e.g. \vc[vecdisplay=bm]{x}
 
 % Use pgfkeys for everything [[[1
 % Early packages loads required for handling the configuration.
 \RequirePackage{pgfkeys}
 \RequirePackage{xparse}
+\RequirePackage{ifxetex}
+\RequirePackage{ifluatex}
 % TODO: ifs for: luatex, xelatex, beamer
 
 % Key-value interface: convenient access to the namespace
@@ -17,7 +19,7 @@
 \cs_new:Npn \__wisper_keys:n #1 { \pgfkeys{/wisper/.cd,#1} }
 \cs_new:Npn \__wisper_doc_style:n #1 { \pgfkeys{/wisper/document/.cd,#1} }
 
-\cs_new_eq:NN \DocumentStyle \__wisper_keys:n
+\cs_new_eq:NN \DocumentStyle \__wisper_doc_style:n
 
 % Document class [[[1
 % Conditionals and switches [[[2
@@ -32,6 +34,7 @@
       { \prg_return_false: }
   }
 
+% TODO: support IfDocTypeTF{article,book}, i.e. comma-separated list
 \cs_new_eq:NN \IfDocTypeT \__wisper_if_document_type:nT
 \cs_new_eq:NN \IfDocTypeF \__wisper_if_document_type:nF
 \cs_new_eq:NN \IfDocTypeTF \__wisper_if_document_type:nTF
@@ -63,25 +66,8 @@
 
 \ExplSyntaxOff
 
-% Load the class [[[2
-\SwitchDocType
-  {
-    {article}{\documentclass[a4paper]{article}}
-    {presentation}{\documentclass{beamer}}
-    {letter}{\documentclass{scrlttr2}}
-    {book}{\documentclass{book}}
-  }
-  {
-    % Invalid document type
-    % TODO: use the .is choice handler to prevent this in the first place
-  }
-
-% Early Package loads [[[1
-
-\usepackage[english]{babel}
-\usepackage[T1]{fontenc}
-
-% Font handling [[[1
+% Define the key-value interface [[[1
+% Font handling [[[2
 \ExplSyntaxOn
 
 \__wisper_doc_style:n
@@ -91,6 +77,7 @@
 
     lmodern/.style={
       internal/load~font/.code={
+        \usepackage{lmodern}
       }
     },
 
@@ -121,23 +108,164 @@
 
     TexGyre/.style={
       internal/load~font/.code={
-        \usepackage{lmodern}
+        \usepackage{amsthm}  % preload amsthm to suppress error due to newpxmath redfining \openbox
+        \usepackage[vvarbb]{newpxmath}
+        \ifluatex
+          \usepackage[no-math]{fontspec}  % TODO: tex/luatex switch
+          % TODO: ensure correct small caps, \usepackage[largesc]{newpxtext}
+          \setmainfont{TeXGyrePagellaX}[Numbers=OldStyle]
+          \setsansfont{TeXGyreHeros}
+          \newfontfamily\liningnumtext{TeXGyrePagellaX}[Numbers=Lining]
+        \else
+          \usepackage[largesc]{newpxtext}
+          \useosf
+        \fi
+        \linespread{1.05} 
       }
     },
 
   }
 
 \__wisper_doc_style:n {font/preset=TexGyre}
-\__wisper_doc_style:n {internal/load~font}
+
+%\mhchemoptions{textfontcommand=\liningnumtext}
+%\IfPresentationT{\renewcommand*{\bibfont}{\scriptsize}}
+
+% Adjust layout.
+% TODO: only for KOMA classes
+\IfDocTypeT{book}{\KOMAoptions{DIV=last}}
 
 \ExplSyntaxOff
+
+% Footnotes [[[2
+
+\ExplSyntaxOn
+
+\newif\ifmultiplefootnotes
+
+\__wisper_doc_style:n 
+  {
+    footnotes/.cd,
+
+    multiple/.is~if,
+    %multiple=false,
+  }
+
+\ExplSyntaxOff
+
+% Citations [[[2
+\ExplSyntaxOn
+\__wisper_doc_style:n
+  {
+    cite/style/.is~choice,
+    cite/style/super/.style={ },
+    cite/style/bracket/.style={ },
+
+    %cite/footnote/.style={
+    %  footnotes/multiple=true,
+    %},
+  }
+
+
+% Tufte-style [[[2
+\__wisper_doc_style:n
+  {
+    cite/style=super,
+    %cite/footnote,
+
+    internal/load~sidenotes/.code={},
+    sidenotes/enable/.style={
+      internal/load~sidenotes/.code={
+        \IfPresentationF{
+          \usepackage{sidenotes}
+        }
+      },
+    }
+  }
+
+\ExplSyntaxOff
+
+% Load all the things [[[1
+% Document class [[[2
+\SwitchDocType
+  {
+    % TODO: draft option, final option
+    {article}{\documentclass[a4paper]{article}}
+    {presentation}{\documentclass{beamer}}
+    {letter}{\documentclass{scrlttr2}}
+    {book}{\documentclass{book}}
+    {scrbook}{\documentclass[english, ngerman, a4paper, BCOR=0mm, DIV=10, pagesize]{scrbook}}
+  }
+  {
+    % TODO: use the .is choice handler to prevent this in the first place
+    \PackageError{---}{Invalid document type}{No help here.}
+  }
+
+% Early Package loads [[[2
+\usepackage[main=english]{babel}
+\usepackage[T1]{fontenc}
+\DocumentStyle{internal/load font}
 
 % Load packages [[[1
 \input{common_packages.tex}
 \input{common_packages_late.tex}
 
 % Configure packages, define commands [[[1
+
+% Generic layout-related packages [[[2
+\usepackage[strict]{changepage}
+\IfPresentationF{\usepackage{sidenotes}}
+
+% Footnotes [[[2
+\usepackage{bigfoot}
+\DeclareNewFootnote{default}[alph]
+
+% Citations [[[2
+\let\footnote\footnotedefault
+\let\footnotemark\footnotemarkdefault
+\let\footnotetext\footnotetextdefault
+\DeclareNewFootnote{Cite}
+
+% Layout for KOMA [[[2
+\IfDocTypeT{book}
+  {
+    % Fix chapter/section titles defaulting to sans (i.e. CM) fonts
+    \setkomafont{disposition}{\normalfont\bfseries}
+    \KOMAoptions{headings=normal}
+    % Fix fonts in the toc
+    \setkomafont{chapterentry}{\normalfont\bfseries}
+    % fix item font in descriptions and enumerates
+    \setkomafont{descriptionlabel}{\normalfont\bfseries}
+    \setkomafont{labelinglabel}{\normalfont\bfseries}
+    % Suppress warnings on font fallback
+    \renewcommand\labelitemi{{\fontfamily{cmr}\selectfont\textbullet}}
+    \renewcommand\labelitemiii{{\fontfamily{cmr}\selectfont\textasteriskcentered}}
+    \renewcommand\labelitemiv{{\fontfamily{cmr}\selectfont\textperiodcentered}}
+    %
+    % Titlepage
+    \KOMAoptions{titlepage=firstiscover}
+    %
+    % Footnotes
+    \KOMAoptions{footnotes=multiple}
+    \renewcommand{\multfootsep}{,}
+    %
+    % Header/Footer
+    \usepackage[draft=false]{scrlayer-scrpage}
+    \pagestyle{scrheadings}
+    \automark[chapter]{chapter}
+    \automark*[section]{}
+    \ihead{}
+    \chead{\headmark}
+    \ohead{\pagemark}
+    \ifoot{}
+    \cfoot{}
+    \ofoot{}
+    %\KOMAoptions{headsepline=true}
+    %\KOMAoptions{footsepline=:0.5\textwidth, olines}
+  }
+
 % Colors [[[2
+\usepackage{xcolor}
 % define a few highlighting colors, from https://personal.sron.nl/~pault/
 \definecolor{marklightblue}{HTML}{BBCCEE}
 \definecolor{marklightteal}{HTML}{CCEEFF}
@@ -158,6 +286,63 @@
 \newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
 \newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
 
+% Figures, tables, ... [[[2
+\DeclareCaptionStyle{myfigure}{font=footnotesize,%
+                               labelfont=sc,%
+                               }
+\captionsetup{style=myfigure}  % default
+
+\IfPresentationF
+  {
+    \DeclareCaptionJustification{raggedoutside}{\raggedoutside}
+    \newcommand\raggedoutside
+      {%
+        \checkoddpage%
+        \ifoddpage%
+          \RaggedRight%
+        \else%
+          \RaggedLeft%
+        \fi%
+      }
+
+  \NewDocumentEnvironment{flushinside}{}
+    {%
+      \checkoddpage%
+      \bgroup%
+      \ifoddpage%
+        \flushleft%
+      \else%
+        \flushright%
+      \fi%
+    }
+    {%
+      \egroup%
+    }
+
+  \DeclareCaptionStyle{marginfigure}{justification=raggedoutside,%
+                                     font=footnotesize,%
+                                     labelfont=sc,%
+                                     }
+
+  \DeclareCaptionStyle{margintable}{justification=raggedoutside,%
+                                    font=footnotesize,%
+                                    labelfont=sc,%
+                                    }
+
+  \DeclareCaptionStyle{sidecaption}{justification=raggedoutside,%
+                                    font=footnotesize,%
+                                    labelfont=sc,%
+                                    }
+  \newlength{\realmarginparwidth}
+  \setlength{\realmarginparwidth}{\marginparwidth}
+  \addtolength{\realmarginparwidth}{\marginparsep}
+
+  \DeclareCaptionStyle{widetable}{%justification=raggedoutside,%
+                                  font=footnotesize,%
+                                  labelfont=sc,%
+                                  margin={0pt, \realmarginparwidth}
+                                  }
+  }
 
 % Hyperlinks [[[2
 \hypersetup{%
@@ -203,5 +388,39 @@
 %\showlabels{cite}
 %\showlabels{ref}
 %\showlabels{begin}
+
+\newcounter{todonotecounter}
+\NewDocumentCommand \margintodo {s o m} 
+  {
+    \stepcounter{todonotecounter}
+    \IfBooleanTF{#1}{}{%
+      \marginpar{%
+        \IfValueT{#2}{\vspace{#2}}%
+        \raggedoutside
+        \footnotesize%
+        \fcolorbox{red}{white}{\color{red} \thetodonotecounter}%
+        #3%
+      }
+    }
+  }
+
+
+% Math [[[2
+\IfDocTypeTF{book}
+  {\numberwithin{equation}{chapter}}
+  {\numberwithin{equation}{section}}
+
+%\MathStyle
+%  {
+%    integrate/displayfunc=outset,
+%    vecdisplay=bold,
+%  }
+
+% TODO: remember to set locale correctly!!
+%\sisetup{%
+%  separate-uncertainty=true,
+%  %locale = DE,
+%  %per-mode = symbol
+%}
 
 % vim: ts=2 sw=2 et fdm=marker fmr=[[[,]]]:

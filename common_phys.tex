@@ -16,6 +16,8 @@
 \usepackage{isotope}
 % silence compatibility warning by specifying a version.
 \usepackage[version=4]{mhchem}
+\providecommand\isomerslash{\textnormal{ / }\allowbreak}
+\providecommand\isomer[1]{\cesplit{{\/}{\c{isomerslash}}}{#1}}
 
 % dirac notation
 \usepackage{braket}

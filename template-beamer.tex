@@ -1,4 +1,6 @@
+\RequirePackage[hyphens]{url}  % preven option clash from beamer/hyperref. Ugly.
 \documentclass{beamer}
+\documentclass[hideallsubsections,english,ngerman,usepdftitle=false]{beamer} % [handout]
 
 \mode<presentation>{%
   \usetheme{metropolis}  % comes with a color theme
@@ -7,11 +9,16 @@
   \usetheme{Szeget}  % almost like 'Dresden', more minimalistic
   \usetheme{Montpellier}
   \usetheme{Rochester}
+  \usetheme{Goettingen}
 
   \usecolortheme{beaver}
 
   %\setbeamercovered{transparent}
 }
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{footline}[frame number]
 
 
 \usepackage[english]{babel}
@@ -19,6 +26,63 @@
 
 \usepackage{lmodern}
 \usepackage[T1]{fontenc}
+
+%\AtBeginSection[]{
+%  \begin{frame}
+%  \vfill
+%  \centering
+%  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+%    %\usebeamerfont{title}\insertsectionhead\par%
+%    \usebeamerfont{title}\secname\par%
+%  \end{beamercolorbox}
+%  \vfill
+%  \end{frame}
+%}
+\newenvironment{slide}{%
+  \begin{frame}[environment=slide,fragile]
+    % \secname and \subsecname are not documented. \insertsection and
+    % \insertsubsection include font changes though (at least color schemes
+    % are broken if using them...)
+    \frametitle[]{\secname}
+    \framesubtitle{\subsecname}
+  }{%
+  \end{frame}
+}
+\newenvironment{topslide}{%
+  \begin{frame}[t,environment=topslide,fragile]
+    % \secname and \subsecname are not documented. \insertsection and
+    % \insertsubsection include font changes though (at least color schemes
+    % are broken if using them...)
+    \frametitle[]{\secname}
+    \framesubtitle{\subsecname}
+  }{%
+  \end{frame}
+}
+
+% Additional packages ----------------------------------------------
+
+%\usepackage{geometry}
+%\usepackage{pdfpages}
+%\usepackage{footmisc}
+%\usepackage{multirow}
+%\usepackage{relsize}
+
+\usepackage{empheq}
+\definecolor{myblue}{rgb}{.8, .8, 1}
+\newcommand*\mybluebox[1]{%
+\colorbox{myblue}{\hspace{1em}#1\hspace{1em}}}
+
+% Document-specific configuration ---------------------------------------------
+
+\newcommand{\Title}{}
+\hypersetup{%
+  pdftitle = {\Title},
+  pdfsubject = {B.Sc. Thesis},
+  %pdfauthor = {Someone},
+  pdfkeywords = {},
+  baseurl = {},
+  %pdfdisplaydoctitle = true
+}
 
 \title[Short Paper Title, optional]{Presentation Title}
 %\subtitle{Presentation Subtitle}
@@ -97,6 +161,18 @@
 
 \begin{frame}{Summary}
 \end{frame}
+
+\begin{appendix}
+
+\section*{References}
+\begin{frame}[allowframebreaks]
+ \frametitle{References}
+ \tiny
+ \setbeamertemplate{bibliography item}[text]
+ \printbibliography
+\end{frame}
+  
+\end{appendix}
 
 
 \end{document}
