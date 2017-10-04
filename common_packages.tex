@@ -22,9 +22,9 @@
 
 
 % Misc [[[1
-\usepackage[inline]{enumitem}
+\ifnotbeamer{\usepackage[inline]{enumitem}}  % doesn't play well with overlay specifications
 \usepackage{float}  %
-\usepackage{xparse}
+%\usepackage{xparse}
 \usepackage{calc}
 %\usepackage{fancyhdr}  %
 \usepackage{ragged2e}
@@ -35,7 +35,7 @@
 
 
 % Hyperlinks [[[1
-\usepackage[hyphens]{url}
+\ifnotbeamer{\usepackage[hyphens]{url}}  % loaded early by hyperref which is loaded way to early by beamer...
 %\usepackage{hyperref}
 
 
@@ -49,11 +49,13 @@
 
 % Graphics [[[1
 \usepackage{graphicx}  % advanced key=value arguments for \includegraphics
+\usepackage{caption}
+\usepackage{subcaption}
 
 
 % Bibliography [[[1
 % many of these options can only be given in \usepackage and not later, unfortunately..
-\usepackage[hyperref=true,
+\ifnotbeamer{\usepackage[hyperref=true,
             backref=true,
             %bibstyle=authoryear,
             bibstyle=numeric,
@@ -65,7 +67,17 @@
             url=false,
             isbn=false,%  DOI only
             maxcitenames=3,
-            maxbibnames=100]{biblatex}
+            maxbibnames=3]{biblatex}
+        }
+\ifbeamer{\usepackage[hyperref=true,
+            backref=true,
+            style=alphabetic,
+            citereset=section,
+            url=false,
+            isbn=false,%  DOI only
+            maxcitenames=3,
+            maxbibnames=3]{biblatex}
+        }
 
 
 % New packages to investigate [[[1
@@ -75,7 +87,6 @@
 %\usepackage{geometry}
 %\usepackage{pdfpages}
 %\usepackage{cite}  % better support for numeric citations
-%\usepackage{caption}
 %\usepackage{longtable}  % wrap tables at page boundaries, succeeds supertabular
 %\usepackage{supertabular}  % wrap tables at page boundaries
 %\usepackage{wrapfig}
