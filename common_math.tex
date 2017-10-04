@@ -192,6 +192,22 @@
 
 \DeclareDocumentCommand\Int{}{\Integrate}
 
+% COOL prints the '=' also if the second argument is empty...
+\NewDocumentCommand\SumInternal{m m m m}{%
+    \sum%
+    \IfValueT{#2}{_%
+        {#2\IfValueT{#3}{%
+            \if\relax\detokenize{#3}\relax%
+            \else%
+                = #3%
+            \fi}}%
+        }%
+    \IfValueT{#4}{^{#4}}%
+    #1%
+}
+\DeclareDocumentCommand\Sum{m >{\SplitArgument{2}{,}}m}{%
+    \SumInternal{#1}#2
+}
 
 % combinatorics [[[1
 % \bincoef{N \\ k}
