@@ -54,9 +54,13 @@
     {}%
     {\xappto\cbx@citehook{%
        \noexpand\footnotetextCite[\thefield{labelnumber}]{%
-         \usedriver{}{\thefield{entrytype}}\usebibmacro{postnote}.}}}}
-         %\fullcite{\thefield{entrykey}}\usebibmacro{finentry}}}}}%
-   %\show\fullcite\fullcite{\thefield{entrykey}}\usebibmacro{postnote}\usebibmacro{finentry}}}}}%
+         \entrydata{\thefield{entrykey}}{%
+           %\usedriver{}{\thefield{entrytype}}\printfield{postnote}.}%
+           \usedriver{}{\thefield{entrytype}}}%
+         }%
+       }%
+     }%
+}
 
 %==========================================================%
 % \DeclareCiteCommand below creates a citation with the  
