@@ -14,10 +14,6 @@
 % Variants [[[1
 \cs_generate_variant:Nn \clist_use:Nn {nn}
 
-% Common messages [[[1
-\msg_new:nnn { wisper } { unknown-choice }
-  { Unknown~#1~'#2'.~Valid~choices~are~\clist_use:nn{#3}{,~}. }
-
 % Debugging helpers [[[1
 \prg_new_conditional:Nnn \__wisper_if_debug:
   { p, T, F, TF}
@@ -25,6 +21,50 @@
     % TODO: configurable
     \prg_return_true:
   }
+
+% Common messages [[[1
+\msg_new:nnn { wisper } { unknown-choice }
+  { Unknown~#1~'#2'.~Valid~choices~are~\clist_use:nn{#3}{,~}. }
+
+% Common helper functions for package and document class loading [[[1
+% Helper function to get the square brackets for passing optional arguments.
+\cs_new:Npn \__wisper_load_with_optional_arg_aux:Nnn #1#2#3
+  {
+    #1[#2]{#3}
+  }
+
+% Helper function to transform the class option property list into a clist.
+\cs_new:Npn \__wisper_build_clist_from_prop:NN #1#2
+  {
+    \prop_map_inline:Nn #1
+      {
+        \clist_put_right:Nx #2
+          {
+            \str_if_eq:nnTF {##2} {}
+              {##1,}
+              {##1=##2,}
+          }
+      }
+  }
+
+\cs_new:Npn \__wisper_load_with_optional_arg:NNN #1#2#3
+  {
+    \clist_new:N \l__wisper_optional_arg_clist
+    \__wisper_build_clist_from_prop:NN #2 \l__wisper_optional_arg_clist
+    \__wisper_if_debug:T
+      {
+        \clist_show:N \l__wisper_optional_arg_clist
+        \str_show:N #3
+      }
+    \exp_args:Noo \__wisper_load_with_optional_arg_aux:Nnn #1
+      {
+        \clist_use:Nn \l__wisper_optional_arg_clist { ,~ }
+      }
+      {
+        \str_use:N #3
+      }
+  }
+\cs_generate_variant:Nn \__wisper_load_with_optional_arg:NNN { NNn }
 
 % Convenience funtions for the key-value interface [[[1
 \cs_new:Npn \__wisper_keys_define:n #1 { \keys_define:nn { wisper } {#1} }
@@ -54,43 +94,13 @@
 \str_new:N \g__wisper_classname_str
 \prop_new:N \g__wisper_classopts_prop
 
-% Helper function to get the square brackets.
-\cs_new:Npn \__wisper_load_document_class_aux:nn #1#2
-  {
-    \documentclass[#1]{#2}
-  }
-
-% Helper function to transform the class option property list into a clist.
-\clist_new:N \g__wisper_classopts_clist
-\cs_new:Npn \__wisper_build_classopts_clist:
-  {
-    \prop_map_inline:Nn \g__wisper_classopts_prop
-      {
-        \clist_put_right:Nx \g__wisper_classopts_clist
-          {
-            \str_if_eq:nnTF {##2} {}
-              {##1,}
-              {##1=##2,}
-          }
-      }
-  }
-
-% Top-level document class loader.
+% Document class loader.
 \cs_new:Nn \__wisper_load_document_class:
   {
-    \__wisper_build_classopts_clist:
-    \__wisper_if_debug:T
-      {
-        \clist_show:N \g__wisper_classopts_clist
-        \str_show:N \g__wisper_classname_str
-      }
-    \exp_args:Noo \__wisper_load_document_class_aux:nn
-      {
-        \clist_use:Nn \g__wisper_classopts_clist { ,~ }
-      }
-      {
-        \str_use:N \g__wisper_classname_str
-      }
+    \__wisper_load_with_optional_arg:NNN
+      \documentclass
+      \g__wisper_classopts_prop
+      \g__wisper_classname_str
   }
 
 % Conditional for the document class.
@@ -109,6 +119,52 @@
           { \prg_return_true: }
           { \prg_return_false: }
       }
+  }
+
+% Package declaration [[[1
+\cs_new:Npn \__wisper_declare_package:n #1
+  {
+    \prop:new:N \g_wisper_package_options_#1_prop
+    \__wisper_define_keys_doc:n
+      {
+        packages/#1/enable .bool_set:n = \g__wisper_package_load_#1,
+        packages/#1/enable .initial = {true|false},
+        packages/#1/options / unknown .code:n =
+          {
+            \prop_put:NVn \g__wisper_package_options_#1_prop
+              \l_keys_key_tl
+              {#1}
+          }
+        packages/#1/conflicts / classes .tl_set:N = \g__wisper_package_#1_conflicting_classes,
+        packages/#1/conflicts / packages .tl_set:N = \g__wisper_package_#1_conflicting_packages,
+        packages/#1/conflicts / classes .initial:n = {koma},
+        packages/#1/conflicts / packages .initial:n = {},
+
+        % e.g. document classes can prevent loading a package, should raise an
+        % error if enabled explicitly in some place.
+        packages/#1/deactivate .bool_set:n = \g__wisper_package_deactivated_#1,
+      }
+  }
+
+\cs_new:Npn \__wisper_enable_package:n #1
+  {
+    \__wisper_define_keys_doc:n
+      {
+        packages/#1/enable = true,
+      }
+  }
+
+\cs_new:Npn \__wisper_set_package_options:nn #1#2
+  {
+    \__wisper_set_keys_doc:nn { packages/#1/options } {#2}
+  }
+
+\cs_new:Npn \__wisper_load_package:n #1
+  {
+    \__wisper_load_with_optional_arg:NNn
+      \usepackage
+      \g__wisper_package_options_#1_prop
+      {#1}
   }
  
 % TODO: require values for paper, languages, landscape, type. Or somehow
