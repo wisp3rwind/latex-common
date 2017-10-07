@@ -5,14 +5,20 @@
 % TODO: support passing style options to most of the commands, 
 %       e.g. \vc[vecdisplay=bm]{x}
 
-% Use pgfkeys for everything [[[1
-% Early packages loads required for handling the configuration.
-\RequirePackage{xparse}
-% TODO: ifs for: luatex, xelatex, beamer
 
-% Key-value interface: convenient access to the namespace
+% Early packages loads required for handling the configuration [[[1
+\RequirePackage{xparse}  % includes the l3 kernel
+
 \ExplSyntaxOn
 
+% Variants [[[1
+\cs_generate_variant:Nn \clist_use:Nn {nn}
+
+% Common messages [[[1
+\msg_new:nnn { wisper } { unknown-choice }
+  { Unknown~#1~'#2'.~Valid~choices~are~\clist_use:nn{#3}{,~}. }
+
+% Debugging helpers [[[1
 \prg_new_conditional:Nnn \__wisper_if_debug:
   { p, T, F, TF}
   { 
@@ -20,6 +26,7 @@
     \prg_return_true:
   }
 
+% Convenience funtions for the key-value interface [[[1
 \cs_new:Npn \__wisper_keys_define:n #1 { \keys_define:nn { wisper } {#1} }
 
 \cs_new:Npn \__wisper_keys_define_internal:n #1 { \keys_define:nn { wisper/internal } {#1} }
@@ -35,6 +42,7 @@
 \cs_new:Npn \__wisper_keys_set_code:n #1 { \keys_set:nn { wisper/code } {#1} }
 \cs_new:Npn \__wisper_keys_set_phys:n #1 { \keys_set:nn { wisper/physics } {#1} }
 
+% User-accessible aliases.
 \NewDocumentCommand \DocumentStyle {m} { \keys_set:nn { wisper/document } {#1} }
 %\NewDocumentCommand \MathStyle {m} { \keys_set:nn { wisper/math } {#1} }
 %\NewDocumentCommand \CodeStyle {m} { \keys_set:nn { wisper/code } {#1} }
@@ -163,11 +171,6 @@
     %  }
   }
 
-\cs_generate_variant:Nn \clist_use:Nn {nn}
-
-\msg_new:nnn { wisper } { unknown-choice }
-  { Unknown~#1~'#2'.~Valid~choices~are~\clist_use:nn{#3}{,~}. }
-
 \msg_new:nnn { wisper } { unknown-font }
   { Unknown~font~preset~'#1'. }
 
@@ -204,9 +207,9 @@
 \cs_new_eq:NN \IfDocClassF \__wisper_if_document_class:nF
 \cs_new_eq:NN \IfDocClassTF \__wisper_if_document_class:nTF
 
-% Define the key-value interface [[[1
-% Font handling [[[2
+% Font handling [[[1
 
+% Property list to hold the loading code [[[2
 \prop_new:N \__wisper_font_presets_prop
 \prop_put:Nnn \__wisper_font_presets_prop { lmodern } % [[[3
   {
@@ -262,7 +265,7 @@
     \linespread{1.05} 
   }
 
-% Font preset selection [[[3
+% Interface for font preset selection [[[2
 \tl_new:N \g__wisper_font_preset_code_tl
 \cs_new:Nn \__wisper_load_font:
   {
@@ -285,18 +288,7 @@
     font/preset .initial:n = {TexGyre},
   }
 
-%\mhchemoptions{textfontcommand=\liningnumtext}
-%\IfPresentationT{\renewcommand*{\bibfont}{\scriptsize}}
-
-% Adjust layout.
-\__wisper_if_document_class:nT {koma}
-  { \KOMAoptions{DIV=last} }
-
-\ExplSyntaxOff
-
-% Footnotes [[[2
-
-\ExplSyntaxOn
+% Footnotes [[[1
 
 \bool_new:N \g__wisper_footnotes_multiple_bool
 \__wisper_keys_define_doc:n
@@ -304,10 +296,7 @@
     footnotes/multiple .bool_gset:N = \g__wisper_footnotes_multiple_bool,
   }
 
-\ExplSyntaxOff
-
-% Citations [[[2
-\ExplSyntaxOn
+% Citations [[[1
 \__wisper_keys_define_doc:n
   {
     cite/style .choice:,
@@ -320,8 +309,7 @@
       },
   }
 
-
-% Tufte-style [[[2
+% Tufte-style [[[1
 \__wisper_keys_define_doc:n
   {
     tufte .meta:n =
@@ -341,11 +329,8 @@
       },
   }
 
-\ExplSyntaxOff
-
 % Load all the things [[[1
 % Document class [[[2
-\ExplSyntaxOn
 \DocumentStyle{type=scrbook}
 \__wisper_load_document_class:
 
@@ -353,6 +338,10 @@
 \usepackage[main=english]{babel}
 \usepackage[T1]{fontenc}
 \__wisper_load_font:
+% Adjust layout.
+\__wisper_if_document_class:nT {koma}
+  { \KOMAoptions{DIV=last} }
+
 
 % Load packages [[[2
 \DocumentStyle{internal/load sidenotes}
@@ -458,6 +447,9 @@
 %\usepackage[inner]{showlabels}
 
 % Configure packages, define commands [[[1
+
+%\mhchemoptions{textfontcommand=\liningnumtext}
+%\IfPresentationT{\renewcommand*{\bibfont}{\scriptsize}}
 
 % Generic layout-related packages [[[2
 % TODO: if twoside, maybe only if sidenotes/book?
