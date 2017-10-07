@@ -49,15 +49,8 @@
 %\NewDocumentCommand \PhysStyle {m} { \keys_set:nn { wisper/phys } {#1} }
 
 % Document class [[[1
-% Conditionals and switches [[[2
-% should accept article, book, presentation, letter
-%\prop_new:N \g__wisper_document_class_prop
-%\prop_gput:Nnn \g__wisper_document_class_prop {article}{\documentclass[a4paper]{article}}
-%\prop_gput:Nnn \g__wisper_document_class_prop {presentation}{\documentclass{beamer}}
-%\prop_gput:Nnn \g__wisper_document_class_prop {letter}{\documentclass{scrlttr2}}
-%\prop_gput:Nnn \g__wisper_document_class_prop {book}{\documentclass{book}}
-%\prop_gput:Nnn \g__wisper_document_class_prop {scrbook}{\documentclass[english, ngerman, a4paper, BCOR=0mm, DIV=10, pagesize]{scrbook}}
 
+% Load code [[[2
 % Global storage for class name and options.
 \str_new:N \g__wisper_classname_str
 \prop_new:N \g__wisper_classopts_prop
@@ -103,7 +96,7 @@
 % support default values?
 % -> Ensure that all keys can be set multiple times without issues.
 
-% Key-value interface to pre-defined document layouts ('document types').
+% Key-value interface to pre-defined document layouts ('document types'). [[[2
 \__wisper_keys_define_doc:n
   {
     paper .choices:nn =
@@ -161,19 +154,9 @@
           {#1}
           { article, presentation, letter, book, scrbook } % TODO: Don't hardcode
       },
-
-    %type .code:n =
-    %  {
-    %    \prop_get:NnTF
-    %    \g__wisper_document_class_prop {#1} \l__wisper_document_class_tl
-    %    { \tl_use:N \l__wisper_document_class_tl }
-      %    { \msg_error:nnnn { wisper } { unknown-doc-type } {#1} {}}
-    %  }
   }
 
-\msg_new:nnn { wisper } { unknown-font }
-  { Unknown~font~preset~'#1'. }
-
+% Conditionals [[[2
 \prg_new_conditional:Npnn \__wisper_if_document_type:n #1
   { p, T, F, TF}
   { 
@@ -199,6 +182,7 @@
       }
   }
 
+% User-accessible aliases.
 \cs_new_eq:NN \IfDocTypeT \__wisper_if_document_type:nT
 \cs_new_eq:NN \IfDocTypeF \__wisper_if_document_type:nF
 \cs_new_eq:NN \IfDocTypeTF \__wisper_if_document_type:nTF
