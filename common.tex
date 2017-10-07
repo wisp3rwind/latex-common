@@ -182,9 +182,18 @@
 \prg_new_conditional:Npnn \__wisper_if_document_class:n #1
   { p, T, F, TF}
   { 
-    \clist_if_in:nVTF {#1} \g__wisper_classname_str 
-      { \prg_return_true: }
-      { \prg_return_false: }
+    \str_if_eq:nnTF {#1} {koma}
+      {
+        % koma is an alias for any KOMA-script class
+        \__wisper_if_document_class:nTF { scrartcl, scrbook, scrreprt, scrlttr2 }
+          { \prg_return_true: }
+          { \prg_return_false: }
+      }
+      {
+        \clist_if_in:nVTF {#1} \g__wisper_classname_str 
+          { \prg_return_true: }
+          { \prg_return_false: }
+      }
   }
 
 % TODO: support IfDocTypeTF{article,book}, i.e. comma-separated list
@@ -306,7 +315,7 @@
 %\IfPresentationT{\renewcommand*{\bibfont}{\scriptsize}}
 
 % Adjust layout.
-\__wisper_if_document_class:nT {scrartcl, scrbook, scrlttr2}
+\__wisper_if_document_class:nT {koma}
   { \KOMAoptions{DIV=last} }
 
 \ExplSyntaxOff
@@ -393,7 +402,7 @@
 \DeclareNewFootnote{Cite}
 
 % Layout for KOMA [[[2
-\IfDocTypeT{book}
+\IfDocTypeT{koma}
   {
     % Fix chapter/section titles defaulting to sans (i.e. CM) fonts
     \setkomafont{disposition}{\normalfont\bfseries}
