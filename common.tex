@@ -7,29 +7,182 @@
 
 % Use pgfkeys for everything [[[1
 % Early packages loads required for handling the configuration.
-\RequirePackage{pgfkeys}
 \RequirePackage{xparse}
-\RequirePackage{ifxetex}
-\RequirePackage{ifluatex}
 % TODO: ifs for: luatex, xelatex, beamer
 
 % Key-value interface: convenient access to the namespace
 \ExplSyntaxOn
 
-\cs_new:Npn \__wisper_keys:n #1 { \pgfkeys{/wisper/.cd,#1} }
-\cs_new:Npn \__wisper_doc_style:n #1 { \pgfkeys{/wisper/document/.cd,#1} }
+\prg_new_conditional:Nnn \__wisper_if_debug:
+  { p, T, F, TF}
+  { 
+    % TODO: configurable
+    \prg_return_true:
+  }
 
-\cs_new_eq:NN \DocumentStyle \__wisper_doc_style:n
+\cs_new:Npn \__wisper_keys_define:n #1 { \keys_define:nn { wisper } {#1} }
+
+\cs_new:Npn \__wisper_keys_define_internal:n #1 { \keys_define:nn { wisper/internal } {#1} }
+\cs_new:Npn \__wisper_keys_define_doc:n #1 { \keys_define:nn { wisper/document } {#1} }
+\cs_new:Npn \__wisper_keys_define_doc:nn #1#2 { \keys_define:nn { wisper/document/#1 } {#2} }
+\cs_new:Npn \__wisper_keys_define_math:n #1 { \keys_define:nn { wisper/mathematics } {#1} }
+\cs_new:Npn \__wisper_keys_define_code:n #1 { \keys_define:nn { wisper/code } {#1} }
+\cs_new:Npn \__wisper_keys_define_phys:n #1 { \keys_define:nn { wisper/physics } {#1} }
+
+\cs_new:Npn \__wisper_keys_set_internal:n #1 { \keys_set:nn { wisper/internal } {#1} }
+\cs_new:Npn \__wisper_keys_set_doc:n #1 { \keys_set:nn { wisper/document } {#1} }
+\cs_new:Npn \__wisper_keys_set_math:n #1 { \keys_set:nn { wisper/mathematics } {#1} }
+\cs_new:Npn \__wisper_keys_set_code:n #1 { \keys_set:nn { wisper/code } {#1} }
+\cs_new:Npn \__wisper_keys_set_phys:n #1 { \keys_set:nn { wisper/physics } {#1} }
+
+\NewDocumentCommand \DocumentStyle {m} { \keys_set:nn { wisper/document } {#1} }
+%\NewDocumentCommand \MathStyle {m} { \keys_set:nn { wisper/math } {#1} }
+%\NewDocumentCommand \CodeStyle {m} { \keys_set:nn { wisper/code } {#1} }
+%\NewDocumentCommand \PhysStyle {m} { \keys_set:nn { wisper/phys } {#1} }
 
 % Document class [[[1
 % Conditionals and switches [[[2
 % should accept article, book, presentation, letter
-\__wisper_doc_style:n {type/.initial=article}
+%\prop_new:N \g__wisper_document_class_prop
+%\prop_gput:Nnn \g__wisper_document_class_prop {article}{\documentclass[a4paper]{article}}
+%\prop_gput:Nnn \g__wisper_document_class_prop {presentation}{\documentclass{beamer}}
+%\prop_gput:Nnn \g__wisper_document_class_prop {letter}{\documentclass{scrlttr2}}
+%\prop_gput:Nnn \g__wisper_document_class_prop {book}{\documentclass{book}}
+%\prop_gput:Nnn \g__wisper_document_class_prop {scrbook}{\documentclass[english, ngerman, a4paper, BCOR=0mm, DIV=10, pagesize]{scrbook}}
+
+% Global storage for class name and options.
+\str_new:N \g__wisper_classname_str
+\prop_new:N \g__wisper_classopts_prop
+
+% Helper function to get the square brackets.
+\cs_new:Npn \__wisper_load_document_class_aux:nn #1#2
+  {
+    \documentclass[#1]{#2}
+  }
+
+\clist_new:N \g__wisper_classopts_clist
+\cs_new:Npn \__wisper_build_classopts_clist:
+  {
+    \prop_map_inline:Nn \g__wisper_classopts_prop
+      {
+        \clist_put_right:Nx \g__wisper_classopts_clist
+          {
+            \str_if_eq:nnTF {##2} {}
+              {##1,}
+              {##1=##2,}
+          }
+      }
+  }
+
+\cs_new:Nn \__wisper_load_document_class:
+  {
+    \__wisper_build_classopts_clist:
+    \__wisper_if_debug:T
+      {
+        \clist_show:N \g__wisper_classopts_clist
+        \str_show:N \g__wisper_classname_str
+      }
+    \exp_args:Noo \__wisper_load_document_class_aux:nn
+      {
+        \clist_use:Nn \g__wisper_classopts_clist { ,~ }
+      }
+      {
+        \str_use:N \g__wisper_classname_str
+      }
+  }
+ 
+% TODO: require values for paper, languages, landscape, type. Or somehow
+% support default values?
+% -> Ensure that all keys can be set multiple times without issues.
+
+% Key-value interface to pre-defined document layouts ('document types').
+\__wisper_keys_define_doc:n
+  {
+    paper .choices:nn =
+      { a4paper, a5paper }
+      {
+        \prop_put:NnV \g__wisper_classopts_prop \l_keys_choice_tl
+      },
+    paper / unknown .code:n =
+      {
+        \msg_error:nnnn { wisper } { unknown-choice }
+          { paper~format }
+          {#1}
+          { a4paper, a5paper} % TODO: Don't hardcode
+      },
+    languages .initial:n = {english},
+    %landscape .bool:,
+
+    type .choice:,
+    type / article .code:n = 
+      {
+        \str_set:Nn \g__wisper_document_type_str {article}
+        \str_set:Nn \g__wisper_classname_str {article}
+        \prop_put:Nnn \g__wisper_classopts_prop {a4paper} {}
+      },
+    type / presentation .code:n = 
+      {
+        \str_set:Nn \g__wisper_document_type_str {presentation}
+        \str_set:Nn \g__wisper_classname_str {beamer}
+      },
+    type / letter .code:n = 
+      {
+        \str_set:Nn \g__wisper_document_type_str {letter}
+        \str_set:Nn \g__wisper_classname_str {scrlttr2}
+        \prop_put:Nnn \g__wisper_classopts_prop {a4paper} {}
+      },
+    type / book .code:n = 
+      {
+        \str_set:Nn \g__wisper_document_type_str {book}
+        \str_set:Nn \g__wisper_classname_str {book}
+        \prop_put:Nnn \g__wisper_classopts_prop {a4paper} {}
+      },
+    type / scrbook .code:n = 
+      {
+        \str_set:Nn \g__wisper_document_type_str {scrbook}
+        \str_set:Nn \g__wisper_classname_str {scrbook}
+        \prop_put:Nnn \g__wisper_classopts_prop {a4paper} {}
+        \prop_put:Nnn \g__wisper_classopts_prop {BCOR} {0mm}
+        \prop_put:Nnn \g__wisper_classopts_prop {DIV} {10}
+        \prop_put:Nnn \g__wisper_classopts_prop {pagesize} {}
+      },
+    type / unknown .code:n =
+      {
+        \msg_error:nnnn { wisper } { unknown-choice }
+          { document~type }
+          {#1}
+          { article, presentation, letter, book, scrbook } % TODO: Don't hardcode
+      },
+
+    %type .code:n =
+    %  {
+    %    \prop_get:NnTF
+    %    \g__wisper_document_class_prop {#1} \l__wisper_document_class_tl
+    %    { \tl_use:N \l__wisper_document_class_tl }
+      %    { \msg_error:nnnn { wisper } { unknown-doc-type } {#1} {}}
+    %  }
+  }
+
+\cs_generate_variant:Nn \clist_use:Nn {nn}
+
+\msg_new:nnn { wisper } { unknown-choice }
+  { Unknown~#1~'#2'.~Valid~choices~are~\clist_use:nn{#3}{,~}. }
+
+\msg_new:nnn { wisper } { unknown-font }
+  { Unknown~font~preset~'#1'. }
+
 \prg_new_conditional:Npnn \__wisper_if_document_type:n #1
-  { T, F, TF}
+  { p, T, F, TF}
   { 
-    \__wisper_doc_style:n {type/.get=\tempa}
-    \str_if_eq:nVTF {#1} \tempa
+    \clist_if_in:nVTF {#1} \g__wisper_document_type_str
+      { \prg_return_true: }
+      { \prg_return_false: }
+  }
+
+\prg_new_conditional:Npnn \__wisper_if_document_class:n #1
+  { p, T, F, TF}
+  { 
+    \clist_if_in:nVTF {#1} \g__wisper_classname_str 
       { \prg_return_true: }
       { \prg_return_false: }
   }
@@ -39,30 +192,34 @@
 \cs_new_eq:NN \IfDocTypeF \__wisper_if_document_type:nF
 \cs_new_eq:NN \IfDocTypeTF \__wisper_if_document_type:nTF
 
-% TODO: automate the following definitions
-\cs_new:Npn \IfPresentationT #1 { \__wisper_if_document_type:nT {presentation} {#1} }
-\cs_new:Npn \IfPresentationF #1 { \__wisper_if_document_type:nF {presentation} {#1} }
-\cs_new:Npn \IfPresentationTF #1#2 { \__wisper_if_document_type:nTF {presentation} {#1} {#2} }
+\cs_new_eq:NN \IfDocClassT \__wisper_if_document_class:nT
+\cs_new_eq:NN \IfDocClassF \__wisper_if_document_class:nF
+\cs_new_eq:NN \IfDocClassTF \__wisper_if_document_class:nTF
 
-\cs_new:Npn \IfLetterT #1 { \__wisper_if_document_type:nT {letter} {#1} }
-\cs_new:Npn \IfLetterF #1 { \__wisper_if_document_type:nF {letter} {#1} }
-\cs_new:Npn \IfLetterTF #1#2 { \__wisper_if_document_type:nTF {letter} {#1} {#2} }
+%% TODO: automate the following definitions
+%\cs_new:Npn \IfPresentationT #1 { \__wisper_if_document_type:nT {presentation} {#1} }
+%\cs_new:Npn \IfPresentationF #1 { \__wisper_if_document_type:nF {presentation} {#1} }
+%\cs_new:Npn \IfPresentationTF #1#2 { \__wisper_if_document_type:nTF {presentation} {#1} {#2} }
 
-\cs_new:Npn \IfArticleT #1 { \__wisper_if_document_type:nT {article} {#1} }
-\cs_new:Npn \IfArticleF #1 { \__wisper_if_document_type:nF {article} {#1} }
-\cs_new:Npn \IfArticleTF #1#2 { \__wisper_if_document_type:nTF {article} {#1} {#2} }
+%\cs_new:Npn \IfLetterT #1 { \__wisper_if_document_type:nT {letter} {#1} }
+%\cs_new:Npn \IfLetterF #1 { \__wisper_if_document_type:nF {letter} {#1} }
+%\cs_new:Npn \IfLetterTF #1#2 { \__wisper_if_document_type:nTF {letter} {#1} {#2} }
 
-\cs_new:Npn \IfBookT #1 { \__wisper_if_document_type:nT {book} {#1} }
-\cs_new:Npn \IfBookF #1 { \__wisper_if_document_type:nF {book} {#1} }
-\cs_new:Npn \IfBookTF #1#2 { \__wisper_if_document_type:nTF {book} {#1} {#2} }
+%\cs_new:Npn \IfArticleT #1 { \__wisper_if_document_type:nT {article} {#1} }
+%\cs_new:Npn \IfArticleF #1 { \__wisper_if_document_type:nF {article} {#1} }
+%\cs_new:Npn \IfArticleTF #1#2 { \__wisper_if_document_type:nTF {article} {#1} {#2} }
 
-\cs_new:Npn \SwitchDocType #1#2
-  { 
-    \__wisper_doc_style:n {type/.get=\tempa}
-    \str_case:onF \tempa
-    { #1 }  % should contain lines of {type}{code} pairs
-    { #2 }
-  }
+%\cs_new:Npn \IfBookT #1 { \__wisper_if_document_type:nT {book} {#1} }
+%\cs_new:Npn \IfBookF #1 { \__wisper_if_document_type:nF {book} {#1} }
+%\cs_new:Npn \IfBookTF #1#2 { \__wisper_if_document_type:nTF {book} {#1} {#2} }
+
+%\cs_new:Npn \SwitchDocType #1#2
+%  { 
+%    \__wisper_doc_style:n {type/.get=\tempa}
+%    \str_case:onF \tempa
+%    { #1 }  % should contain lines of {type}{code} pairs
+%    { #2 }
+%  }
 
 \ExplSyntaxOff
 
@@ -70,70 +227,87 @@
 % Font handling [[[2
 \ExplSyntaxOn
 
-\__wisper_doc_style:n
+\prop_new:N \__wisper_font_presets_prop
+\prop_put:Nnn \__wisper_font_presets_prop { lmodern } % [[[3
   {
-    font/preset/.cd,
-    .is~choice,
-
-    lmodern/.style={
-      internal/load~font/.code={
-        \usepackage{lmodern}
+    \usepackage{lmodern}
+  }
+\prop_put:Nnn \__wisper_font_presets_prop { fira } % [[[3
+  {
+    % Mozilla Fira Sans, requires XeLaTeX or LuaLaTex TODO: raise error
+    \usepackage[sfdefault]{FiraSans}
+    \usepackage{FiraMono}
+  }
+\prop_put:Nnn \__wisper_font_presets_prop { garamond } % [[[3
+  {
+    % URW-Garamond: A free garamond font, supposedly good for books but to fragile
+    %   for presentations. Math fonts provided by the mathdesign project
+    \usepackage[urw-garamond]{mathdesign}
+    % FIXME: maybe drop this? PagellaX is better anyway. At least give a
+    % warning.
+    % TODO: matching sans font
+  }
+\prop_put:Nnn \__wisper_font_presets_prop { palatino } % [[[3
+  {
+    \usepackage[osf]{mathpazo}
+  }
+\prop_put:Nnn \__wisper_font_presets_prop { TexGyre } % [[[3
+  {
+    \usepackage{amsthm}  % preload amsthm to suppress error due to newpxmath redfining \openbox
+    \usepackage[vvarbb]{newpxmath}
+    % TODO: tex/xetextex/luatex switch that is more readable
+    \sys_if_engine_luatex:TF
+      {
+        % LuaTeX
+        \usepackage[no-math]{fontspec}
+        % TODO: ensure correct small caps, \usepackage[largesc]{newpxtext}
+        \setmainfont{TeXGyrePagellaX}[Numbers=OldStyle]
+        \setsansfont{TeXGyreHeros}
+        \newfontfamily\liningnumtext{TeXGyrePagellaX}[Numbers=Lining]
       }
-    },
-
-    fira/.style={
-      internal/load~font/.code={
-        % Mozilla Fira Sans, requires XeLaTeX or LuaLaTex TODO: raise error
-        \usepackage[sfdefault]{FiraSans}
-        \usepackage{FiraMono}
+      {
+        \sys_if_engine_xetex:TF
+          {
+            % XeTeX
+            \PackageError{---}{No~XeTeX~support~here.}
+          }
+          {
+            % Other TeX
+            \usepackage[largesc]{newpxtext}
+            \useosf
+          }
       }
-    },
-
-    garamond/.style={
-      internal/load~font/.code={
-        % URW-Garamond: A free garamond font, supposedly good for books but to fragile
-        %   for presentations. Math fonts provided by the mathdesign project
-        \usepackage[urw-garamond]{mathdesign}
-        % FIXME: maybe drop this? PagellaX is better anyway. At least give a
-        % warning.
-        % TODO: matching sans font
-      }
-    },
-
-    palatino/.style={
-      internal/load~font/.code={
-        \usepackage[osf]{mathpazo}
-      }
-    },
-
-    TexGyre/.style={
-      internal/load~font/.code={
-        \usepackage{amsthm}  % preload amsthm to suppress error due to newpxmath redfining \openbox
-        \usepackage[vvarbb]{newpxmath}
-        \ifluatex
-          \usepackage[no-math]{fontspec}  % TODO: tex/luatex switch
-          % TODO: ensure correct small caps, \usepackage[largesc]{newpxtext}
-          \setmainfont{TeXGyrePagellaX}[Numbers=OldStyle]
-          \setsansfont{TeXGyreHeros}
-          \newfontfamily\liningnumtext{TeXGyrePagellaX}[Numbers=Lining]
-        \else
-          \usepackage[largesc]{newpxtext}
-          \useosf
-        \fi
-        \linespread{1.05} 
-      }
-    },
-
+    \linespread{1.05} 
   }
 
-\__wisper_doc_style:n {font/preset=TexGyre}
+% Font preset selection [[[3
+\tl_new:N \g__wisper_font_preset_code_tl
+\cs_new:Nn \__wisper_load_font:
+  {
+    \tl_use:N \g__wisper_font_preset_code_tl
+  }
+\__wisper_keys_define_doc:n
+  {
+    font/preset .code:n =
+      {
+        \prop_get:NnNF \__wisper_font_presets_prop {#1} \g__wisper_font_preset_code_tl
+          {
+            \msg_error:nnn { wisper } { unknown-choice }
+              { font~preset }
+              {#1}
+              { lmodern, fira, garamond, palatino, TexGyre }
+          }
+      },
+  }
+
+\DocumentStyle {font/preset=TexGyre}
 
 %\mhchemoptions{textfontcommand=\liningnumtext}
 %\IfPresentationT{\renewcommand*{\bibfont}{\scriptsize}}
 
 % Adjust layout.
-% TODO: only for KOMA classes
-\IfDocTypeT{book}{\KOMAoptions{DIV=last}}
+\__wisper_if_document_class:nT {scrartcl, scrbook, scrlttr2}
+  { \KOMAoptions{DIV=last} }
 
 \ExplSyntaxOff
 
@@ -141,70 +315,62 @@
 
 \ExplSyntaxOn
 
-\newif\ifmultiplefootnotes
-
-\__wisper_doc_style:n 
+\bool_new:N \g__wisper_footnotes_multiple_bool
+\__wisper_keys_define_doc:n
   {
-    footnotes/.cd,
-
-    multiple/.is~if,
-    %multiple=false,
+    footnotes/multiple .bool_gset:N = \g__wisper_footnotes_multiple_bool,
   }
 
 \ExplSyntaxOff
 
 % Citations [[[2
 \ExplSyntaxOn
-\__wisper_doc_style:n
+\__wisper_keys_define_doc:n
   {
-    cite/style/.is~choice,
-    cite/style/super/.style={ },
-    cite/style/bracket/.style={ },
+    cite/style .choice:,
+    cite/style/super .meta:n = {},
+    cite/style/bracket .meta:n = {},
 
-    %cite/footnote/.style={
-    %  footnotes/multiple=true,
-    %},
+    cite/enable~footnote .meta:n =
+      {
+        footnotes/multiple = true,
+      },
   }
 
 
 % Tufte-style [[[2
-\__wisper_doc_style:n
+\__wisper_keys_define_doc:n
   {
-    cite/style=super,
-    %cite/footnote,
-
-    internal/load~sidenotes/.code={},
-    sidenotes/enable/.style={
-      internal/load~sidenotes/.code={
-        \IfPresentationF{
-          \usepackage{sidenotes}
-        }
+    tufte .meta:n =
+      {
+        cite/style = super,
+        cite/enable~footnote,
       },
-    }
+
+    internal/load~sidenotes .code:n = {},
+    sidenotes/enable .meta:n =
+      {
+        internal/load~sidenotes .code:n =
+          {
+            \__wisper_if_document_type:nT {book, scrbook}
+              { \usepackage{sidenotes} }
+          }
+      },
   }
 
 \ExplSyntaxOff
 
 % Load all the things [[[1
 % Document class [[[2
-\SwitchDocType
-  {
-    % TODO: draft option, final option
-    {article}{\documentclass[a4paper]{article}}
-    {presentation}{\documentclass{beamer}}
-    {letter}{\documentclass{scrlttr2}}
-    {book}{\documentclass{book}}
-    {scrbook}{\documentclass[english, ngerman, a4paper, BCOR=0mm, DIV=10, pagesize]{scrbook}}
-  }
-  {
-    % TODO: use the .is choice handler to prevent this in the first place
-    \PackageError{---}{Invalid document type}{No help here.}
-  }
+\ExplSyntaxOn
+\DocumentStyle{type=scrbook}
+\__wisper_load_document_class:
 
 % Early Package loads [[[2
 \usepackage[main=english]{babel}
 \usepackage[T1]{fontenc}
-\DocumentStyle{internal/load font}
+\__wisper_load_font:
+\DocumentStyle{internal/load sidenotes}
 
 % Load packages [[[1
 \input{common_packages.tex}
@@ -213,8 +379,8 @@
 % Configure packages, define commands [[[1
 
 % Generic layout-related packages [[[2
+% TODO: if twoside, maybe only if sidenotes/book?
 \usepackage[strict]{changepage}
-\IfPresentationF{\usepackage{sidenotes}}
 
 % Footnotes [[[2
 \usepackage{bigfoot}
@@ -292,7 +458,8 @@
                                }
 \captionsetup{style=myfigure}  % default
 
-\IfPresentationF
+% TODO: as for changepage: better conditional, cf. above
+\__wisper_if_document_type:nT {book, scrbook}
   {
     \DeclareCaptionJustification{raggedoutside}{\raggedoutside}
     \newcommand\raggedoutside
@@ -406,7 +573,7 @@
 
 
 % Math [[[2
-\IfDocTypeTF{book}
+\IfDocClassTF{book, scrbook}
   {\numberwithin{equation}{chapter}}
   {\numberwithin{equation}{section}}
 
@@ -422,5 +589,7 @@
 %  %locale = DE,
 %  %per-mode = symbol
 %}
+
+\ExplSyntaxOff
 
 % vim: ts=2 sw=2 et fdm=marker fmr=[[[,]]]:

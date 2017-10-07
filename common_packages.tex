@@ -6,7 +6,9 @@
 \newif\ifloadmath\loadmathtrue
 \newif\ifloadphys\loadphystrue
 
-\usepackage[utf8]{inputenc}
+% Suppress inputenc warning for utf8 engines
+\bool_if:nF { \sys_if_engine_xetex_p: || \sys_if_engine_luatex_p: }
+  { \usepackage[utf8]{inputenc} }
 \usepackage[T1]{fontenc}
 
 
@@ -22,7 +24,8 @@
 
 
 % Misc [[[1
-\IfPresentationF{\usepackage[inline]{enumitem}}  % doesn't play well with overlay specifications
+\IfDocClassF {beamer}
+  { \usepackage[inline]{enumitem} }  % doesn't play well with overlay specifications
 \usepackage{float}  %
 %\usepackage{xparse}
 \usepackage{calc}
@@ -35,7 +38,8 @@
 
 
 % Hyperlinks [[[1
-\IfPresentationF{\usepackage[hyphens]{url}}  % loaded early by hyperref which is loaded way to early by beamer...
+\IfDocClassF {beamer}
+  { \usepackage[hyphens]{url} }  % loaded early by hyperref which is loaded way to early by beamer...
 %\usepackage{hyperref}
 
 
@@ -55,7 +59,7 @@
 
 % Bibliography [[[1
 % many of these options can only be given in \usepackage and not later, unfortunately..
-\IfPresentationTF
+\IfDocClassTF {beamer}
     {\usepackage[hyperref=true,
                  backref=true,
                  style=alphabetic,
