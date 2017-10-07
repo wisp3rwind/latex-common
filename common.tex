@@ -353,11 +353,109 @@
 \usepackage[main=english]{babel}
 \usepackage[T1]{fontenc}
 \__wisper_load_font:
+
+% Load packages [[[2
 \DocumentStyle{internal/load sidenotes}
 
-% Load packages [[[1
-\input{common_packages.tex}
-\input{common_packages_late.tex}
+\newif\ifloadcode\loadcodetrue
+\newif\ifloadmath\loadmathtrue
+\newif\ifloadphys\loadphystrue
+
+% Suppress inputenc warning for utf8 engines
+\bool_if:nF { \sys_if_engine_xetex_p: || \sys_if_engine_luatex_p: }
+  { \usepackage[utf8]{inputenc} }
+\usepackage[T1]{fontenc}
+
+
+% load minted before csquotes to suppress a warning due to a common package
+% they load
+\ifloadcode
+  \usepackage{minted}
+\fi
+
+\usepackage{csquotes}  % context-sensitive quotes
+
+\usepackage{microtype}
+
+
+% Misc [[[2
+\IfDocClassF {beamer}
+  { \usepackage[inline]{enumitem} }  % doesn't play well with overlay specifications
+\usepackage{float}  %
+%\usepackage{xparse}
+\usepackage{calc}
+%\usepackage{fancyhdr}  %
+\usepackage{ragged2e}
+
+
+% Colors [[[2
+\usepackage{xcolor}
+
+
+% Hyperlinks [[[2
+\IfDocClassF {beamer}
+  { \usepackage[hyphens]{url} }  % loaded early by hyperref which is loaded way to early by beamer...
+%\usepackage{hyperref}
+
+
+% Better tables [[[2
+\usepackage{rotating}
+\usepackage{booktabs}
+\usepackage{array}
+%\usepackage{multirow}
+%\usepackage{tabu}
+
+
+% Graphics [[[2
+\usepackage{graphicx}  % advanced key=value arguments for \includegraphics
+\usepackage{caption}
+\usepackage{subcaption}
+
+
+% Bibliography [[[2
+% many of these options can only be given in \usepackage and not later, unfortunately..
+\IfDocClassTF {beamer}
+    {\usepackage[hyperref=true,
+                 backref=true,
+                 style=alphabetic,
+                 citereset=section,
+                 url=false,
+                 isbn=false,%  DOI only
+                 maxcitenames=3,
+                 maxbibnames=3]{biblatex}}
+    {\usepackage[hyperref=true,
+                 backref=true,
+                 %bibstyle=authoryear,
+                 bibstyle=numeric,
+                 %bibstyle=alphabetic,
+                 citestyle=custom-numeric-comp,
+                 %citestyle=numeric-comp,
+                 %citestyle=custom-alphabetic,
+                 citereset=section,
+                 url=false,
+                 isbn=false,%  DOI only
+                 maxcitenames=3,
+                 maxbibnames=3]{biblatex}}
+
+
+% New packages to investigate [[[2
+%\usepackage{float}
+%\usepackage{color}
+%\usepackage{subfigure}
+%\usepackage{geometry}
+%\usepackage{pdfpages}
+%\usepackage{cite}  % better support for numeric citations
+%\usepackage{longtable}  % wrap tables at page boundaries, succeeds supertabular
+%\usepackage{supertabular}  % wrap tables at page boundaries
+%\usepackage{wrapfig}
+%\usepackage{footmisc}
+%\usepackage{epstopdf}
+%\usepackage{textcomp}
+%\usepackage{marginnote}
+
+% Packages that need to be loaded last [[[2
+\usepackage{hyperref}
+%\usepackage[inner]{showlabels}
 
 % Configure packages, define commands [[[1
 
