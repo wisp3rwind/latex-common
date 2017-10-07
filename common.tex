@@ -205,36 +205,8 @@
 \cs_new_eq:NN \IfDocClassF \__wisper_if_document_class:nF
 \cs_new_eq:NN \IfDocClassTF \__wisper_if_document_class:nTF
 
-%% TODO: automate the following definitions
-%\cs_new:Npn \IfPresentationT #1 { \__wisper_if_document_type:nT {presentation} {#1} }
-%\cs_new:Npn \IfPresentationF #1 { \__wisper_if_document_type:nF {presentation} {#1} }
-%\cs_new:Npn \IfPresentationTF #1#2 { \__wisper_if_document_type:nTF {presentation} {#1} {#2} }
-
-%\cs_new:Npn \IfLetterT #1 { \__wisper_if_document_type:nT {letter} {#1} }
-%\cs_new:Npn \IfLetterF #1 { \__wisper_if_document_type:nF {letter} {#1} }
-%\cs_new:Npn \IfLetterTF #1#2 { \__wisper_if_document_type:nTF {letter} {#1} {#2} }
-
-%\cs_new:Npn \IfArticleT #1 { \__wisper_if_document_type:nT {article} {#1} }
-%\cs_new:Npn \IfArticleF #1 { \__wisper_if_document_type:nF {article} {#1} }
-%\cs_new:Npn \IfArticleTF #1#2 { \__wisper_if_document_type:nTF {article} {#1} {#2} }
-
-%\cs_new:Npn \IfBookT #1 { \__wisper_if_document_type:nT {book} {#1} }
-%\cs_new:Npn \IfBookF #1 { \__wisper_if_document_type:nF {book} {#1} }
-%\cs_new:Npn \IfBookTF #1#2 { \__wisper_if_document_type:nTF {book} {#1} {#2} }
-
-%\cs_new:Npn \SwitchDocType #1#2
-%  { 
-%    \__wisper_doc_style:n {type/.get=\tempa}
-%    \str_case:onF \tempa
-%    { #1 }  % should contain lines of {type}{code} pairs
-%    { #2 }
-%  }
-
-\ExplSyntaxOff
-
 % Define the key-value interface [[[1
 % Font handling [[[2
-\ExplSyntaxOn
 
 \prop_new:N \__wisper_font_presets_prop
 \prop_put:Nnn \__wisper_font_presets_prop { lmodern } % [[[3
