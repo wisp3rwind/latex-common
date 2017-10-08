@@ -36,6 +36,9 @@
 % Helper function to transform the class option property list into a clist.
 \cs_new:Npn \__wisper_build_clist_from_prop:NN #1#2
   {
+    \__wisper_if_debug:T 
+      { \prop_show:N #1 }
+
     \prop_map_inline:Nn #1
       {
         \clist_put_right:Nx #2
@@ -47,24 +50,22 @@
       }
   }
 
-\cs_new:Npn \__wisper_load_with_optional_arg:NNN #1#2#3
+\cs_new:Npn \__wisper_load_with_optional_arg:NNn #1#2#3
   {
-    \clist_new:N \l__wisper_optional_arg_clist
-    \__wisper_build_clist_from_prop:NN #2 \l__wisper_optional_arg_clist
+    \clist_clear:N \l__tmpa_clist
+    \__wisper_build_clist_from_prop:NN #2 \l__tmpa_clist
     \__wisper_if_debug:T
       {
-        \clist_show:N \l__wisper_optional_arg_clist
-        \str_show:N #3
+        \clist_show:N \l__tmpa_clist
+        \str_show:n {#3}
       }
     \exp_args:Noo \__wisper_load_with_optional_arg_aux:Nnn #1
       {
-        \clist_use:Nn \l__wisper_optional_arg_clist { ,~ }
+        \clist_use:Nn \l__tmpa_clist { ,~ }
       }
-      {
-        \str_use:N #3
-      }
+      { #3 }
   }
-\cs_generate_variant:Nn \__wisper_load_with_optional_arg:NNN { NNn, Ncn}
+\cs_generate_variant:Nn \__wisper_load_with_optional_arg:NNn { NNV, Ncn}
 
 % Convenience funtions for the key-value interface [[[1
 \cs_new:Npn \__wisper_keys_define:n #1 { \keys_define:nn { wisper } {#1} }
@@ -98,7 +99,7 @@
 % Document class loader.
 \cs_new:Nn \__wisper_load_document_class:
   {
-    \__wisper_load_with_optional_arg:NNN
+    \__wisper_load_with_optional_arg:NNV
       \documentclass
       \g__wisper_classopts_prop
       \g__wisper_classname_str
@@ -122,10 +123,15 @@
       }
   }
 
+\msg_new:nnn { wisper } { declaring-package } { Declaring~package~'#1'. }
+
 % Package declaration helpers [[[1
 \cs_new:Npn \__wisper_declare_package:n #1
   {
-    \prop_new:c {g_wisper_package_ #1 _options_prop}
+    \__wisper_if_debug:T
+      { \msg_warning:nnn { wisper } { declaring-package } {#1} }
+
+    \prop_new:c {g__wisper_package_ #1 _options_prop}
     \__wisper_keys_define_doc:n
       {
         packages/#1/enable .bool_gset:c = {g__wisper_package_ #1 _enabled_bool},
@@ -164,9 +170,9 @@
 \cs_new:Npn \__wisper_enable_package:nn #1#2
   {
     \clist_if_in:nnT {true, enable, enabled} {#2}
-      \__wisper_keys_set_doc:n { packages/#1/enable = true }
+      { \__wisper_keys_set_doc:n { packages/#1/enable = true } }
     \clist_if_in:nnT {false, disable, disabled} {#2}
-      \__wisper_keys_set_doc:n { packages/#1/enable = false }
+      { \__wisper_keys_set_doc:n { packages/#1/enable = false } }
   }
 
 \cs_new:Npn \__wisper_declare_package_set_state:nn #1#2
@@ -186,7 +192,7 @@
     % TODO: respect forced deactivation
     \__wisper_load_with_optional_arg:Ncn
       \usepackage
-      {g__wisper_package_options_ #1 _prop}
+      {g__wisper_package_ #1 _options_prop}
       {#1}
   }
 
@@ -212,19 +218,20 @@
 \__wisper_declare_packages:n
   {
     enumitem,
-    calc,
-    ragged2e,
-    xcolor,
+    calc = enabled,
+    ragged2e = enabled,
+    xcolor = enabled,
     url,
     hyperref,
     sidenotes,
     babel,
     fontenc,
-    csquotes,
-    microtype,
+    csquotes = enabled,
+    microtype = enabled,
     inputenc,
     fancyhdr,
     amsthm,
+    bigfoot,
   }
 
 % Fonts, handled differently (for now?) [[[2
@@ -243,21 +250,21 @@
 % Code display [[[2
 \__wisper_declare_packages:n
   {
-    minted,
+    minted = enabled,
   }
 
 % Tables, figures [[[2
 \__wisper_declare_packages:n
   {
-    float,
-    rotating,
-    booktabs,
-    array,
+    float = enabled,
+    rotating = enabled,
+    booktabs = enabled,
+    array = enabled,
     multirow,
     tabu,
-    caption,
-    subcaption,
-    graphicx,
+    caption = enabled,
+    subcaption = enabled,
+    graphicx = enabled,
   }
 
 % TODO: require values for paper, languages, landscape, type. Or somehow
@@ -495,26 +502,27 @@
 % load minted before csquotes to suppress a warning due to a common package
 % they load
 \ifloadcode
-  \usepackage{minted}
+  \__wisper_enable_package:n {minted}
 \fi
+\__wisper_load_package:n {minted}
 
-\usepackage{csquotes}  % context-sensitive quotes
+\__wisper_load_package:n {csquotes}  % context-sensitive quotes
 
-\usepackage{microtype}
+\__wisper_load_package:n {microtype}
 
 
 % Misc [[[2
 \IfDocClassF {beamer}
   { \usepackage[inline]{enumitem} }  % doesn't play well with overlay specifications
-\usepackage{float}  %
+\__wisper_load_package:n {float}  %
 %\usepackage{xparse}
-\usepackage{calc}
+\__wisper_load_package:n {calc}
 %\usepackage{fancyhdr}  %
-\usepackage{ragged2e}
+\__wisper_load_package:n {ragged2e}
 
 
 % Colors [[[2
-\usepackage{xcolor}
+\__wisper_load_package:n {xcolor}
 
 
 % Hyperlinks [[[2
@@ -524,17 +532,17 @@
 
 
 % Better tables [[[2
-\usepackage{rotating}
-\usepackage{booktabs}
-\usepackage{array}
-%\usepackage{multirow}
-%\usepackage{tabu}
+\__wisper_load_package:n {rotating}
+\__wisper_load_package:n {booktabs}
+\__wisper_load_package:n {array}
+%\__wisper_load_package:n {multirow}
+%\__wisper_load_package:n {tabu}
 
 
 % Graphics [[[2
-\usepackage{graphicx}  % advanced key=value arguments for \includegraphics
-\usepackage{caption}
-\usepackage{subcaption}
+\__wisper_load_package:n {graphicx}  % advanced key=value arguments for \includegraphics
+\__wisper_load_package:n {caption}
+\__wisper_load_package:n {subcaption}
 
 
 % Bibliography [[[2
@@ -564,8 +572,6 @@
 
 
 % New packages to investigate [[[2
-%\usepackage{float}
-%\usepackage{color}
 %\usepackage{subfigure}
 %\usepackage{geometry}
 %\usepackage{pdfpages}
@@ -579,7 +585,7 @@
 %\usepackage{marginnote}
 
 % Packages that need to be loaded last [[[2
-\usepackage{hyperref}
+\__wisper_load_package:n {hyperref}
 %\usepackage[inner]{showlabels}
 
 % Configure packages, define commands [[[1
@@ -592,7 +598,7 @@
 \usepackage[strict]{changepage}
 
 % Footnotes [[[2
-\usepackage{bigfoot}
+\__wisper_load_package:n {bigfoot}
 \DeclareNewFootnote{default}[alph]
 
 % Citations [[[2
@@ -640,7 +646,7 @@
   }
 
 % Colors [[[2
-\usepackage{xcolor}
+\__wisper_load_package:n {xcolor}
 % define a few highlighting colors, from https://personal.sron.nl/~pault/
 \definecolor{marklightblue}{HTML}{BBCCEE}
 \definecolor{marklightteal}{HTML}{CCEEFF}
