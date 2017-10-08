@@ -13,6 +13,7 @@
 
 % Variants [[[1
 \cs_generate_variant:Nn \clist_use:Nn {nn}
+\cs_generate_variant:Nn \prop_get:cnN { cvN }
 
 % Debugging helpers [[[1
 \clist_new:N \g__wisper_debug_modules_clist
@@ -127,6 +128,13 @@
 
 \msg_new:nnn { wisper } { declaring-package } { Declaring~package~'#1'. }
 
+\cs_new:Npn \__wisper_prop_keys_to_clist:NN #1#2
+  {
+    \clist_clear:N #2
+    \prop_map_inline:Nn #1 { \clist_put_right:Nn #2 {##1} }
+  }
+\cs_generate_variant:Nn \__wisper_prop_keys_to_clist:NN { cN }
+
 % Package declaration helpers [[[1
 \cs_new:Npn \__wisper_declare_package:n #1
   {
@@ -134,6 +142,8 @@
       { \msg_warning:nnn { wisper } { declaring-package } {#1} }
 
     \prop_new:c {g__wisper_package_ #1 _options_prop}
+    \prop_new:c {g__wisper_package_ #1 _presets_prop}
+    \cs_new:cn {g__wisper_package_ #1 _setup_code_tl:} {}  % no-op
     \__wisper_keys_define_doc:n
       {
         packages/#1/enable .bool_gset:c = {g__wisper_package_ #1 _enabled_bool},
@@ -141,9 +151,10 @@
 
         packages/#1/options / unknown .code:n =
           {
-            \prop_gput:NVc {g__wisper_package_ #1 _options_prop}
+            \tl_show:N \l_keys_key_tl
+            \prop_gput:cVn {g__wisper_package_ #1 _options_prop}
                 \l_keys_key_tl
-                {#1}
+                {##1}
           },
 
         packages/#1/conflicts / classes .tl_gset:c = {g__wisper_package_ #1 _conflicting_classes_tl},
@@ -154,8 +165,55 @@
         % e.g. document classes can prevent loading a package, should raise an
         % error if enabled explicitly in some place.
         packages/#1/deactivate .bool_gset:c = {g__wisper_package_ #1 _deactivated_bool},
+
+        packages/#1/selected_preset .code:n = 
+          {
+            \prop_if_in:cnTF {g__wisper_package_ #1 _presets_prop} {##1}
+              {
+                \tl_gset:cn {g__wisper_package_ #1 _selected_preset_tl} {##1}
+              }
+              {
+                \__wisper_prop_keys_to_clist:cN
+                  {g__wisper_package_ #1 _presets_prop}
+                  \l__tmpa_clist
+                \msg_error:nnnnn { wisper } { unknown-choice }
+                  { package~preset } {##1} { \l__tmpa_clist }
+              }
+          },
+        packages/#1/selected_preset .value_required:n = true,
+      }
+    % default: no options
+    \__wisper_declare_package_preset:nnn {#1} { default } {} {}
+    \__wisper_select_package_preset:nn {#1} {default}
+  }
+
+\cs_new:Npn \__wisper_select_package_preset:nn #1#2
+  {
+    \__wisper_keys_set_doc:n
+      {
+        packages/#1/selected_preset = #2
       }
   }
+
+% TODO: support combining presets (needs conflict detection)
+
+% Add a package preset:
+% #1 is the package name
+% TODO: #? extends preset name
+% #2 is the preset name
+% #3 are packages options
+% #4 is additional setup code that will (eventually, TODO:!) be run after ALL
+% packages have been loaded.
+\cs_new:Npn \__wisper_declare_package_preset:nnnn #1#2#3#4
+  {
+    \prop_put:cnn {g__wisper_package_ #1 _presets_prop} {#2}
+      {
+        \__wisper_keys_set_doc:nn { packages/#1/options } {#3}
+        \cs_gset:cn {g__wisper_package_ #1 _setup_code_tl:} {#4}
+      }
+  }
+\cs_new:Npn \__wisper_declare_package_preset:nnn #1#2#3
+  { \__wisper_declare_package_preset:nnnn {#1} {#2} {#3} {} }
 
 \cs_new:Npn \__wisper_declare_package:nn #1#2
   {
@@ -192,10 +250,19 @@
 \cs_new:Npn \__wisper_load_package:n #1
   {
     % TODO: respect forced deactivation
+    % Apply preset options.
+    \prop_get:cvN
+      {g__wisper_package_ #1 _presets_prop}
+      {g__wisper_package_ #1 _selected_preset_tl}
+      \l_tmpa_tl
+    \tl_use:N \l_tmpa_tl
+    % Load package.
     \__wisper_load_with_optional_arg:Ncn
       \usepackage
       {g__wisper_package_ #1 _options_prop}
       {#1}
+    % Use preset setup code.
+    \use:c {g__wisper_package_ #1 _setup_code_tl:}
   }
 
 % name=enabled clist
@@ -284,7 +351,7 @@
       },
     paper / unknown .code:n =
       {
-        \msg_error:nnnn { wisper } { unknown-choice }
+        \msg_error:nnnnn { wisper } { unknown-choice }
           { paper~format }
           {#1}
           { a4paper, a5paper} % TODO: Don't hardcode
@@ -327,7 +394,7 @@
       },
     type / unknown .code:n =
       {
-        \msg_error:nnnn { wisper } { unknown-choice }
+        \msg_error:nnnnn { wisper } { unknown-choice }
           { document~type }
           {#1}
           { article, presentation, letter, book, scrbook } % TODO: Don't hardcode
@@ -422,7 +489,7 @@
       {
         \prop_get:NnNF \__wisper_font_presets_prop {#1} \g__wisper_font_preset_code_tl
           {
-            \msg_error:nnn { wisper } { unknown-choice }
+            \msg_error:nnnnn { wisper } { unknown-choice }
               { font~preset }
               {#1}
               { lmodern, fira, garamond, palatino, TexGyre }
