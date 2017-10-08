@@ -15,11 +15,13 @@
 \cs_generate_variant:Nn \clist_use:Nn {nn}
 
 % Debugging helpers [[[1
-\prg_new_conditional:Nnn \__wisper_if_debug:
-  { p, T, F, TF}
+\clist_new:N \g__wisper_debug_modules_clist
+\clist_gset:Nn \g__wisper_debug_modules_clist {} % { loader, declaration }
+\prg_new_conditional:Nnn \__wisper_if_debug:n { T, F, TF }
   { 
-    % TODO: configurable
-    \prg_return_true:
+    \clist_if_in:NnTF \g__wisper_debug_modules_clist {#1}
+      { \prg_return_true: }
+      { \prg_return_false: }
   }
 
 % Common messages [[[1
@@ -36,7 +38,7 @@
 % Helper function to transform the class option property list into a clist.
 \cs_new:Npn \__wisper_build_clist_from_prop:NN #1#2
   {
-    \__wisper_if_debug:T 
+    \__wisper_if_debug:nT { loader }
       { \prop_show:N #1 }
 
     \prop_map_inline:Nn #1
@@ -54,7 +56,7 @@
   {
     \clist_clear:N \l__tmpa_clist
     \__wisper_build_clist_from_prop:NN #2 \l__tmpa_clist
-    \__wisper_if_debug:T
+    \__wisper_if_debug:nT { loader }
       {
         \clist_show:N \l__tmpa_clist
         \str_show:n {#3}
@@ -128,7 +130,7 @@
 % Package declaration helpers [[[1
 \cs_new:Npn \__wisper_declare_package:n #1
   {
-    \__wisper_if_debug:T
+    \__wisper_if_debug:nT { declaration }
       { \msg_warning:nnn { wisper } { declaring-package } {#1} }
 
     \prop_new:c {g__wisper_package_ #1 _options_prop}
