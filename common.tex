@@ -64,7 +64,7 @@
         \str_use:N #3
       }
   }
-\cs_generate_variant:Nn \__wisper_load_with_optional_arg:NNN { NNn }
+\cs_generate_variant:Nn \__wisper_load_with_optional_arg:NNN { NNn, Ncn}
 
 % Convenience funtions for the key-value interface [[[1
 \cs_new:Npn \__wisper_keys_define:n #1 { \keys_define:nn { wisper } {#1} }
@@ -78,6 +78,7 @@
 
 \cs_new:Npn \__wisper_keys_set_internal:n #1 { \keys_set:nn { wisper/internal } {#1} }
 \cs_new:Npn \__wisper_keys_set_doc:n #1 { \keys_set:nn { wisper/document } {#1} }
+\cs_new:Npn \__wisper_keys_set_doc:nn #1#2 { \keys_set:nn { wisper/document/#1 } {#2} }
 \cs_new:Npn \__wisper_keys_set_math:n #1 { \keys_set:nn { wisper/mathematics } {#1} }
 \cs_new:Npn \__wisper_keys_set_code:n #1 { \keys_set:nn { wisper/code } {#1} }
 \cs_new:Npn \__wisper_keys_set_phys:n #1 { \keys_set:nn { wisper/physics } {#1} }
@@ -121,52 +122,144 @@
       }
   }
 
-% Package declaration [[[1
+% Package declaration helpers [[[1
 \cs_new:Npn \__wisper_declare_package:n #1
   {
-    \prop:new:N \g_wisper_package_options_#1_prop
-    \__wisper_define_keys_doc:n
+    \prop_new:c {g_wisper_package_ #1 _options_prop}
+    \__wisper_keys_define_doc:n
       {
-        packages/#1/enable .bool_set:n = \g__wisper_package_load_#1,
-        packages/#1/enable .initial = {true|false},
+        packages/#1/enable .bool_gset:c = {g__wisper_package_ #1 _enabled_bool},
+        packages/#1/enable .initial:n = {false},
+
         packages/#1/options / unknown .code:n =
           {
-            \prop_put:NVn \g__wisper_package_options_#1_prop
-              \l_keys_key_tl
-              {#1}
-          }
-        packages/#1/conflicts / classes .tl_set:N = \g__wisper_package_#1_conflicting_classes,
-        packages/#1/conflicts / packages .tl_set:N = \g__wisper_package_#1_conflicting_packages,
-        packages/#1/conflicts / classes .initial:n = {koma},
+            \prop_gput:NVc {g__wisper_package_ #1 _options_prop}
+                \l_keys_key_tl
+                {#1}
+          },
+
+        packages/#1/conflicts / classes .tl_gset:c = {g__wisper_package_ #1 _conflicting_classes_tl},
+        packages/#1/conflicts / packages .tl_gset:c = {g__wisper_package_ #1 _conflicting_packages_tl},
+        packages/#1/conflicts / classes .initial:n = {},
         packages/#1/conflicts / packages .initial:n = {},
 
         % e.g. document classes can prevent loading a package, should raise an
         % error if enabled explicitly in some place.
-        packages/#1/deactivate .bool_set:n = \g__wisper_package_deactivated_#1,
+        packages/#1/deactivate .bool_gset:c = {g__wisper_package_ #1 _deactivated_bool},
       }
+  }
+
+\cs_new:Npn \__wisper_declare_package:nn #1#2
+  {
+    \__wisper_declare_package:n {#1}
+    \__wisper_set_package_configuration:nn {#1} {#2}
   }
 
 \cs_new:Npn \__wisper_enable_package:n #1
+  { \__wisper_keys_set_doc:n { packages/#1/enable = true } }
+
+\cs_new:Npn \__wisper_disable_package:n #1
+  { \__wisper_keys_set_doc:n { packages/#1/enable = true } }
+
+\cs_new:Npn \__wisper_enable_package:nn #1#2
   {
-    \__wisper_define_keys_doc:n
-      {
-        packages/#1/enable = true,
-      }
+    \clist_if_in:nnT {true, enable, enabled} {#2}
+      \__wisper_keys_set_doc:n { packages/#1/enable = true }
+    \clist_if_in:nnT {false, disable, disabled} {#2}
+      \__wisper_keys_set_doc:n { packages/#1/enable = false }
   }
 
-\cs_new:Npn \__wisper_set_package_options:nn #1#2
+\cs_new:Npn \__wisper_declare_package_set_state:nn #1#2
   {
-    \__wisper_set_keys_doc:nn { packages/#1/options } {#2}
+    \__wisper_declare_package:n {#1}
+    \__wisper_enable_package:nn {#1} {#2}
   }
+
+\cs_new:Npn \__wisper_set_package_configuration:nn #1#2
+  { \__wisper_keys_set_doc:nn { packages/#1 } {#2} }
+
+\cs_new:Npn \__wisper_set_package_options:nn #1#2
+  { \__wisper_keys_set_doc:nn { packages/#1/options } {#2} }
 
 \cs_new:Npn \__wisper_load_package:n #1
   {
-    \__wisper_load_with_optional_arg:NNn
+    % TODO: respect forced deactivation
+    \__wisper_load_with_optional_arg:Ncn
       \usepackage
-      \g__wisper_package_options_#1_prop
+      {g__wisper_package_options_ #1 _prop}
       {#1}
   }
- 
+
+% name=enabled clist
+\cs_new:Npn \__wisper_declare_packages:n #1
+  {
+    \keyval_parse:NNn
+      \__wisper_declare_package:n
+      \__wisper_declare_package_set_state:nn
+      {#1}
+  }
+
+% Package declarations [[[1
+% TODO: package option presets!
+
+% Bibliography [[[2
+\__wisper_declare_packages:n
+  {
+    biblatex,
+  }
+
+% Generic [[[2
+\__wisper_declare_packages:n
+  {
+    enumitem,
+    calc,
+    ragged2e,
+    xcolor,
+    url,
+    hyperref,
+    sidenotes,
+    babel,
+    fontenc,
+    csquotes,
+    microtype,
+    inputenc,
+    fancyhdr,
+    amsthm,
+  }
+
+% Fonts, handled differently (for now?) [[[2
+\__wisper_declare_packages:n
+  {
+    newpxmath,
+    fontspec,
+    newpxtext,
+    lmodern,
+    FiraSans,
+    FiraMono,
+    mathdesign,
+    mathpazo,
+  }
+
+% Code display [[[2
+\__wisper_declare_packages:n
+  {
+    minted,
+  }
+
+% Tables, figures [[[2
+\__wisper_declare_packages:n
+  {
+    float,
+    rotating,
+    booktabs,
+    array,
+    multirow,
+    tabu,
+    caption,
+    subcaption,
+    graphicx,
+  }
+
 % TODO: require values for paper, languages, landscape, type. Or somehow
 % support default values?
 % -> Ensure that all keys can be set multiple times without issues.
