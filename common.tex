@@ -235,27 +235,10 @@
   }
 
 \cs_new:Npn \__wisper_enable_package:n #1
-  { \__wisper_keys_set_doc:n { packages/#1/enable = true } }
+  { \bool_gset_true:c {g__wisper_package_ #1 _enabled_bool} }
 
 \cs_new:Npn \__wisper_disable_package:n #1
-  { \__wisper_keys_set_doc:n { packages/#1/enable = true } }
-
-\cs_new:Npn \__wisper_enable_package:nn #1#2
-  {
-    \clist_if_in:nnT {true, enable, enabled} {#2}
-      { \__wisper_keys_set_doc:n { packages/#1/enable = true } }
-    \clist_if_in:nnT {false, disable, disabled} {#2}
-      { \__wisper_keys_set_doc:n { packages/#1/enable = false } }
-  }
-
-\cs_new:Npn \__wisper_declare_package_set_state:nn #1#2
-  {
-    \__wisper_declare_package:n {#1}
-    \__wisper_enable_package:nn {#1} {#2}
-  }
-
-\cs_new:Npn \__wisper_set_package_configuration:nn #1#2
-  { \__wisper_keys_set_doc:nn { packages/#1 } {#2} }
+  { \bool_gset_false:c {g__wisper_package_ #1 _enabled_bool} }
 
 \cs_new:Npn \__wisper_set_package_options:nn #1#2
   { \__wisper_keys_set_doc:nn { packages/#1/options } {#2} }
