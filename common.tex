@@ -200,6 +200,15 @@
     \cs_gset:cn {g__wisper_package_ #1 _setup_code_tl:} {#3}
   }
 
+% name={keyvals} clist
+\cs_new:Npn \__wisper_declare_packages:n #1
+  {
+    \keyval_parse:NNn
+      \__wisper_declare_package:n
+      \__wisper_declare_package:nn
+      {#1}
+  }
+
 \cs_new:Npn \__wisper_enable_package:n #1
   { \bool_gset_true:c {g__wisper_package_ #1 _enabled_bool} }
 
@@ -267,15 +276,6 @@
         % Use preset setup code.
         \use:c {g__wisper_package_ #1 _setup_code_tl:}
       }
-  }
-
-  % name={keyvals} clist
-\cs_new:Npn \__wisper_declare_packages:n #1
-  {
-    \keyval_parse:NNn
-      \__wisper_declare_package:n
-      \__wisper_declare_package:nn
-      {#1}
   }
 
 % Features [[[1
