@@ -617,36 +617,49 @@
 \prop_new:N \__wisper_font_presets_prop
 \prop_put:Nnn \__wisper_font_presets_prop { lmodern } % [[[3
   {
-    \usepackage{lmodern}
+    \__wisper_enable_package:n {lmodern}
+    \__wisper_load_package:n {lmodern}
   }
 \prop_put:Nnn \__wisper_font_presets_prop { fira } % [[[3
   {
     % Mozilla Fira Sans, requires XeLaTeX or LuaLaTex TODO: raise error
-    \usepackage[sfdefault]{FiraSans}
-    \usepackage{FiraMono}
+    \__wisper_enable_package:n {FiraSans}
+    \__wisper_enable_package:n {FiraMono}
+    \__wisper_pass_options_to_package:nn {sfdefault} {FiraSans}
+    \__wisper_load_package:n {FiraSans}
+    \__wisper_load_package:n {FiraMono}
   }
 \prop_put:Nnn \__wisper_font_presets_prop { garamond } % [[[3
   {
     % URW-Garamond: A free garamond font, supposedly good for books but to fragile
     %   for presentations. Math fonts provided by the mathdesign project
-    \usepackage[urw-garamond]{mathdesign}
+    \__wisper_enable_package:n {mathdesign}
+    \__wisper_pass_options_to_package:nn {urw-garamond} {mathdesign}
+    \__wisper_load_package:n {mathdesign}
     % FIXME: maybe drop this? PagellaX is better anyway. At least give a
     % warning.
     % TODO: matching sans font
   }
 \prop_put:Nnn \__wisper_font_presets_prop { palatino } % [[[3
   {
-    \usepackage[osf]{mathpazo}
+    \__wisper_enable_package:n {mathpazo}
+    \__wisper_pass_options_to_package:nn {osf} {mathpazo}
+    \__wisper_load_package:n {mathpazo}
   }
 \prop_put:Nnn \__wisper_font_presets_prop { TexGyre } % [[[3
   {
-    \usepackage{amsthm}  % preload amsthm to suppress error due to newpxmath redfining \openbox
-    \usepackage[vvarbb]{newpxmath}
+    \__wisper_enable_package:n {amsthm}
+    \__wisper_load_package:n {amsthm}  % preload amsthm to suppress error due to newpxmath redfining \openbox
+    \__wisper_enable_package:n {newpxmath}
+    \__wisper_pass_options_to_package:nn {vvarbb} {newpxmath}
+    \__wisper_load_package:n {newpxmath}
     % TODO: tex/xetextex/luatex switch that is more readable
     \sys_if_engine_luatex:TF
       {
         % LuaTeX
-        \usepackage[no-math]{fontspec}
+        \__wisper_enable_package:n {fontspec}
+        \__wisper_pass_options_to_package:nn {no-math} {fontspec}
+        \__wisper_load_package:n {fontspec}
         % TODO: ensure correct small caps, \usepackage[largesc]{newpxtext}
         \setmainfont{TeXGyrePagellaX}[Numbers=OldStyle]
         \setsansfont{TeXGyreHeros}
@@ -662,7 +675,9 @@
           }
           {
             % Other TeX
-            \usepackage[largesc]{newpxtext}
+            \__wisper_enable_package:n {newpxtext}
+            \__wisper_pass_options_to_package:nn {largesc} {newpxtext}
+            \__wisper_load_package:n {newpxtext}
             \useosf
           }
       }
