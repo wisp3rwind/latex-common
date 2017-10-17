@@ -262,6 +262,14 @@
 
 \prg_new_conditional:Npnn \__wisper_should_load_package:n #1 { T, F, TF }
   {
+    % TODO: simplify. The following doesn't work unfortunately
+    %\bool_lazy_any:nTF
+    %  {
+    %    { \bool_not_p:c {g__wisper_package_ #1 _enabled_bool} }
+    %    { \bool_if_p:c {g__wisper_package_ #1 _loaded_bool} }
+    %    { \__wisper_if_engine_p:v {g__wisper_package_ #1 _deactivated_for_engines_tl} }
+    %    { \__wisper_if_document_class_p:v {g__wisper_package_ #1 _deactivated_for_classes_tl} }
+    %  }
     % TODO: respect forced deactivation
     \bool_if:cTF {g__wisper_package_ #1 _enabled_bool}
       {
