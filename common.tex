@@ -17,6 +17,8 @@
 % Variants [[[1
 \cs_generate_variant:Nn \clist_use:Nn {nn}
 \cs_generate_variant:Nn \prop_get:cnN { cvN }
+\cs_new_eq:NN \__wisper_pass_options_to_package:nn \PassOptionsToPackage
+\cs_generate_variant:Nn \__wisper_pass_options_to_package:nn { Vn }
 
 % Debugging helpers [[[1
 \clist_new:N \g__wisper_debug_modules_clist
@@ -157,7 +159,6 @@
     \__wisper_if_debug:nT { declaration }
       { \msg_warning:nnn { wisper } { declaring-package } {#1} }
 
-    \prop_new:c {g__wisper_package_ #1 _options_prop}
     \prop_new:c {g__wisper_package_ #1 _presets_prop}
     \cs_new:cn {g__wisper_package_ #1 _setup_code_tl:} {}  % no-op
     \bool_new:c {g__wisper_package_ #1 _loaded_bool}
@@ -167,12 +168,7 @@
         packages/#1/enable .initial:n = {false},
 
         packages/#1/options / unknown .code:n =
-          {
-            \tl_show:N \l_keys_key_tl
-            \prop_gput:cVn {g__wisper_package_ #1 _options_prop}
-                \l_keys_key_tl
-                {##1}
-          },
+          { \__wisper_pass_options_to_package:Vn \l_keys_key_tl {#1} },
 
         packages/#1/conflicts / classes .tl_gset:c = {g__wisper_package_ #1 _conflicting_classes_tl},
         packages/#1/conflicts / packages .tl_gset:c = {g__wisper_package_ #1 _conflicting_packages_tl},
@@ -300,10 +296,7 @@
           \l_tmpa_tl
         \tl_use:N \l_tmpa_tl
         % Load package.
-        \__wisper_load_with_optional_arg:Ncn
-          \usepackage
-          {g__wisper_package_ #1 _options_prop}
-          {#1}
+        \usepackage {#1}
         % Use preset setup code.
         \use:c {g__wisper_package_ #1 _setup_code_tl:}
       }
