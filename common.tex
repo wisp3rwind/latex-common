@@ -268,10 +268,9 @@
 \cs_new:Npn \__wisper_set_package_options:nn #1#2
   { \__wisper_keys_set_doc:nn { packages/#1/options } {#2} }
 
-\prg_new_conditional:Npnn \__wisper_should_load_package:n { T, F, TF }
+\prg_new_conditional:Npnn \__wisper_should_load_package:n #1 { T, F, TF }
   {
     % TODO: respect forced deactivation
-    \prop_get:NnN \g__wisper_package
     \bool_if:cTF {g__wisper_package_ #1 _loaded_bool}
       {
         % enabled
@@ -531,12 +530,12 @@
       {
         \clist_map_inline:nn {#1}
           { \prop_put:Nnn \g__wisper_classopts_prop {##1} {} }
-      }
+      },
     main_language .code:n =
       {
         \__wisper_set_package_options:nn {babel} {main=#1}
         \prop_put:Nnn \g__wisper_classopts_prop {#1} {}
-      }
+      },
 
     languages .initial:n = {english},
 
@@ -805,7 +804,7 @@
 
 % Citations [[[2
 \__wisper_declare_feature:nnnn {footnotecite}
-  { multiple-footnotes },
+  { multiple-footnotes }
   {}
   {
     \DeclareNewFootnote{Cite}
