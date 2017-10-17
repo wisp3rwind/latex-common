@@ -289,11 +289,16 @@
     % Apply preset options.
     \__wisper_should_load_package:nT {#1}
       {
+        % Do not execute this loading code multiple times. The \usepackage
+        % itself would not be problematic, but the custom preset setup code
+        % could potentially be.
         \bool_gset:cn {g__wisper_package_ #1 _loaded_bool} {true}
+        % Load code to apply the options from the selected preset
         \prop_get:cvN
           {g__wisper_package_ #1 _presets_prop}
           {g__wisper_package_ #1 _selected_preset_tl}
           \l_tmpa_tl
+        % Run it
         \tl_use:N \l_tmpa_tl
         % Load package.
         \usepackage {#1}
