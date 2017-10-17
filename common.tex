@@ -158,10 +158,14 @@
     \prop_new:c {g__wisper_package_ #1 _presets_prop}
     \cs_new:cn {g__wisper_package_ #1 _setup_code_tl:} {}  % no-op
     \bool_new:c {g__wisper_package_ #1 _loaded_bool}
+    \bool_new:c {g__wisper_package_ #1 _enabled_bool}
+
     \__wisper_keys_define_doc:n
       {
-        packages/#1/enable .bool_gset:c = {g__wisper_package_ #1 _enabled_bool},
-        packages/#1/enable .initial:n = {false},
+        packages/#1/enabled .bool_gset:c = {g__wisper_package_ #1 _enabled_bool},
+        packages/#1/enabled .default:n = true,
+        packages/#1/disabled .bool_gset_inverse:c = {g__wisper_package_ #1 _enabled_bool},
+        packages/#1/enabled .default:n = true,
 
         packages/#1/options / unknown .code:n =
           { \__wisper_pass_options_to_package:Vn \l_keys_key_tl {#1} },
@@ -228,10 +232,18 @@
 \cs_new:Npn \__wisper_declare_package_preset:nnn #1#2#3
   { \__wisper_declare_package_preset:nnnn {#1} {#2} {#3} {} }
 
+\cs_new:Npn \__wisper_configure_package:nn #1#2
+  { \__wisper_keys_set_doc:nn { packages/#1 } {#2} }
+
 \cs_new:Npn \__wisper_declare_package:nn #1#2
   {
     \__wisper_declare_package:n {#1}
-    \__wisper_set_package_configuration:nn {#1} {#2}
+    \__wisper_configure_package:nn {#1} {#2}
+  }
+\cs_new:Npn \__wisper_declare_package:nnn #1#2#3
+  {
+    \__wisper_declare_package:nn {#1} {#2}
+    \cs_gset:cn {g__wisper_package_ #1 _setup_code_tl:} {#3}
   }
 
 \cs_new:Npn \__wisper_enable_package:n #1
@@ -310,12 +322,12 @@
       }
   }
 
-% name=enabled clist
+  % name={keyvals} clist
 \cs_new:Npn \__wisper_declare_packages:n #1
   {
     \keyval_parse:NNn
       \__wisper_declare_package:n
-      \__wisper_declare_package_set_state:nn
+      \__wisper_declare_package:nn
       {#1}
   }
 
