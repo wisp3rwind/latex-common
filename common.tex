@@ -77,14 +77,9 @@
 
 \prg_new_conditional:Npnn \__wisper_if_engine:n #1 { T, F, TF }
   {
-    \bool_lazy_any_p:x
-      {
-        \clist_map_inline:nn {#1}
-          {
-            % Additional pair of braces according to \bool_lazy_any_p:x syntax!
-            { \str_if_eq:nVTF {##1} \c_sys_engine_str { \c_true_bool } { \c_false_bool } }
-          }
-      }
+    \clist_if_in:nVTF {#1} \c_sys_engine_str
+      { \prg_return_true: }
+      { \prg_return_false: }
   }
 \cs_generate_variant:Nn \__wisper_if_engine:nTF { vTF }
 
@@ -143,6 +138,7 @@
           { \prg_return_false: }
       }
   }
+\cs_generate_variant:Nn \__wisper_if_document_class:nTF { vTF }
 
 \msg_new:nnn { wisper } { declaring-package } { Declaring~package~'#1'. }
 
@@ -267,15 +263,31 @@
 \prg_new_conditional:Npnn \__wisper_should_load_package:n #1 { T, F, TF }
   {
     % TODO: respect forced deactivation
-    \bool_if:cTF {g__wisper_package_ #1 _loaded_bool}
+    \bool_if:cTF {g__wisper_package_ #1 _enabled_bool}
       {
         % enabled
-        \__wisper_if_engine:vTF {g__wisper_package_ #1 _deactivated_for_engines_tl}
-          { \prg_return_true: }
+        \bool_if:cTF {g__wisper_package_ #1 _loaded_bool}
           {
-            \__wisper_if_classname:vTF {g__wisper_package_ #1 _deactivated_for_classes_tl}
-              { \prg_return_true: }
-              { \prg_return_false: }
+            % already loaded
+            \prg_return_false:
+          }
+          {
+            \__wisper_if_engine:vTF {g__wisper_package_ #1 _deactivated_for_engines_tl}
+              {
+                % deactivated for engine
+                \prg_return_false:
+              }
+              {
+                \__wisper_if_document_class:vTF {g__wisper_package_ #1 _deactivated_for_classes_tl}
+                  {
+                    % deactivated for class
+                    \prg_return_false:
+                  }
+                  {
+                    % else
+                    \prg_return_true:
+                  }
+              }
           }
       }
       {
@@ -292,7 +304,7 @@
         % Do not execute this loading code multiple times. The \usepackage
         % itself would not be problematic, but the custom preset setup code
         % could potentially be.
-        \bool_gset:cn {g__wisper_package_ #1 _loaded_bool} {true}
+        \bool_gset_true:c {g__wisper_package_ #1 _loaded_bool}
         % Load code to apply the options from the selected preset
         \prop_get:cvN
           {g__wisper_package_ #1 _presets_prop}
