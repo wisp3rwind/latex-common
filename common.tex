@@ -182,55 +182,8 @@
         packages/#1/deactivate_for_engines .initial:n = {},
         packages/#1/deactivate_for_classes .tl_gset:c = {g__wisper_package_ #1 _deactivated_for_classes_tl},
         packages/#1/deactivate_for_classes .initial:n = {},
-
-        packages/#1/selected_preset .code:n = 
-          {
-            \prop_if_in:cnTF {g__wisper_package_ #1 _presets_prop} {##1}
-              {
-                \tl_gset:cn {g__wisper_package_ #1 _selected_preset_tl} {##1}
-              }
-              {
-                \__wisper_prop_keys_to_clist:cN
-                  {g__wisper_package_ #1 _presets_prop}
-                  \l__tmpa_clist
-                \msg_error:nnnnn { wisper } { unknown-choice }
-                  { package~preset } {##1} { \l__tmpa_clist }
-              }
-          },
-        packages/#1/selected_preset .value_required:n = true,
-      }
-    % default: no options
-    \__wisper_declare_package_preset:nnn {#1} { default } {} {}
-    \__wisper_select_package_preset:nn {#1} {default}
-  }
-
-\cs_new:Npn \__wisper_select_package_preset:nn #1#2
-  {
-    \__wisper_keys_set_doc:n
-      {
-        packages/#1/selected_preset = #2
       }
   }
-
-% TODO: support combining presets (needs conflict detection)
-
-% Add a package preset:
-% #1 is the package name
-% TODO: #? extends preset name
-% #2 is the preset name
-% #3 are packages options
-% #4 is additional setup code that will (eventually, TODO:!) be run after ALL
-% packages have been loaded.
-\cs_new:Npn \__wisper_declare_package_preset:nnnn #1#2#3#4
-  {
-    \prop_put:cnn {g__wisper_package_ #1 _presets_prop} {#2}
-      {
-        \__wisper_keys_set_doc:nn { packages/#1/options } {#3}
-        \cs_gset:cn {g__wisper_package_ #1 _setup_code_tl:} {#4}
-      }
-  }
-\cs_new:Npn \__wisper_declare_package_preset:nnn #1#2#3
-  { \__wisper_declare_package_preset:nnnn {#1} {#2} {#3} {} }
 
 \cs_new:Npn \__wisper_configure_package:nn #1#2
   { \__wisper_keys_set_doc:nn { packages/#1 } {#2} }
@@ -240,6 +193,7 @@
     \__wisper_declare_package:n {#1}
     \__wisper_configure_package:nn {#1} {#2}
   }
+
 \cs_new:Npn \__wisper_declare_package:nnn #1#2#3
   {
     \__wisper_declare_package:nn {#1} {#2}
@@ -308,13 +262,6 @@
         % itself would not be problematic, but the custom preset setup code
         % could potentially be.
         \bool_gset_true:c {g__wisper_package_ #1 _loaded_bool}
-        % Load code to apply the options from the selected preset
-        \prop_get:cvN
-          {g__wisper_package_ #1 _presets_prop}
-          {g__wisper_package_ #1 _selected_preset_tl}
-          \l_tmpa_tl
-        % Run it
-        \tl_use:N \l_tmpa_tl
         % Load package.
         \usepackage {#1}
         % Use preset setup code.
