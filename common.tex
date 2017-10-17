@@ -436,41 +436,125 @@
     maxcitenames=3,
     maxbibnames=3,
   }
-\__wisper_declare_package_preset:nnn {changepage} {default}
-  { strict }
-\__wisper_declare_package_preset:nnnn {bigfoot} {default}
-  {}
+\__wisper_declare_package:nnn { changepage }
   {
-    \DeclareNewFootnote{default}[alph]
-    \let\footnote\footnotedefault
-    \let\footnotemark\footnotemarkdefault
-    \let\footnotetext\footnotetextdefault
+    disabled,
+    options = {
+      changepage = {
+        strict,
+      }
+    },
   }
-\__wisper_declare_package_preset:nnnn {hyperref} {black}
-  {}
+
+\__wisper_declare_feature:nnn { oneside }
+  % This feature mostly exists to provide dummy commands for justification etc.
+  % so that twoside documents can easily be compiled onesided.
   {
-    \hypersetup
+    enabled,
+  }
+  {
+    \cs_new_eq:NN \raggedoutside \raggedright
+    \NewDocumentEnvironment {flushinside} {}
+      { \bgroup \flushleft }
+      { \egroup }
+  }
+\__wisper_declare_feature:nn { twoside }
+  {
+    disabled,
+    classoptions = { twoside },
+    requires = { changepage },
+  }
+  {
+    \cs_new:Nn \raggedoutside
       {
-        hidelinks
-        bookmarksopen=true,
-        bookmarksopenlevel=3
+        \checkoddpage
+        \ifoddpage
+          \RaggedRight
+        \else
+          \RaggedLeft
+        \fi
+      }
+    \NewDocumentEnvironment {flushinside} {}
+      {
+        \checkoddpage
+        \bgroup
+        \ifoddpage
+          \flushleft
+        \else
+          \flushright
+        \fi
+      }
+      {
+        \egroup
       }
   }
-\__wisper_declare_package_preset:nnnn {hyperref} {pale-colors}
-  {}
+\__wisper_declare_mutually_exclusive_features:n { oneside, twoside }
+
+\__wisper_declare_package:nn { bigfoot }
   {
-    \hypersetup
+    disabled,
+    options = {},
+    conflicting_classes = {},
+    conflicting_packages = {},
+  }
+\__wisper_declare_feature:nnn { alphabetic-default-footnote }
+  {
+    disabled,
+    requires = { bigfoot },
+    conflicting_classes = {},
+    conflicting_packages = {},
+  }
+  {
+    \__wisper_if_package_enabled:n { bigfoot }
       {
+        \DeclareNewFootnote{default}[alph]
+        \cs_gset_eq:NN \footnote \footnotedefault
+        \cs_gset_eq:NN \footnotemark \footnotemarkdefault
+        \cs_gset_eq:NN \footnotetext \footnotetextdefault
+      }
+      {
+        \cs_gset:Nn \thefootnote { \alph{footnote} }
+      }
+  }
+\__wisper_declare_feature:nn { hyperref-bookmarks-default }
+  {
+    enabled,
+    requires = hyperref,
+    package_options = {
+      hyperref = {
+        bookmarksopen=true,
+        bookmarksopenlevel=3,
+      }
+    },
+  }
+\__wisper_declare_feature:nn { hyperref-black }
+  {
+    enabled,
+    requires = hyperref,
+    package_options = {
+      hyperref = {
+        hidelinks,
+      }
+    },
+  }
+\__wisper_declare_feature:nn { hyperref-pale-colors }
+  {
+    enabled,
+    requires = hyperref,
+    package_options = {
+      hyperref = {
         % TODO: this required another package!
         colorlinks=true,
         linkcolor=black,  % for internal links, color is just too much
         citecolor=markdarkteal,
         filecolor=markdarkgreen,
         urlcolor=markdarkblue,
-        bookmarksopen=true,
-        bookmarksopenlevel=3
       }
+    },
   }
+\__wisper_declare_mutually_exclusive_features:n
+  { hyperref-black, hyperref-pale-colors }
+
 \__wisper_declare_package_preset:nnn {showlabels} {default}
   { inner }
 
@@ -491,6 +575,14 @@
 \__wisper_declare_packages:n
   {
     minted = enabled,
+  }
+\__wisper_declare_feature:nnn { minted-default }
+  {
+    enabled,
+    requires = { minted },
+  }
+  {
+    \input{common_code.tex}
   }
 
 % Tables, figures [[[2
@@ -930,53 +1022,30 @@
     \__wisper_if_document_type:nT {book, scrbook}
       {
         \DeclareCaptionJustification{raggedoutside}{\raggedoutside}
-        \newcommand\raggedoutside
-          {%
-            \checkoddpage%
-            \ifoddpage%
-              \RaggedRight%
-            \else%
-              \RaggedLeft%
-            \fi%
-          }
 
-      \NewDocumentEnvironment{flushinside}{}
-        {%
-          \checkoddpage%
-          \bgroup%
-          \ifoddpage%
-            \flushleft%
-          \else%
-            \flushright%
-          \fi%
-        }
-        {%
-          \egroup%
-        }
+        \DeclareCaptionStyle{marginfigure}{justification=raggedoutside,%
+                                           font=footnotesize,%
+                                           labelfont=sc,%
+                                           }
 
-      \DeclareCaptionStyle{marginfigure}{justification=raggedoutside,%
-                                         font=footnotesize,%
-                                         labelfont=sc,%
-                                         }
+        \DeclareCaptionStyle{margintable}{justification=raggedoutside,%
+                                          font=footnotesize,%
+                                          labelfont=sc,%
+                                          }
 
-      \DeclareCaptionStyle{margintable}{justification=raggedoutside,%
+        \DeclareCaptionStyle{sidecaption}{justification=raggedoutside,%
+                                          font=footnotesize,%
+                                          labelfont=sc,%
+                                          }
+        \newlength{\realmarginparwidth}
+        \setlength{\realmarginparwidth}{\marginparwidth}
+        \addtolength{\realmarginparwidth}{\marginparsep}
+
+        \DeclareCaptionStyle{widetable}{%justification=raggedoutside,%
                                         font=footnotesize,%
                                         labelfont=sc,%
+                                        margin={0pt, \realmarginparwidth}
                                         }
-
-      \DeclareCaptionStyle{sidecaption}{justification=raggedoutside,%
-                                        font=footnotesize,%
-                                        labelfont=sc,%
-                                        }
-      \newlength{\realmarginparwidth}
-      \setlength{\realmarginparwidth}{\marginparwidth}
-      \addtolength{\realmarginparwidth}{\marginparsep}
-
-      \DeclareCaptionStyle{widetable}{%justification=raggedoutside,%
-                                      font=footnotesize,%
-                                      labelfont=sc,%
-                                      margin={0pt, \realmarginparwidth}
-                                      }
       }
   }
 
