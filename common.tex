@@ -330,71 +330,91 @@
 % Package declarations [[[1
 % TODO: package option presets!
 
-% Bibliography [[[2
-\__wisper_declare_packages:n
-  {
-    biblatex,
-  }
-
 % Generic [[[2
 \__wisper_declare_packages:n
   {
-    enumitem = enabled,
+    enumitem = { enabled, options = { inline } },
     calc = enabled,
     ragged2e = enabled,
     xcolor = enabled,
-    url = enabled,
+    url = { enabled, options = { hyphens } },
     hyperref = enabled,
     sidenotes,
-    babel,
-    fontenc,
+    babel = { enabled, options = { main=english } },
+    fontenc = { enabled, options = { T1 } },
     csquotes = enabled,
     microtype = enabled,
-    inputenc = enabled,
+    inputenc = { enabled, options = { utf8 } },
     fancyhdr,
     amsthm,
     bigfoot,
     changepage = enabled,
     showlabels,
   }
-\__wisper_declare_package_preset:nnn {babel} {default}
-  { main=english }
-\__wisper_declare_package_preset:nnn {url} {default}
-  { hyphens }
-\__wisper_declare_package_preset:nnn {enumitem} {default}
-  { inline }
-\__wisper_declare_package_preset:nnn {inputenc} {default}
-  { utf8 }
-\__wisper_declare_package_preset:nnn {fontenc} {default}
-  { T1 }
-\__wisper_declare_package_preset:nnn {biblatex} {presentation}
+
+% Bibliography [[[2
+\__wisper_declare_packages:n
   {
-    % many of these options can only be given in \usepackage and not later, unfortunately..
-    hyperref=true,
-    backref=true,
-    style=alphabetic,
-    citereset=section,
-    url=false,
-    isbn=false,%  DOI only
-    maxcitenames=3,
-    maxbibnames=3,
+    biblatex = { disabled, options = { hyperref=true } },
   }
-\__wisper_declare_package_preset:nnn {biblatex} {book}
+
+\__wisper_declare_feature:nn { biblatex-backref }
   {
-    hyperref=true,
-    backref=true,
-    %bibstyle=authoryear,
-    bibstyle=numeric,
-    %bibstyle=alphabetic,
-    citestyle=custom-numeric-comp,
-    %citestyle=numeric-comp,
-    %citestyle=custom-alphabetic,
-    citereset=section,
-    url=false,
-    isbn=false,%  DOI only
-    maxcitenames=3,
-    maxbibnames=3,
+    disabled,
+    requires = biblatex,
+    package_options = {
+      biblatex = {
+        backref=true,
+      },
+    },
   }
+
+\__wisper_declare_feature:nn { biblatex-default-verbosity }
+  {
+    disabled,
+    requires = biblatex,
+    package_options = {
+      biblatex = {
+        url=false,
+        isbn=false,%  DOI only
+        maxcitenames=3,
+        maxbibnames=3,
+        citereset=section,
+      },
+    },
+  }
+
+\__wisper_declare_feature:nn { biblatex-alphabetic }
+  {
+    disabled,
+    requires = { biblatex, biblatex-backref, biblatex-default-verbosity },
+    package_options = {
+      biblatex = {
+        % many of these options can only be given in \usepackage and not later, unfortunately..
+        style=alphabetic,
+      },
+    },
+  }
+
+\__wisper_declare_feature:nn { biblatex-numeric-supercite }
+  {
+    disabled,
+    requires = { biblatex, biblatex-backref, biblatex-default-verbosity },
+    package_options = {
+      biblatex = {
+        %bibstyle=authoryear,
+        bibstyle=numeric,
+        citestyle=custom-numeric-comp,
+        %citestyle=numeric-comp,
+      },
+    },
+  }
+
+\__wisper_declare_feature:nn { biblatex-alphabetic-supercite }
+  {
+    % FIXME: implement
+  }
+
 \__wisper_declare_package:nnn { changepage }
   {
     disabled,
@@ -656,11 +676,30 @@
 % Font handling [[[1
 
 % Property list to hold the loading code [[[2
+\__wisper_declare_feature:nnn { font-lmodern }
+  {
+    requires = lmodern,
+  }
+  {
+    \__wisper_load_package:n { lmodern }
+  }
 \prop_new:N \__wisper_font_presets_prop
 \prop_put:Nnn \__wisper_font_presets_prop { lmodern } % [[[3
   {
     \__wisper_enable_package:n {lmodern}
     \__wisper_load_package:n {lmodern}
+  }
+\__wisper_declare_feature:nnn { font-fira }
+  {
+    requires = { FiraMono, FiraSans },
+    options = {
+      FiraSans = sfdefault
+    },
+  }
+  {
+    % Mozilla Fira Sans, requires XeLaTeX or LuaLaTex TODO: raise error
+    \__wisper_load_package:n {FiraSans}
+    \__wisper_load_package:n {FiraMono}
   }
 \prop_put:Nnn \__wisper_font_presets_prop { fira } % [[[3
   {
@@ -1083,7 +1122,7 @@
 
     % Early Package loads
     \__wisper_load_packages:n { before-font }
-    \__wisper_load_font:
+    \__wisper_load_features:n { font }
     % Adjust layout.
     \__wisper_if_document_class:nT {koma}
       { \KOMAoptions{DIV=last} }
@@ -1098,7 +1137,7 @@
     \__wisper_select_package_preset:nn {hyperref} {pale-colors}
     % here: enable features
     \__wisper_load_packages:n { main }
-    \__wisper_load_features:
+    \__wisper_load_features:n { main }
   }
 
 \ExplSyntaxOff
