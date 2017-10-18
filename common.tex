@@ -75,9 +75,28 @@
   }
 \cs_generate_variant:Nn \__wisper_load_with_optional_arg:NNn { NNV, Ncn}
 
+\prg_new_conditional:Npnn \__strlist_if_in:nn #1#2 { p, T, F, TF }
+  {
+    \exp_args:No \__strlist_if_in:nww { \tl_to_str:n {#2} }
+      #1 , \q_recursion_tail ,
+    \__prg_break_point:
+  }
+\cs_new:Npn \__strlist_if_in:nww #1 #2 , #3
+  {
+    \if_meaning:w \q_recursion_tail #1
+      \prg_return_false:
+      \__prg_break:
+    \else:
+      \str_if_eq:nnTF {#1} {#2}
+        { \prg_return_true: \__prg_break: }
+        { \__strlist_if_in:nww {#1} }
+    \fi:
+  }
+\cs_generate_variant:Nn \__strlist_if_in:nnTF { nVTF }
 \prg_new_conditional:Npnn \__wisper_if_engine:n #1 { T, F, TF }
   {
-    \clist_if_in:nVTF {#1} \c_sys_engine_str
+    \__strlist_if_in:nVTF {#1} \c_sys_engine_str
+    %\clist_if_in:nVTF {#1} \c_sys_engine_str
       { \prg_return_true: }
       { \prg_return_false: }
   }
