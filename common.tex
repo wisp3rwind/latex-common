@@ -820,29 +820,6 @@
       \linespread{1.05}
     }  % ]]]
 
-% Interface for font preset selection [[[2
-\tl_new:N \g__wisper_font_preset_code_tl
-\cs_new:Nn \__wisper_load_font:
-  {
-    \tl_use:N \g__wisper_font_preset_code_tl
-  }
-\__wisper_keys_define_doc:n
-  {
-    font/preset .code:n =
-      {
-        \prop_get:NnNF \__wisper_font_presets_prop {#1} \g__wisper_font_preset_code_tl
-          {
-            \msg_error:nnnnn { wisper } { unknown-choice }
-              { font~preset }
-              {#1}
-              { lmodern, fira, garamond, palatino, TexGyre }
-          }
-      },
-
-    % default
-    font/preset .initial:n = {TexGyre},
-  }
-
 % Footnotes [[[1
 
 \bool_new:N \g__wisper_footnotes_multiple_bool
