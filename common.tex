@@ -19,6 +19,8 @@
 \cs_generate_variant:Nn \prop_get:cnN { cvN }
 \cs_new_eq:NN \__wisper_pass_options_to_package:nn \PassOptionsToPackage
 \cs_generate_variant:Nn \__wisper_pass_options_to_package:nn { Vn }
+\cs_generate_variant:Nn \bool_not_p:n { v }
+\cs_generate_variant:Nn \bool_if_p:n { v }
 
 % Debugging helpers [[[1
 \clist_new:N \g__wisper_debug_modules_clist
@@ -98,7 +100,7 @@
   }
 \cs_generate_variant:Nn \__strlist_if_in:nnTF { nVTF }
 
-\prg_new_conditional:Npnn \__wisper_if_engine:n #1 { T, F, TF }
+\prg_new_conditional:Npnn \__wisper_if_engine:n #1 { p, T, F, TF }
   {
     \__strlist_if_in:nVTF {#1} \c_sys_engine_str
     %\clist_if_in:nVTF {#1} \c_sys_engine_str
@@ -106,6 +108,7 @@
       { \prg_return_false: }
   }
 \cs_generate_variant:Nn \__wisper_if_engine:nTF { vTF }
+\cs_generate_variant:Nn \__wisper_if_engine_p:n { v }
 
 % Code mostly borrowed from \__str_case:nnTF
 \cs_new:Npn \__wisper_switch_engine:n #1
@@ -181,25 +184,18 @@
   }
 
 % Conditional for the document class.
-\prg_new_conditional:Npnn \__wisper_if_document_class:n #1
-  { p, T, F, TF}
+\prg_new_conditional:Npnn \__wisper_if_document_class:n #1 { p, T, F, TF}
   { 
     \str_if_eq:nnTF {#1} {koma}
       {
         % koma is an alias for any KOMA-script class
-        \__wisper_if_document_class:nTF { scrartcl, scrbook, scrreprt, scrlttr2 }
-          { \prg_return_true: }
-          { \prg_return_false: }
+        \__wisper_if_document_class_p:n { scrartcl, scrbook, scrreprt, scrlttr2 }
       }
       {
-        \clist_if_in:nVTF {#1} \g__wisper_classname_str 
-          { \prg_return_true: }
-          { \prg_return_false: }
+        \strlist_if_in_p:nV {#1} \g__wisper_classname_str 
       }
   }
 \cs_generate_variant:Nn \__wisper_if_document_class:nTF { vTF }
-
-\msg_new:nnn { wisper } { declaring-package } { Declaring~package~'#1'. }
 
 \cs_new:Npn \__wisper_prop_keys_to_clist:NN #1#2
   {
@@ -207,135 +203,6 @@
     \prop_map_inline:Nn #1 { \clist_put_right:Nn #2 {##1} }
   }
 \cs_generate_variant:Nn \__wisper_prop_keys_to_clist:NN { cN }
-
-% Package declaration helpers [[[1
-\cs_new:Npn \__wisper_declare_package:n #1
-  {
-    \__wisper_if_debug:nT { declaration }
-      { \msg_warning:nnn { wisper } { declaring-package } {#1} }
-
-    \prop_new:c {g__wisper_package_ #1 _presets_prop}
-    \cs_new:cn {g__wisper_package_ #1 _setup_code_tl:} {}  % no-op
-    \bool_new:c {g__wisper_package_ #1 _loaded_bool}
-    \bool_new:c {g__wisper_package_ #1 _enabled_bool}
-
-    \__wisper_keys_define_doc:n
-      {
-        packages/#1/enabled .bool_gset:c = {g__wisper_package_ #1 _enabled_bool},
-        packages/#1/enabled .default:n = true,
-        packages/#1/disabled .bool_gset_inverse:c = {g__wisper_package_ #1 _enabled_bool},
-        packages/#1/enabled .default:n = true,
-
-        packages/#1/options / unknown .code:n =
-          { \__wisper_pass_options_to_package:Vn \l_keys_key_tl {#1} },
-
-        packages/#1/conflicts / classes .tl_gset:c = {g__wisper_package_ #1 _conflicting_classes_tl},
-        packages/#1/conflicts / packages .tl_gset:c = {g__wisper_package_ #1 _conflicting_packages_tl},
-        packages/#1/conflicts / classes .initial:n = {},
-        packages/#1/conflicts / packages .initial:n = {},
-
-        % e.g. document classes can prevent loading a package, should raise an
-        % error if enabled explicitly in some place.
-        packages/#1/deactivate .bool_gset:c = {g__wisper_package_ #1 _deactivated_bool},
-        packages/#1/deactivate_for_engines .tl_gset:c = {g__wisper_package_ #1 _deactivated_for_engines_tl},
-        packages/#1/deactivate_for_engines .initial:n = {},
-        packages/#1/deactivate_for_classes .tl_gset:c = {g__wisper_package_ #1 _deactivated_for_classes_tl},
-        packages/#1/deactivate_for_classes .initial:n = {},
-      }
-  }
-
-\cs_new:Npn \__wisper_configure_package:nn #1#2
-  { \__wisper_keys_set_doc:nn { packages/#1 } {#2} }
-
-\cs_new:Npn \__wisper_declare_package:nn #1#2
-  {
-    \__wisper_declare_package:n {#1}
-    \__wisper_configure_package:nn {#1} {#2}
-  }
-
-\cs_new:Npn \__wisper_declare_package:nnn #1#2#3
-  {
-    \__wisper_declare_package:nn {#1} {#2}
-    \cs_gset:cn {g__wisper_package_ #1 _setup_code_tl:} {#3}
-  }
-
-% name={keyvals} clist
-\cs_new:Npn \__wisper_declare_packages:n #1
-  {
-    \keyval_parse:NNn
-      \__wisper_declare_package:n
-      \__wisper_declare_package:nn
-      {#1}
-  }
-
-\cs_new:Npn \__wisper_enable_package:n #1
-  { \bool_gset_true:c {g__wisper_package_ #1 _enabled_bool} }
-
-\cs_new:Npn \__wisper_disable_package:n #1
-  { \bool_gset_false:c {g__wisper_package_ #1 _enabled_bool} }
-
-\cs_new:Npn \__wisper_set_package_options:nn #1#2
-  { \__wisper_keys_set_doc:nn { packages/#1/options } {#2} }
-
-\prg_new_conditional:Npnn \__wisper_should_load_package:n #1 { T, F, TF }
-  {
-    % TODO: simplify. The following doesn't work unfortunately
-    %\bool_lazy_any:nTF
-    %  {
-    %    { \bool_not_p:c {g__wisper_package_ #1 _enabled_bool} }
-    %    { \bool_if_p:c {g__wisper_package_ #1 _loaded_bool} }
-    %    { \__wisper_if_engine_p:v {g__wisper_package_ #1 _deactivated_for_engines_tl} }
-    %    { \__wisper_if_document_class_p:v {g__wisper_package_ #1 _deactivated_for_classes_tl} }
-    %  }
-    % TODO: respect forced deactivation
-    \bool_if:cTF {g__wisper_package_ #1 _enabled_bool}
-      {
-        % enabled
-        \bool_if:cTF {g__wisper_package_ #1 _loaded_bool}
-          {
-            % already loaded
-            \prg_return_false:
-          }
-          {
-            \__wisper_if_engine:vTF {g__wisper_package_ #1 _deactivated_for_engines_tl}
-              {
-                % deactivated for engine
-                \prg_return_false:
-              }
-              {
-                \__wisper_if_document_class:vTF {g__wisper_package_ #1 _deactivated_for_classes_tl}
-                  {
-                    % deactivated for class
-                    \prg_return_false:
-                  }
-                  {
-                    % else
-                    \prg_return_true:
-                  }
-              }
-          }
-      }
-      {
-        % disabled
-        \prg_return_false:
-      }
-  }
-
-\cs_new:Npn \__wisper_load_package:n #1
-  {
-    % Apply preset options.
-    \__wisper_should_load_package:nT {#1}
-      {
-        % Do not execute this loading code multiple times. The \usepackage
-        % itself would not be problematic, but the custom preset setup code
-        % could potentially be.
-        \bool_gset_true:c {g__wisper_package_ #1 _loaded_bool}
-        % Load package.
-        \usepackage {#1}
-        % Use preset setup code.
-        \use:c {g__wisper_package_ #1 _setup_code_tl:}
-      }
-  }
 
 % Features [[[1
 \prop_new:N \g__wisper_feature_features_prop
@@ -371,9 +238,9 @@
         % e.g. document classes can prevent loading a feature, should raise an
         % error if enabled explicitly in some place.
         features/#1/deactivate .bool_gset:c = {g__wisper_package_ #1 _deactivated_bool},
-        features/#1/deactivate_for_engines .tl_gset:c = {g__wisper_package_ #1 _deactivated_for_engines_tl},
+        features/#1/deactivate_for_engines .tl_gset:c = {g__wisper_package_ #1 _deactivated_for_engines_strlist},
         features/#1/deactivate_for_engines .initial:n = {},
-        features/#1/deactivate_for_classes .tl_gset:c = {g__wisper_package_ #1 _deactivated_for_classes_tl},
+        features/#1/deactivate_for_classes .tl_gset:c = {g__wisper_package_ #1 _deactivated_for_classes_strlist},
         features/#1/deactivate_for_classes .initial:n = {},
       }
 
@@ -383,22 +250,7 @@
   { \__wisper_keys_set_doc:nn { features/#1 } {#2} }
 \cs_new:Npn \__wisper_set_feature_config:nnn #1#2#3
   { \__wisper_keys_set_doc:nn { features/#1/#2 } {#3} }
-\cs_new_Npn \__wisper_declare_package:nnn #1#2#3
-  {
-    \clist_put_right:Nn \g__wisper_all_features_packages_clist {#1}
-    \__wisper_declare_feature:nnn {#1} {#2}
-      {
-        \usepackage{#1}
-        #3
-      }
-    \__wisper_keys_define_doc:n
-      {
-        features/#1/options / unknown .code:n =
-          { \__wisper_pass_options_to_package:Vn \l_keys_key_tl {#1} },
-      }
-  }
-\cs_new_Npn \__wisper_declare_package:nn #1#2
-  { \__wisper_declare_package:nnn {#1} {#2} {} }
+
 \cs_new:Npn \__wisper_enable_feature:n #1
   {
     \bool_if:cF {g__wisper_feature_ #1 _enabled_bool}
@@ -421,6 +273,57 @@
           { \msg_warning:nnn { wisper } { feature-executing } {##1} }
         \use:n {##2}
       }
+  }
+% Feature loading [[[2
+\prg_new_conditional:Npnn \__wisper_should_load_feature:n #1 { T, F, TF }
+  {
+    \bool_lazy_any_p:n
+      {
+        { \bool_not_p:v {g__wisper_feature_ #1 _enabled_bool} }
+        { \bool_if_p:v {g__wisper_feature_ #1 _loaded_bool} }
+        { \__wisper_if_engine_p:v {g__wisper_feature_ #1 _deactivated_for_engines_strlist} }
+        { \__wisper_if_document_class_p:v {g__wisper_feature_ #1 _deactivated_for_classes_strlist} }
+      }
+  }
+\cs_new:Npn \__wisper_load_feature:n #1
+  {
+    \__wisper_should_load_feature:nT {#1}
+      {
+        \bool_gset_true:c {g__wisper_feature_ #1 _loaded_bool}
+        \use:c {g__wisper_feature_ #1 _code_tl}
+      }
+  }
+\cs_new:Npn \__wisper_load_features:n #1
+  {
+    \clist_map_inline:cn {g__wisper_all_features_ #1 _clist}
+      { \__wisper_load_feature:n {##1} }
+  }
+
+% Special case features: packages [[[2
+\cs_new_Npn \__wisper_declare_package:nnn #1#2#3
+  {
+    \clist_put_right:Nn \g__wisper_all_features_packages_clist {#1}
+    \__wisper_declare_feature:nnn {#1} {#2}
+      {
+        \usepackage{#1}
+        #3
+      }
+    \__wisper_keys_define_doc:n
+      {
+        features/#1/options / unknown .code:n =
+          { \__wisper_pass_options_to_package:Vn \l_keys_key_tl {#1} },
+      }
+  }
+\cs_new:Npn \__wisper_declare_package:nn #1#2
+  { \__wisper_declare_package:nnn {#1} {#2} {} }
+\cs_new:Npn \__wisper_declare_package:n #1
+  { \__wisper_declare_package:nnn {#1} {} {} }
+\cs_new:Npn \__wisper_declare_packages:n #1
+  {
+    \keyval_parse:NNn
+      \__wisper_declare_package:n
+      \__wisper_declare_package:nn
+      {#1}
   }
 
 % Package declarations [[[1
@@ -902,17 +805,6 @@
 
 % Load packages
 
-\cs_new:Npn \__wisper_load_features:n #1
-  {
-    \str_if_eq:nnT {#1} { before-font }
-      {
-          \__wisper_load_feature:n
-      }
-    \str_if_eq:nnT {#1} { main }
-      {
-          \__wisper_load_feature:n
-      }
-  }
 
 % TODO: automatically set these clists from \__wisper_declare_feature:
 \clist_gset:Nn \g__wisper_all_features_early_packages_clist
@@ -967,11 +859,6 @@
   }
 \clist_new:n \g__wisper_all_features_main_clist
 
-\cs_new:Npn \__wisper_load_features:n #1
-  {
-    \clist_map_inline:cn {g__wisper_all_features_ #1 _clist}
-      { \__wisper_load_feature:n {##1} }
-  }
 
 % New packages to investigate
 % subfigure
