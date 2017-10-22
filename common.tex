@@ -735,20 +735,14 @@
 % Font handling [[[1
 
 % Property list to hold the loading code [[[2
-\__wisper_declare_feature:nnn { font-lmodern }
+\__wisper_declare_feature:nnn { font-lmodern }  % [[[
   {
     requires = lmodern,
   }
   {
     \__wisper_load_package:n { lmodern }
-  }
-\prop_new:N \__wisper_font_presets_prop
-\prop_put:Nnn \__wisper_font_presets_prop { lmodern } % [[[3
-  {
-    \__wisper_enable_package:n {lmodern}
-    \__wisper_load_package:n {lmodern}
-  }
-\__wisper_declare_feature:nnn { font-fira }
+  }  % ]]]
+\__wisper_declare_feature:nnn { font-fira }  % [[[
   {
     requires = { FiraMono, FiraSans },
     options = {
@@ -759,70 +753,72 @@
     % Mozilla Fira Sans, requires XeLaTeX or LuaLaTex TODO: raise error
     \__wisper_load_package:n {FiraSans}
     \__wisper_load_package:n {FiraMono}
-  }
-\prop_put:Nnn \__wisper_font_presets_prop { fira } % [[[3
+  }  % ]]]
+  \__wisper_declare_feature:nnn { font-garamond }  % [[[
   {
-    % Mozilla Fira Sans, requires XeLaTeX or LuaLaTex TODO: raise error
-    \__wisper_enable_package:n {FiraSans}
-    \__wisper_enable_package:n {FiraMono}
-    \__wisper_pass_options_to_package:nn {sfdefault} {FiraSans}
-    \__wisper_load_package:n {FiraSans}
-    \__wisper_load_package:n {FiraMono}
+    requires = { mathdesign },
+    options = {
+      mathdesign = urw-garamond,
+    },
   }
-\prop_put:Nnn \__wisper_font_presets_prop { garamond } % [[[3
   {
-    % URW-Garamond: A free garamond font, supposedly good for books but to fragile
-    %   for presentations. Math fonts provided by the mathdesign project
-    \__wisper_enable_package:n {mathdesign}
-    \__wisper_pass_options_to_package:nn {urw-garamond} {mathdesign}
-    \__wisper_load_package:n {mathdesign}
+    % URW-Garamond: A free garamond font, supposedly good for books but to
+    % fragile for presentations. Math fonts provided by the mathdesign project
     % FIXME: maybe drop this? PagellaX is better anyway. At least give a
     % warning.
     % TODO: matching sans font
-  }
-\prop_put:Nnn \__wisper_font_presets_prop { palatino } % [[[3
+    \__wisper_load_package:n {mathdesign}
+  }  % ]]]
+  \__wisper_declare_feature:nnn { font-palatino }  % [[[
   {
-    \__wisper_enable_package:n {mathpazo}
-    \__wisper_pass_options_to_package:nn {osf} {mathpazo}
+    requires = { mathpazo },
+    options = {
+      mathpazo = osf,
+    },
+  }
+  {
     \__wisper_load_package:n {mathpazo}
-  }
-\prop_put:Nnn \__wisper_font_presets_prop { TexGyre } % [[[3
+  }  % ]]]
+\__wisper_declare_feature:nnn { font-TexGyre }  % [[[
   {
-    \__wisper_enable_package:n {amsthm}
-    \__wisper_load_package:n {amsthm}  % preload amsthm to suppress error due to newpxmath redfining \openbox
-    \__wisper_enable_package:n {newpxmath}
-    \__wisper_pass_options_to_package:nn {vvarbb} {newpxmath}
+    requires = { amsthm, newpxmath, newpxtext, fontspec },
+    options = {
+      newpxmath = vvarbb,
+      fontspec = no-math,
+    },
+  }
+  {
+    % preload amsthm to suppress error due to newpxmath redfining \openbox
+    \__wisper_load_package:n {amsthm}
     \__wisper_load_package:n {newpxmath}
-    % TODO: tex/xetextex/luatex switch that is more readable
-    \sys_if_engine_luatex:TF
+
+    \__wisper_switch_engine:nF
       {
-        % LuaTeX
-        \__wisper_enable_package:n {fontspec}
-        \__wisper_pass_options_to_package:nn {no-math} {fontspec}
-        \__wisper_load_package:n {fontspec}
-        % TODO: ensure correct small caps, \usepackage[largesc]{newpxtext}
-        \setmainfont{TeXGyrePagellaX}[Numbers=OldStyle]
-        \setsansfont{TeXGyreHeros}
-        % TODO: where appropriate, check for \liningnumtext to be defined and
-        % use it.
-        \newfontfamily\liningnumtext{TeXGyrePagellaX}[Numbers=Lining]
-      }
-      {
-        \sys_if_engine_xetex:TF
+        { luatex }
           {
-            % XeTeX
+            \__wisper_load_package:n {fontspec}
+            % TODO: ensure correct small caps, \usepackage[largesc]{newpxtext}
+            \setmainfont{TeXGyrePagellaX}[Numbers=OldStyle]
+            \setsansfont{TeXGyreHeros}
+            % TODO: where appropriate, check for \liningnumtext to be defined and
+            % use it.
+            \newfontfamily\liningnumtext{TeXGyrePagellaX}[Numbers=Lining]
+          }
+        { xetex }
+          {
             \PackageError{---}{No~XeTeX~support~here.}
           }
-          {
-            % Other TeX
-            \__wisper_enable_package:n {newpxtext}
-            \__wisper_pass_options_to_package:nn {largesc} {newpxtext}
-            \__wisper_load_package:n {newpxtext}
-            \useosf
-          }
       }
-    \linespread{1.05} 
-  }
+      {
+        % Other TeX
+        \__wisper_enable_package:n {newpxtext}
+        \__wisper_pass_options_to_package:nn {largesc} {newpxtext}
+        \__wisper_load_package:n {newpxtext}
+        \useosf
+      }
+
+      \linespread{1.05}
+    }  % ]]]
 
 % Interface for font preset selection [[[2
 \tl_new:N \g__wisper_font_preset_code_tl
