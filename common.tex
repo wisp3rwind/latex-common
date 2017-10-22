@@ -8,6 +8,30 @@
 % -> fonts are nothing but features!
 % TODO: append code to package setup (independent of enabling)
 
+% New packages to investigate
+% subfigure
+% geometry
+% pdfpages
+% cite  % better support for numeric citations
+% longtable  % wrap tables at page boundaries, succeeds supertabular
+% supertabular  % wrap tables at page boundaries
+% wrapfig
+% footmisc
+% epstopdf
+% textcomp
+% marginnote
+
+
+%\mhchemoptions{textfontcommand=\liningnumtext}
+%\IfPresentationT{\renewcommand*{\bibfont}{\scriptsize}}
+
+% TODO: remember to set locale correctly!!
+%\sisetup{%
+%  separate-uncertainty=true,
+%  %locale = DE,
+%  %per-mode = symbol
+%}
+
 
 % Early packages loads required for handling the configuration [[[1
 \RequirePackage{xparse}  % includes the l3 kernel
@@ -174,7 +198,7 @@
 \str_new:N \g__wisper_classname_str
 \prop_new:N \g__wisper_classopts_prop
 
-% Document class loader.
+% Document class loader.   [[[2
 \cs_new:Nn \__wisper_load_document_class:
   {
     \__wisper_load_with_optional_arg:NNV
@@ -183,7 +207,7 @@
       \g__wisper_classname_str
   }
 
-% Conditional for the document class.
+% Conditional for the document class.   [[[2
 \prg_new_conditional:Npnn \__wisper_if_document_class:n #1 { p, T, F, TF}
   { 
     \str_if_eq:nnTF {#1} {koma}
@@ -203,6 +227,100 @@
     \prop_map_inline:Nn #1 { \clist_put_right:Nn #2 {##1} }
   }
 \cs_generate_variant:Nn \__wisper_prop_keys_to_clist:NN { cN }
+
+% TODO: require values for paper, roman/sans, languages, landscape, tocdepth, type. Or somehow
+% support default values?
+% -> Ensure that all keys can be set multiple times without issues.
+
+% Key-value interface to pre-defined document layouts ('document types'). [[[2
+\__wisper_keys_define_doc:n
+  {
+    paper .choices:nn =
+      { a4paper, a5paper }
+      {
+        \prop_put:NnV \g__wisper_classopts_prop {paper} \l_keys_choice_tl
+      },
+    paper / unknown .code:n =
+      {
+        \msg_error:nnnnn { wisper } { unknown-choice }
+          { paper~format }
+          {#1}
+          { a4paper, a5paper} % TODO: Don't hardcode
+      },
+    languages .code:n =
+      {
+        \clist_map_inline:nn {#1}
+          { \prop_put:Nnn \g__wisper_classopts_prop {##1} {} }
+      },
+    main_language .code:n =
+      {
+        \__wisper_set_package_options:nn {babel} {main=#1}
+        \prop_put:Nnn \g__wisper_classopts_prop {#1} {}
+      },
+
+    languages .initial:n = {english},
+
+    %landscape .bool:,
+
+    type .choice:,
+    type / article .code:n = 
+      {
+        \str_set:Nn \g__wisper_document_type_str {article}
+        \str_set:Nn \g__wisper_classname_str {article}
+        \prop_put:Nnn \g__wisper_classopts_prop {a4paper} {}
+      },
+    type / presentation .code:n = 
+      {
+        \str_set:Nn \g__wisper_document_type_str {presentation}
+        \str_set:Nn \g__wisper_classname_str {beamer}
+      },
+    type / letter .code:n = 
+      {
+        \str_set:Nn \g__wisper_document_type_str {letter}
+        \str_set:Nn \g__wisper_classname_str {scrlttr2}
+        \prop_put:Nnn \g__wisper_classopts_prop {a4paper} {}
+      },
+    type / book .code:n = 
+      {
+        \str_set:Nn \g__wisper_document_type_str {book}
+        \str_set:Nn \g__wisper_classname_str {book}
+        \prop_put:Nnn \g__wisper_classopts_prop {a4paper} {}
+      },
+    type / scrbook .code:n = 
+      {
+        \str_set:Nn \g__wisper_document_type_str {scrbook}
+        \str_set:Nn \g__wisper_classname_str {scrbook}
+        \prop_put:Nnn \g__wisper_classopts_prop {a4paper} {}
+        \prop_put:Nnn \g__wisper_classopts_prop {BCOR} {0mm}
+        \prop_put:Nnn \g__wisper_classopts_prop {DIV} {10}
+        \prop_put:Nnn \g__wisper_classopts_prop {pagesize} {}
+      },
+    type / unknown .code:n =
+      {
+        \msg_error:nnnnn { wisper } { unknown-choice }
+          { document~type }
+          {#1}
+          { article, presentation, letter, book, scrbook } % TODO: Don't hardcode
+      },
+  }
+
+% Conditionals [[[2
+\prg_new_conditional:Npnn \__wisper_if_document_type:n #1
+  { p, T, F, TF}
+  { 
+    \clist_if_in:nVTF {#1} \g__wisper_document_type_str
+      { \prg_return_true: }
+      { \prg_return_false: }
+  }
+
+% User-accessible aliases.
+\cs_new_eq:NN \IfDocTypeT \__wisper_if_document_type:nT
+\cs_new_eq:NN \IfDocTypeF \__wisper_if_document_type:nF
+\cs_new_eq:NN \IfDocTypeTF \__wisper_if_document_type:nTF
+
+\cs_new_eq:NN \IfDocClassT \__wisper_if_document_class:nT
+\cs_new_eq:NN \IfDocClassF \__wisper_if_document_class:nF
+\cs_new_eq:NN \IfDocClassTF \__wisper_if_document_class:nTF
 
 % Features [[[1
 \prop_new:N \g__wisper_feature_features_prop
@@ -326,218 +444,11 @@
       {#1}
   }
 
-% Package declarations [[[1
+% Feature declarations [[[1
 % TODO: package option presets!
 
-% Generic [[[2
-\__wisper_declare_packages:n
-  {
-    enumitem = {
-      enabled,
-      options = { inline },
-      % doesn't play well with overlay specifications
-      deactivate_for_classes = { beamer },
-    },
-    calc = enabled,
-    ragged2e = enabled,
-    xcolor = enabled,
-    url = {
-      enabled,
-      options = { hyphens },
-      % loaded early by hyperref which is loaded way to early by beamer...
-      % loading it again gives an option clash.
-      deactivate_for_classes = { beamer },
-    },
-    hyperref = enabled,
-    sidenotes,
-    babel = { enabled, options = { main=english } },
-    fontenc = { enabled, options = { T1 } },
-    csquotes = enabled,
-    microtype = enabled,
-    inputenc = {
-      enabled,
-      options = { utf8 },
-      % Suppress inputenc warning for utf8 engines
-      deactivate_for_engines = { luatex, xetex },
-    },
-    fancyhdr,
-    amsthm,
-    bigfoot,
-    changepage = enabled,
-    showlabels,
-  }
-
-% Bibliography [[[2
-  \__wisper_declare_package:nn { biblatex }
-  {
-    disabled,
-    options = { hyperref=true },
-  }
-
-\__wisper_declare_feature:nn { biblatex-backref }
-  {
-    disabled,
-    requires = {
-      biblatex = {
-        backref=true,
-      },
-    },
-  }
-
-\__wisper_declare_feature:nn { biblatex-default-verbosity }
-  {
-    disabled,
-    requires = {
-      biblatex = {
-        url=false,
-        isbn=false,%  DOI only
-        maxcitenames=3,
-        maxbibnames=3,
-        citereset=section,
-      },
-    },
-  }
-
-\__wisper_declare_feature:nn { biblatex-alphabetic }
-  {
-    disabled,
-    requires = {
-      biblatex = {
-        % many of these options can only be given in \usepackage and not later, unfortunately..
-        style=alphabetic,
-      },
-      biblatex-backref,
-      biblatex-default-verbosity,
-    },
-  }
-
-\__wisper_declare_feature:nn { biblatex-numeric-supercite }
-  {
-    disabled,
-    requires = {
-      biblatex = {
-        %bibstyle=authoryear,
-        bibstyle=numeric,
-        citestyle=custom-numeric-comp,
-        %citestyle=numeric-comp,
-      },
-      biblatex-backref,
-      biblatex-default-verbosity,
-    },
-  }
-
-\__wisper_declare_feature:nn { biblatex-alphabetic-supercite }
-  {
-    % FIXME: implement
-  }
-
-\__wisper_declare_package:nn { changepage }
-  {
-    disabled,
-  }
-
-\__wisper_declare_feature:nnn { oneside }
-  % This feature mostly exists to provide dummy commands for justification etc.
-  % so that twoside documents can easily be compiled onesided.
-  {
-    enabled,
-  }
-  {
-    \cs_new_eq:NN \raggedoutside \raggedright
-    \NewDocumentEnvironment {flushinside} {}
-      { \bgroup \flushleft }
-      { \egroup }
-  }
-\__wisper_declare_feature:nn { twoside }
-  {
-    disabled,
-    classoptions = { twoside },
-    requires = {
-      changepage = strict,
-    },
-  }
-  {
-    \cs_new:Nn \raggedoutside
-      {
-        \checkoddpage
-        \ifoddpage
-          \RaggedRight
-        \else
-          \RaggedLeft
-        \fi
-      }
-    \NewDocumentEnvironment {flushinside} {}
-      {
-        \checkoddpage
-        \bgroup
-        \ifoddpage
-          \flushleft
-        \else
-          \flushright
-        \fi
-      }
-      {
-        \egroup
-      }
-  }
-\__wisper_declare_mutually_exclusive_features:n { oneside, twoside }
-
-\__wisper_declare_package:n { bigfoot }
-\__wisper_declare_feature:nnn { alphabetic-default-footnote }
-  {
-    requires = { bigfoot },
-  }
-  {
-    \__wisper_if_feature_enabled:n { bigfoot }
-      {
-        \DeclareNewFootnote{default}[alph]
-        \cs_gset_eq:NN \footnote \footnotedefault
-        \cs_gset_eq:NN \footnotemark \footnotemarkdefault
-        \cs_gset_eq:NN \footnotetext \footnotetextdefault
-      }
-      {
-        \cs_gset:Nn \thefootnote { \alph{footnote} }
-      }
-  }
-\__wisper_declare_feature:nn { hyperref-bookmarks-default }
-  {
-    enabled,
-    requires = {
-      hyperref = {
-        bookmarksopen=true,
-        bookmarksopenlevel=3,
-      }
-    },
-  }
-\__wisper_declare_feature:nn { hyperref-black }
-  {
-    requires = {
-      hyperref = {
-        hidelinks,
-      }
-    },
-  }
-\__wisper_declare_feature:nn { hyperref-pale-colors }
-  {
-    enabled,
-    requires = {
-      hyperref = {
-        % TODO: this required another package!
-        colorlinks=true,
-        linkcolor=black,  % for internal links, color is just too much
-        citecolor=markdarkteal,
-        filecolor=markdarkgreen,
-        urlcolor=markdarkblue,
-      }
-    },
-  }
-\__wisper_declare_mutually_exclusive_features:n
-  { hyperref-black, hyperref-pale-colors }
-
-\__wisper_declare_package:nn { showlabels }
-  { options = inner }
-
-% Fonts, handled differently (for now?) [[[2
+% Fonts [[[2
+% Packages [[[
 \__wisper_declare_packages:n
   {
     % These packages are not supposed to be loaded in
@@ -551,131 +462,7 @@
     FiraMono,
     mathdesign,
     mathpazo,
-  }
-
-% Code display [[[2
-\__wisper_declare_packages:n
-  { minted }
-\__wisper_declare_feature:nnn { minted-default }
-  {
-    requires = { minted },
-  }
-  {
-    \input{common_code.tex}
-  }
-
-% Tables, figures [[[2
-\__wisper_declare_packages:n
-  {
-    float = enabled,
-    rotating = enabled,
-    booktabs = enabled,
-    array = enabled,
-    multirow,
-    tabu,
-    caption = enabled,
-    subcaption = enabled,
-    graphicx = enabled,
-  }
-
-% TODO: require values for paper, roman/sans, languages, landscape, tocdepth, type. Or somehow
-% support default values?
-% -> Ensure that all keys can be set multiple times without issues.
-
-% Document types [[[1
-% Key-value interface to pre-defined document layouts ('document types'). [[[2
-\__wisper_keys_define_doc:n
-  {
-    paper .choices:nn =
-      { a4paper, a5paper }
-      {
-        \prop_put:NnV \g__wisper_classopts_prop {paper} \l_keys_choice_tl
-      },
-    paper / unknown .code:n =
-      {
-        \msg_error:nnnnn { wisper } { unknown-choice }
-          { paper~format }
-          {#1}
-          { a4paper, a5paper} % TODO: Don't hardcode
-      },
-    languages .code:n =
-      {
-        \clist_map_inline:nn {#1}
-          { \prop_put:Nnn \g__wisper_classopts_prop {##1} {} }
-      },
-    main_language .code:n =
-      {
-        \__wisper_set_package_options:nn {babel} {main=#1}
-        \prop_put:Nnn \g__wisper_classopts_prop {#1} {}
-      },
-
-    languages .initial:n = {english},
-
-    %landscape .bool:,
-
-    type .choice:,
-    type / article .code:n = 
-      {
-        \str_set:Nn \g__wisper_document_type_str {article}
-        \str_set:Nn \g__wisper_classname_str {article}
-        \prop_put:Nnn \g__wisper_classopts_prop {a4paper} {}
-      },
-    type / presentation .code:n = 
-      {
-        \str_set:Nn \g__wisper_document_type_str {presentation}
-        \str_set:Nn \g__wisper_classname_str {beamer}
-      },
-    type / letter .code:n = 
-      {
-        \str_set:Nn \g__wisper_document_type_str {letter}
-        \str_set:Nn \g__wisper_classname_str {scrlttr2}
-        \prop_put:Nnn \g__wisper_classopts_prop {a4paper} {}
-      },
-    type / book .code:n = 
-      {
-        \str_set:Nn \g__wisper_document_type_str {book}
-        \str_set:Nn \g__wisper_classname_str {book}
-        \prop_put:Nnn \g__wisper_classopts_prop {a4paper} {}
-      },
-    type / scrbook .code:n = 
-      {
-        \str_set:Nn \g__wisper_document_type_str {scrbook}
-        \str_set:Nn \g__wisper_classname_str {scrbook}
-        \prop_put:Nnn \g__wisper_classopts_prop {a4paper} {}
-        \prop_put:Nnn \g__wisper_classopts_prop {BCOR} {0mm}
-        \prop_put:Nnn \g__wisper_classopts_prop {DIV} {10}
-        \prop_put:Nnn \g__wisper_classopts_prop {pagesize} {}
-      },
-    type / unknown .code:n =
-      {
-        \msg_error:nnnnn { wisper } { unknown-choice }
-          { document~type }
-          {#1}
-          { article, presentation, letter, book, scrbook } % TODO: Don't hardcode
-      },
-  }
-
-% Conditionals [[[2
-\prg_new_conditional:Npnn \__wisper_if_document_type:n #1
-  { p, T, F, TF}
-  { 
-    \clist_if_in:nVTF {#1} \g__wisper_document_type_str
-      { \prg_return_true: }
-      { \prg_return_false: }
-  }
-
-% User-accessible aliases.
-\cs_new_eq:NN \IfDocTypeT \__wisper_if_document_type:nT
-\cs_new_eq:NN \IfDocTypeF \__wisper_if_document_type:nF
-\cs_new_eq:NN \IfDocTypeTF \__wisper_if_document_type:nTF
-
-\cs_new_eq:NN \IfDocClassT \__wisper_if_document_class:nT
-\cs_new_eq:NN \IfDocClassF \__wisper_if_document_class:nF
-\cs_new_eq:NN \IfDocClassTF \__wisper_if_document_class:nTF
-
-% Feature declarations [[[1
-
-% Fonts [[[2
+  }  % ]]]
 \__wisper_declare_feature:nnn { font-lmodern }  % [[[
   {
     requires = lmodern,
@@ -761,14 +548,75 @@
       \linespread{1.05}
     }  % ]]]
 
-% Footnotes [[[2
-\bool_new:N \g__wisper_footnotes_multiple_bool
-\__wisper_keys_define_doc:n
+
+% Generic [[[2
+\__wisper_declare_packages:n
   {
-    footnotes/multiple .bool_gset:N = \g__wisper_footnotes_multiple_bool,
+    enumitem = {
+      enabled,
+      options = { inline },
+      % doesn't play well with overlay specifications
+      deactivate_for_classes = { beamer },
+    },
+    calc = enabled,
+    ragged2e = enabled,
+    xcolor = enabled,
+    url = {
+      enabled,
+      options = { hyphens },
+      % loaded early by hyperref which is loaded way to early by beamer...
+      % loading it again gives an option clash.
+      deactivate_for_classes = { beamer },
+    },
+    hyperref = enabled,
+    sidenotes,
+    babel = { enabled, options = { main=english } },
+    fontenc = { enabled, options = { T1 } },
+    csquotes = enabled,
+    microtype = enabled,
+    inputenc = {
+      enabled,
+      options = { utf8 },
+      % Suppress inputenc warning for utf8 engines
+      deactivate_for_engines = { luatex, xetex },
+    },
+    fancyhdr,
+    amsthm,
+    bigfoot,
+    changepage = enabled,
+    showlabels,
   }
 
-% Citations [[[2
+\__wisper_declare_feature:nnnn { nonnum-section-commands }
+  {} {}
+  {
+    % unnumbered section that shows up in the TOC
+    \newcommand{\tocsection}[1]{\section*{#1}\addcontentsline{toc}{section}{#1}}
+    % non-numbered subsection that works properly with hyperref
+    \newcommand{\nonumchapter}[1]{\phantomsection\addcontentsline{toc}{chapter}{#1}}
+    \newcommand{\nonumsection}[1]{\phantomsection\addcontentsline{toc}{section}{#1}}
+    \newcommand{\nonumsubsection}[1]{\phantomsection\addcontentsline{toc}{subsection}{#1}}
+    \newcommand{\nonumsubsubsection}[1]{\phantomsection\addcontentsline{toc}{subsubsection}{#1}}
+  }
+
+% Colors  [[[2
+\__wisper_declare_feature:nnnn {sron-mark-colors}
+  { xcolor } {}
+  {
+    % define a few highlighting colors, from https://personal.sron.nl/~pault/
+    \definecolor{marklightblue}{HTML}{BBCCEE}
+    \definecolor{marklightteal}{HTML}{CCEEFF}
+    \definecolor{marklightgreen}{HTML}{CCDDAA}
+    \definecolor{marklightsand}{HTML}{EEEEBB}
+    \definecolor{marklightred}{HTML}{FFCCCC}
+    \definecolor{markdarkblue}{HTML}{222255}
+    \definecolor{markdarkteal}{HTML}{225555}
+    \definecolor{markdarkgreen}{HTML}{225522}
+    \definecolor{markdarksand}{HTML}{666633}
+    \definecolor{markdarkred}{HTML}{663333}
+  }
+
+% Bibliography [[[2
 \__wisper_keys_define_doc:n
   {
     cite/style .choice:,
@@ -781,7 +629,193 @@
       },
   }
 
-% Tufte-style [[[2
+\__wisper_declare_package:nn { biblatex }
+  {
+    disabled,
+    options = { hyperref=true },
+  }
+
+\__wisper_declare_feature:nn { biblatex-backref }
+  {
+    disabled,
+    requires = {
+      biblatex = {
+        backref=true,
+      },
+    },
+  }
+
+\__wisper_declare_feature:nn { biblatex-default-verbosity }
+  {
+    disabled,
+    requires = {
+      biblatex = {
+        url=false,
+        isbn=false,%  DOI only
+        maxcitenames=3,
+        maxbibnames=3,
+        citereset=section,
+      },
+    },
+  }
+
+\__wisper_declare_feature:nn { biblatex-alphabetic }
+  {
+    disabled,
+    requires = {
+      biblatex = {
+        % many of these options can only be given in \usepackage and not later, unfortunately..
+        style=alphabetic,
+      },
+      biblatex-backref,
+      biblatex-default-verbosity,
+    },
+  }
+
+\__wisper_declare_feature:nn { biblatex-numeric-supercite }
+  {
+    disabled,
+    requires = {
+      biblatex = {
+        %bibstyle=authoryear,
+        bibstyle=numeric,
+        citestyle=custom-numeric-comp,
+        %citestyle=numeric-comp,
+      },
+      biblatex-backref,
+      biblatex-default-verbosity,
+    },
+  }
+
+\__wisper_declare_feature:nn { biblatex-alphabetic-supercite }
+  {
+    % FIXME: implement
+  }
+
+\__wisper_declare_feature:nnnn {footnotecite}
+  { multiple-footnotes }
+  {}
+  {
+    \DeclareNewFootnote{Cite}
+  }
+
+\__wisper_declare_feature:nnnn { supershortnotecite }
+  {} {}
+  {
+    % From http://www.khirevich.com/latex/footnote_citation/
+    % new command \sjcitep prints footnote citation above punctuation
+    \newlength{\spc} % declare a variable to save spacing value
+    % TODO: ensure that this works when there are non-cite footnotes on the same page
+    \NewDocumentCommand{\citep}{D<>{} o o m}{% new command with two arguments: optional (#1) and mandatory (#2)
+            \settowidth{\spc}{#1}% set value of \spc variable to the width of #1 argument
+            \addtolength{\spc}{-1.8\spc}% subtract from \spc about two (1.8) of its values making its magnitude negative
+            #1% print the optional argument
+            \hspace*{\spc}% print an additional negative spacing stored in \spc after #1
+            \IfNoValueTF{#2}
+                {\supershortnotecite{#4}}
+                {\IfNoValueTF{#3}
+                    {\supershortnotecite[#2]{#4}}
+                    {\supershortnotecite[#2][#3]{#4}}}
+        }% print (cite) the mandatory argument
+  }
+
+
+
+% Page-layout: one-/twoside etc [[[2
+\__wisper_declare_package:nn { changepage }
+  {
+    disabled,
+  }
+
+\__wisper_declare_feature:nnn { oneside }
+  % This feature mostly exists to provide dummy commands for justification etc.
+  % so that twoside documents can easily be compiled onesided.
+  {
+    enabled,
+  }
+  {
+    \cs_new_eq:NN \raggedoutside \raggedright
+    \NewDocumentEnvironment {flushinside} {}
+      { \bgroup \flushleft }
+      { \egroup }
+  }
+\__wisper_declare_feature:nn { twoside }
+  {
+    disabled,
+    classoptions = { twoside },
+    requires = {
+      changepage = strict,
+    },
+  }
+  {
+    \cs_new:Nn \raggedoutside
+      {
+        \checkoddpage
+        \ifoddpage
+          \RaggedRight
+        \else
+          \RaggedLeft
+        \fi
+      }
+    \NewDocumentEnvironment {flushinside} {}
+      {
+        \checkoddpage
+        \bgroup
+        \ifoddpage
+          \flushleft
+        \else
+          \flushright
+        \fi
+      }
+      {
+        \egroup
+      }
+  }
+\__wisper_declare_mutually_exclusive_features:n { oneside, twoside }
+
+% Layout for KOMA [[[
+\__wisper_declare_feature:nnn { koma-misc }
+  {}
+  {
+    \IfDocTypeT{koma}
+      {
+        % Fix chapter/section titles defaulting to sans (i.e. CM) fonts
+        \setkomafont{disposition}{\normalfont\bfseries}
+        \KOMAoptions{headings=normal}
+        % Fix fonts in the toc
+        \setkomafont{chapterentry}{\normalfont\bfseries}
+        % fix item font in descriptions and enumerates
+        \setkomafont{descriptionlabel}{\normalfont\bfseries}
+        \setkomafont{labelinglabel}{\normalfont\bfseries}
+        % Suppress warnings on font fallback
+        \renewcommand\labelitemi{{\fontfamily{cmr}\selectfont\textbullet}}
+        \renewcommand\labelitemiii{{\fontfamily{cmr}\selectfont\textasteriskcentered}}
+        \renewcommand\labelitemiv{{\fontfamily{cmr}\selectfont\textperiodcentered}}
+        
+        % Titlepage
+        \KOMAoptions{titlepage=firstiscover}
+        
+        % Footnotes
+        \KOMAoptions{footnotes=multiple}  % comma-separate footnote superscripts
+        \renewcommand{\multfootsep}{,}
+        
+        % Header/Footer
+        \usepackage[draft=false]{scrlayer-scrpage}
+        \pagestyle{scrheadings}
+        \automark[chapter]{chapter}
+        \automark*[section]{}
+        \ihead{}
+        \chead{\headmark}
+        \ohead{\pagemark}
+        \ifoot{}
+        \cfoot{}
+        \ofoot{}
+        %\KOMAoptions{headsepline=true}
+        %\KOMAoptions{footsepline=:0.5\textwidth, olines}
+      }
+    }  % ]]]
+
+% Tufte-style
 \__wisper_keys_define_doc:n
   {
     tufte .meta:n =
@@ -801,10 +835,200 @@
       },
   }
 
-% Load all the things [[[1
+% Footnotes [[[2
+\__wisper_declare_package:n { bigfoot }
 
-% Load packages
+\bool_new:N \g__wisper_footnotes_multiple_bool
+\__wisper_keys_define_doc:n
+  {
+    footnotes/multiple .bool_gset:N = \g__wisper_footnotes_multiple_bool,
+  }
 
+\__wisper_declare_feature:nnn { alphabetic-default-footnote }
+  {
+    requires = { bigfoot },
+  }
+  {
+    \__wisper_if_feature_enabled:n { bigfoot }
+      {
+        \DeclareNewFootnote{default}[alph]
+        \cs_gset_eq:NN \footnote \footnotedefault
+        \cs_gset_eq:NN \footnotemark \footnotemarkdefault
+        \cs_gset_eq:NN \footnotetext \footnotetextdefault
+      }
+      {
+        \cs_gset:Nn \thefootnote { \alph{footnote} }
+      }
+  }
+
+% Hyperref [[[2
+\__wisper_declare_feature:nn { hyperref-bookmarks-default }
+  {
+    enabled,
+    requires = {
+      hyperref = {
+        bookmarksopen=true,
+        bookmarksopenlevel=3,
+      }
+    },
+  }
+\__wisper_declare_feature:nn { hyperref-black }
+  {
+    requires = {
+      hyperref = {
+        hidelinks,
+      }
+    },
+  }
+\__wisper_declare_feature:nn { hyperref-pale-colors }
+  {
+    enabled,
+    requires = {
+      hyperref = {
+        % TODO: this required another package!
+        colorlinks=true,
+        linkcolor=black,  % for internal links, color is just too much
+        citecolor=markdarkteal,
+        filecolor=markdarkgreen,
+        urlcolor=markdarkblue,
+      }
+    },
+  }
+\__wisper_declare_mutually_exclusive_features:n
+  { hyperref-black, hyperref-pale-colors }
+
+\__wisper_declare_package:nn { showlabels }
+  { options = inner }
+
+% Code display [[[2
+\__wisper_declare_packages:n
+  { minted }
+
+\__wisper_declare_feature:nnn { minted-default }
+  {
+    requires = { minted },
+  }
+  {
+    \input{common_code.tex}
+  }
+
+\__wisper_declare_feature:nnnn { listings }
+  { minted } {}
+  {
+  }
+
+% Math, physics [[[2
+\__wisper_declare_feature:nnnn { math }
+  {} {}
+  {
+    \input{common_math.tex}
+    \MathStyle
+      {
+        integrate/displayfunc=outset,
+        vecdisplay=bold,
+      }
+  }
+
+\__wisper_declare_feature:nnnn { phys }
+  {} {}
+  {
+    \input{common_phys.tex}
+  }
+
+% Tables, figures [[[2
+\__wisper_declare_packages:n
+  {
+    float = enabled,
+    rotating = enabled,
+    booktabs = enabled,
+    array = enabled,
+    multirow,
+    tabu,
+    caption = enabled,
+    subcaption = enabled,
+    graphicx = enabled,
+  }
+
+\__wisper_declare_feature:nnnn {array-par-columns}
+  { array } {}
+  {
+    % https://tex.stackexchange.com/a/2442/111880
+    % https://tex.stackexchange.com/a/12712/111880
+    \newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+    \newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+    \newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+  }
+
+\__wisper_declare_feature:nnnn { twoside-floats }
+  { caption } {}
+  {
+    \DeclareCaptionStyle{myfigure}{font=footnotesize,%
+                                   labelfont=sc,%
+                                   }
+    \captionsetup{style=myfigure}  % default
+
+    % TODO: as for changepage: better conditional, cf. above
+    \__wisper_if_document_type:nT {book, scrbook}
+      {
+        \DeclareCaptionJustification{raggedoutside}{\raggedoutside}
+
+        \DeclareCaptionStyle{marginfigure}{justification=raggedoutside,%
+                                           font=footnotesize,%
+                                           labelfont=sc,%
+                                           }
+
+        \DeclareCaptionStyle{margintable}{justification=raggedoutside,%
+                                          font=footnotesize,%
+                                          labelfont=sc,%
+                                          }
+
+        \DeclareCaptionStyle{sidecaption}{justification=raggedoutside,%
+                                          font=footnotesize,%
+                                          labelfont=sc,%
+                                          }
+        \newlength{\realmarginparwidth}
+        \setlength{\realmarginparwidth}{\marginparwidth}
+        \addtolength{\realmarginparwidth}{\marginparsep}
+
+        \DeclareCaptionStyle{widetable}{%justification=raggedoutside,%
+                                        font=footnotesize,%
+                                        labelfont=sc,%
+                                        margin={0pt, \realmarginparwidth}
+                                        }
+      }
+  }
+
+% Drafts [[[2
+
+\__wisper_declare_feature:nnnn { showlabels }
+  { showlabels } {}
+  {
+    \renewcommand{\showlabelfont}{\tiny\ttfamily}
+    \showlabels{cite}
+    \showlabels{ref}
+    \showlabels{begin}
+  }
+
+\__wisper_declare_feature:nnnn { draft-tools }
+  {} {}
+  {
+    \newcounter{todonotecounter}
+    \NewDocumentCommand \margintodo {s o m} 
+      {
+        \stepcounter{todonotecounter}
+        \IfBooleanTF{#1}{}{%
+          \marginpar{%
+            \IfValueT{#2}{\vspace{#2}}%
+            \raggedoutside
+            \footnotesize%
+            \fcolorbox{red}{white}{\color{red} \thetodonotecounter}%
+            #3%
+          }
+        }
+      }
+  }
+
+% Loading orders [[[1
 
 % TODO: automatically set these clists from \__wisper_declare_feature:
 \clist_gset:Nn \g__wisper_all_features_early_packages_clist
@@ -859,232 +1083,6 @@
   }
 \clist_new:n \g__wisper_all_features_main_clist
 
-
-% New packages to investigate
-% subfigure
-% geometry
-% pdfpages
-% cite  % better support for numeric citations
-% longtable  % wrap tables at page boundaries, succeeds supertabular
-% supertabular  % wrap tables at page boundaries
-% wrapfig
-% footmisc
-% epstopdf
-% textcomp
-% marginnote
-
-
-%\mhchemoptions{textfontcommand=\liningnumtext}
-%\IfPresentationT{\renewcommand*{\bibfont}{\scriptsize}}
-
-% Citations [[[2
-\__wisper_declare_feature:nnnn {footnotecite}
-  { multiple-footnotes }
-  {}
-  {
-    \DeclareNewFootnote{Cite}
-  }
-
-% Layout for KOMA [[[2
-\__wisper_declare_feature:nnnn { koma-misc }
-  {} {}
-  {
-    \IfDocTypeT{koma}
-      {
-        % Fix chapter/section titles defaulting to sans (i.e. CM) fonts
-        \setkomafont{disposition}{\normalfont\bfseries}
-        \KOMAoptions{headings=normal}
-        % Fix fonts in the toc
-        \setkomafont{chapterentry}{\normalfont\bfseries}
-        % fix item font in descriptions and enumerates
-        \setkomafont{descriptionlabel}{\normalfont\bfseries}
-        \setkomafont{labelinglabel}{\normalfont\bfseries}
-        % Suppress warnings on font fallback
-        \renewcommand\labelitemi{{\fontfamily{cmr}\selectfont\textbullet}}
-        \renewcommand\labelitemiii{{\fontfamily{cmr}\selectfont\textasteriskcentered}}
-        \renewcommand\labelitemiv{{\fontfamily{cmr}\selectfont\textperiodcentered}}
-        
-        % Titlepage
-        \KOMAoptions{titlepage=firstiscover}
-        
-        % Footnotes
-        \KOMAoptions{footnotes=multiple}  % comma-separate footnote superscripts
-        \renewcommand{\multfootsep}{,}
-        
-        % Header/Footer
-        \usepackage[draft=false]{scrlayer-scrpage}
-        \pagestyle{scrheadings}
-        \automark[chapter]{chapter}
-        \automark*[section]{}
-        \ihead{}
-        \chead{\headmark}
-        \ohead{\pagemark}
-        \ifoot{}
-        \cfoot{}
-        \ofoot{}
-        %\KOMAoptions{headsepline=true}
-        %\KOMAoptions{footsepline=:0.5\textwidth, olines}
-      }
-  }
-
-\__wisper_declare_feature:nnnn {sron-mark-colors}
-  { xcolor } {}
-  {
-    % define a few highlighting colors, from https://personal.sron.nl/~pault/
-    \definecolor{marklightblue}{HTML}{BBCCEE}
-    \definecolor{marklightteal}{HTML}{CCEEFF}
-    \definecolor{marklightgreen}{HTML}{CCDDAA}
-    \definecolor{marklightsand}{HTML}{EEEEBB}
-    \definecolor{marklightred}{HTML}{FFCCCC}
-    \definecolor{markdarkblue}{HTML}{222255}
-    \definecolor{markdarkteal}{HTML}{225555}
-    \definecolor{markdarkgreen}{HTML}{225522}
-    \definecolor{markdarksand}{HTML}{666633}
-    \definecolor{markdarkred}{HTML}{663333}
-  }
-
-\__wisper_declare_feature:nnnn { listings }
-  { minted } {}
-  {
-  }
-
-\__wisper_declare_feature:nnnn { math }
-  {} {}
-  {
-    \input{common_math.tex}
-    \MathStyle
-      {
-        integrate/displayfunc=outset,
-        vecdisplay=bold,
-      }
-  }
-
-\__wisper_declare_feature:nnnn { phys }
-  {} {}
-  {
-    \input{common_phys.tex}
-  }
-
-% Tables [[[2
-\__wisper_declare_feature:nnnn {array-par-columns}
-  { array } {}
-  {
-    % https://tex.stackexchange.com/a/2442/111880
-    % https://tex.stackexchange.com/a/12712/111880
-    \newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
-    \newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
-    \newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
-  }
-
-% Figures, tables, ... [[[2
-\__wisper_declare_feature:nnnn { twoside-misc }
-  { caption } {}
-  {
-    \DeclareCaptionStyle{myfigure}{font=footnotesize,%
-                                   labelfont=sc,%
-                                   }
-    \captionsetup{style=myfigure}  % default
-
-    % TODO: as for changepage: better conditional, cf. above
-    \__wisper_if_document_type:nT {book, scrbook}
-      {
-        \DeclareCaptionJustification{raggedoutside}{\raggedoutside}
-
-        \DeclareCaptionStyle{marginfigure}{justification=raggedoutside,%
-                                           font=footnotesize,%
-                                           labelfont=sc,%
-                                           }
-
-        \DeclareCaptionStyle{margintable}{justification=raggedoutside,%
-                                          font=footnotesize,%
-                                          labelfont=sc,%
-                                          }
-
-        \DeclareCaptionStyle{sidecaption}{justification=raggedoutside,%
-                                          font=footnotesize,%
-                                          labelfont=sc,%
-                                          }
-        \newlength{\realmarginparwidth}
-        \setlength{\realmarginparwidth}{\marginparwidth}
-        \addtolength{\realmarginparwidth}{\marginparsep}
-
-        \DeclareCaptionStyle{widetable}{%justification=raggedoutside,%
-                                        font=footnotesize,%
-                                        labelfont=sc,%
-                                        margin={0pt, \realmarginparwidth}
-                                        }
-      }
-  }
-
-% Bibliography [[[2
-\__wisper_declare_feature:nnnn { supershortnotecite }
-  {} {}
-  {
-    % From http://www.khirevich.com/latex/footnote_citation/
-    % new command \sjcitep prints footnote citation above punctuation
-    \newlength{\spc} % declare a variable to save spacing value
-    % TODO: ensure that this works when there are non-cite footnotes on the same page
-    \NewDocumentCommand{\citep}{D<>{} o o m}{% new command with two arguments: optional (#1) and mandatory (#2)
-            \settowidth{\spc}{#1}% set value of \spc variable to the width of #1 argument
-            \addtolength{\spc}{-1.8\spc}% subtract from \spc about two (1.8) of its values making its magnitude negative
-            #1% print the optional argument
-            \hspace*{\spc}% print an additional negative spacing stored in \spc after #1
-            \IfNoValueTF{#2}
-                {\supershortnotecite{#4}}
-                {\IfNoValueTF{#3}
-                    {\supershortnotecite[#2]{#4}}
-                    {\supershortnotecite[#2][#3]{#4}}}
-        }% print (cite) the mandatory argument
-  }
-
-
-\__wisper_declare_feature:nnnn { nonnum-sections }
-  {} {}
-  {
-    % unnumbered section that shows up in the TOC
-    \newcommand{\tocsection}[1]{\section*{#1}\addcontentsline{toc}{section}{#1}}
-    % non-numbered subsection that works properly with hyperref
-    \newcommand{\nonumchapter}[1]{\phantomsection\addcontentsline{toc}{chapter}{#1}}
-    \newcommand{\nonumsection}[1]{\phantomsection\addcontentsline{toc}{section}{#1}}
-    \newcommand{\nonumsubsection}[1]{\phantomsection\addcontentsline{toc}{subsection}{#1}}
-    \newcommand{\nonumsubsubsection}[1]{\phantomsection\addcontentsline{toc}{subsubsection}{#1}}
-  }
-
-\__wisper_declare_feature:nnnn { showlabels }
-  { showlabels } {}
-  {
-    \renewcommand{\showlabelfont}{\tiny\ttfamily}
-    \showlabels{cite}
-    \showlabels{ref}
-    \showlabels{begin}
-  }
-
-\__wisper_declare_feature:nnnn { draft-tools }
-  {} {}
-  {
-    \newcounter{todonotecounter}
-    \NewDocumentCommand \margintodo {s o m} 
-      {
-        \stepcounter{todonotecounter}
-        \IfBooleanTF{#1}{}{%
-          \marginpar{%
-            \IfValueT{#2}{\vspace{#2}}%
-            \raggedoutside
-            \footnotesize%
-            \fcolorbox{red}{white}{\color{red} \thetodonotecounter}%
-            #3%
-          }
-        }
-      }
-  }
-
-
-% TODO: remember to set locale correctly!!
-%\sisetup{%
-%  separate-uncertainty=true,
-%  %locale = DE,
-%  %per-mode = symbol
-%}
 \NewDocumentCommand \Preamble { m }
   {
     \__wisper_enable_features:n {#1}
