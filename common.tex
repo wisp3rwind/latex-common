@@ -338,42 +338,79 @@
   }
 
 % Features [[[1
-\prop_new:N \g__wisper_feature_packages_prop
 \prop_new:N \g__wisper_feature_features_prop
 \prop_new:N \g__wisper_feature_code_prop
-\prop_new:N \g__wisper_feature_enabled_prop
 \tl_new:N \g__wisper_feature_code_tl
 
-\cs_new:Npn \__wisper_declare_feature:nnnn #1#2#3#4
+% #1 - name
+% #2 - keyvals
+% #3 - code
+\cs_new:Npn \__wisper_declare_feature_aux:nnn #1#2#3
   {
-    % TODO: support supplying package options
-    \prop_put:Nnn \g__wisper_feature_enabled_prop {#1} { \c_false_bool }
-    \prop_put:Nnn \g__wisper_feature_packages_prop {#1} {#2}
-    \prop_put:Nnn \g__wisper_feature_features_prop {#1} {#3}
-    \prop_put:Nnn \g__wisper_feature_code_prop {#1}
+    \bool_gset_false:c {g__wisper_feature_ #1 _enabled_bool}
+    \clist_new:c {g__wisper_feature_ #1 _features_clist}
+    \tl_gset:cn {g__wisper_feature_ #1 _code_tl} {#3}
+
+    \__wisper_keys_define_doc:n
       {
-        \prop_get:NnN \g__wisper_feature_enabled_prop {#1} \l_tmpa_bool
-        \bool_if:NT \l_tmpa_bool
-          {#3}
+        features/#1/enabled .bool_gset:c = {g__wisper_package_ #1 _enabled_bool},
+        features/#1/enabled .default:n = true,
+        features/#1/disabled .bool_gset_inverse:c = {g__wisper_package_ #1 _enabled_bool},
+        features/#1/disabled .default:n = true,
+
+        features/#1/requires .clist_gset:c {g__wisper_feature_ #1 _features_clist}
+
+        features/#1/options / unknown .code:n =
+          { \msg_error:nn { wisper } { no-such-feature-option } },
+
+        features/#1/conflicts / classes .tl_gset:c = {g__wisper_package_ #1 _conflicting_classes_tl},
+        features/#1/conflicts / features .tl_gset:c = {g__wisper_package_ #1 _conflicting_features_tl},
+        features/#1/conflicts / classes .initial:n = {},
+        features/#1/conflicts / features .initial:n = {},
+
+        % e.g. document classes can prevent loading a feature, should raise an
+        % error if enabled explicitly in some place.
+        features/#1/deactivate .bool_gset:c = {g__wisper_package_ #1 _deactivated_bool},
+        features/#1/deactivate_for_engines .tl_gset:c = {g__wisper_package_ #1 _deactivated_for_engines_tl},
+        features/#1/deactivate_for_engines .initial:n = {},
+        features/#1/deactivate_for_classes .tl_gset:c = {g__wisper_package_ #1 _deactivated_for_classes_tl},
+        features/#1/deactivate_for_classes .initial:n = {},
+      }
+
+      \__wisper_set_feature_config:nn {#1} {#2}
+  }
+\cs_new:Npn \__wisper_set_feature_config:nn #1#2
+  { \__wisper_keys_set_doc:nn { features/#1 } {#2} }
+\cs_new:Npn \__wisper_set_feature_config:nnn #1#2#3
+  { \__wisper_keys_set_doc:nn { features/#1/#2 } {#3} }
+\cs_new_Npn \__wisper_declare_package:nnn #1#2#3
+  {
+    \clist_put_right:Nn \g__wisper_all_features_packages_clist {#1}
+    \__wisper_declare_feature:nnn {#1} {#2}
+      {
+        \usepackage{#1}
+        #3
+      }
+    \__wisper_keys_define_doc:n
+      {
+        features/#1/options / unknown .code:n =
+          { \__wisper_pass_options_to_package:Vn \l_keys_key_tl {#1} },
       }
   }
+\cs_new_Npn \__wisper_declare_package:nn #1#2
+  { \__wisper_declare_package:nnn {#1} {#2} {} }
 \cs_new:Npn \__wisper_enable_feature:n #1
   {
-    \prop_get:NnN \g__wisper_feature_enabled_prop {#1} \l_tmpa_bool
-    \bool_if:NF \l_tmpa_bool
+    \bool_if:cF {g__wisper_feature_ #1 _enabled_bool}
       {
-        \prop_put:Nnn \g__wisper_feature_enabled_prop {#1} { \c_true_bool }
-        \prop_get:NnN \g__wisper_feature_packages_prop {#1} \l_tmpa_tl
-        \clist_map_inline:Vn \l_tmpa_tl
-          {
-            \__wisper_enable_package:n {##1}
-          }
-        \prop_get:NnN \g__wisper_feature_features_prop {#1} \l_tmpa_tl
-        \clist_map_inline:Vn \l_tmpa_tl
-          {
-            \__wisper_enable_feature:n {##1}
-          }
+        \bool_gset_true:c {g__wisper_feature_ #1 _enabled_bool}
+        \clist_map_inline:vn {g__wisper_feature_ #1 _features_clist}
+          { \__wisper_enable_feature:n {##1} }
       }
+  }
+\cs_new:Npn \__wisper_enable_features:n #1
+  {
+    \clist_map_function:nN {#1} \__wisper_enable_feature:n
   }
 \msg_new:nnn { wisper } { feature-executing } { Executing~feature-code~'#1'. }
 \cs_new:Nn \__wisper_load_features: 
@@ -392,18 +429,34 @@
 % Generic [[[2
 \__wisper_declare_packages:n
   {
-    enumitem = { enabled, options = { inline } },
+    enumitem = {
+      enabled,
+      options = { inline },
+      % doesn't play well with overlay specifications
+      deactivate_for_classes = { beamer },
+    },
     calc = enabled,
     ragged2e = enabled,
     xcolor = enabled,
-    url = { enabled, options = { hyphens } },
+    url = {
+      enabled,
+      options = { hyphens },
+      % loaded early by hyperref which is loaded way to early by beamer...
+      % loading it again gives an option clash.
+      deactivate_for_classes = { beamer },
+    },
     hyperref = enabled,
     sidenotes,
     babel = { enabled, options = { main=english } },
     fontenc = { enabled, options = { T1 } },
     csquotes = enabled,
     microtype = enabled,
-    inputenc = { enabled, options = { utf8 } },
+    inputenc = {
+      enabled,
+      options = { utf8 },
+      % Suppress inputenc warning for utf8 engines
+      deactivate_for_engines = { luatex, xetex },
+    },
     fancyhdr,
     amsthm,
     bigfoot,
@@ -412,16 +465,16 @@
   }
 
 % Bibliography [[[2
-\__wisper_declare_packages:n
+  \__wisper_declare_package:nn { biblatex }
   {
-    biblatex = { disabled, options = { hyperref=true } },
+    disabled,
+    options = { hyperref=true },
   }
 
 \__wisper_declare_feature:nn { biblatex-backref }
   {
     disabled,
-    requires = biblatex,
-    package_options = {
+    requires = {
       biblatex = {
         backref=true,
       },
@@ -431,8 +484,7 @@
 \__wisper_declare_feature:nn { biblatex-default-verbosity }
   {
     disabled,
-    requires = biblatex,
-    package_options = {
+    requires = {
       biblatex = {
         url=false,
         isbn=false,%  DOI only
@@ -446,26 +498,28 @@
 \__wisper_declare_feature:nn { biblatex-alphabetic }
   {
     disabled,
-    requires = { biblatex, biblatex-backref, biblatex-default-verbosity },
-    package_options = {
+    requires = {
       biblatex = {
         % many of these options can only be given in \usepackage and not later, unfortunately..
         style=alphabetic,
       },
+      biblatex-backref,
+      biblatex-default-verbosity,
     },
   }
 
 \__wisper_declare_feature:nn { biblatex-numeric-supercite }
   {
     disabled,
-    requires = { biblatex, biblatex-backref, biblatex-default-verbosity },
-    package_options = {
+    requires = {
       biblatex = {
         %bibstyle=authoryear,
         bibstyle=numeric,
         citestyle=custom-numeric-comp,
         %citestyle=numeric-comp,
       },
+      biblatex-backref,
+      biblatex-default-verbosity,
     },
   }
 
@@ -474,14 +528,9 @@
     % FIXME: implement
   }
 
-\__wisper_declare_package:nnn { changepage }
+\__wisper_declare_package:nn { changepage }
   {
     disabled,
-    options = {
-      changepage = {
-        strict,
-      }
-    },
   }
 
 \__wisper_declare_feature:nnn { oneside }
@@ -500,7 +549,9 @@
   {
     disabled,
     classoptions = { twoside },
-    requires = { changepage },
+    requires = {
+      changepage = strict,
+    },
   }
   {
     \cs_new:Nn \raggedoutside
@@ -528,22 +579,13 @@
   }
 \__wisper_declare_mutually_exclusive_features:n { oneside, twoside }
 
-\__wisper_declare_package:nn { bigfoot }
-  {
-    disabled,
-    options = {},
-    conflicting_classes = {},
-    conflicting_packages = {},
-  }
+\__wisper_declare_package:n { bigfoot }
 \__wisper_declare_feature:nnn { alphabetic-default-footnote }
   {
-    disabled,
     requires = { bigfoot },
-    conflicting_classes = {},
-    conflicting_packages = {},
   }
   {
-    \__wisper_if_package_enabled:n { bigfoot }
+    \__wisper_if_feature_enabled:n { bigfoot }
       {
         \DeclareNewFootnote{default}[alph]
         \cs_gset_eq:NN \footnote \footnotedefault
@@ -557,8 +599,7 @@
 \__wisper_declare_feature:nn { hyperref-bookmarks-default }
   {
     enabled,
-    requires = hyperref,
-    package_options = {
+    requires = {
       hyperref = {
         bookmarksopen=true,
         bookmarksopenlevel=3,
@@ -567,9 +608,7 @@
   }
 \__wisper_declare_feature:nn { hyperref-black }
   {
-    enabled,
-    requires = hyperref,
-    package_options = {
+    requires = {
       hyperref = {
         hidelinks,
       }
@@ -578,8 +617,7 @@
 \__wisper_declare_feature:nn { hyperref-pale-colors }
   {
     enabled,
-    requires = hyperref,
-    package_options = {
+    requires = {
       hyperref = {
         % TODO: this required another package!
         colorlinks=true,
@@ -593,12 +631,15 @@
 \__wisper_declare_mutually_exclusive_features:n
   { hyperref-black, hyperref-pale-colors }
 
-\__wisper_declare_package_preset:nnn {showlabels} {default}
-  { inner }
+\__wisper_declare_package:nn { showlabels }
+  { options = inner }
 
 % Fonts, handled differently (for now?) [[[2
 \__wisper_declare_packages:n
   {
+    % These packages are not supposed to be loaded in
+    % \__wisper_load_features:n { main },
+    % but manually in \__wisper_load_features:n { font }
     newpxmath,
     fontspec,
     newpxtext,
@@ -611,12 +652,9 @@
 
 % Code display [[[2
 \__wisper_declare_packages:n
-  {
-    minted = enabled,
-  }
+  { minted }
 \__wisper_declare_feature:nnn { minted-default }
   {
-    enabled,
     requires = { minted },
   }
   {
@@ -732,9 +770,9 @@
 \cs_new_eq:NN \IfDocClassF \__wisper_if_document_class:nF
 \cs_new_eq:NN \IfDocClassTF \__wisper_if_document_class:nTF
 
-% Font handling [[[1
+% Feature declarations [[[1
 
-% Property list to hold the loading code [[[2
+% Fonts [[[2
 \__wisper_declare_feature:nnn { font-lmodern }  % [[[
   {
     requires = lmodern,
@@ -820,15 +858,14 @@
       \linespread{1.05}
     }  % ]]]
 
-% Footnotes [[[1
-
+% Footnotes [[[2
 \bool_new:N \g__wisper_footnotes_multiple_bool
 \__wisper_keys_define_doc:n
   {
     footnotes/multiple .bool_gset:N = \g__wisper_footnotes_multiple_bool,
   }
 
-% Citations [[[1
+% Citations [[[2
 \__wisper_keys_define_doc:n
   {
     cite/style .choice:,
@@ -841,7 +878,7 @@
       },
   }
 
-% Tufte-style [[[1
+% Tufte-style [[[2
 \__wisper_keys_define_doc:n
   {
     tufte .meta:n =
@@ -865,62 +902,75 @@
 
 % Load packages
 
-\cs_new:Npn \__wisper_load_packages:n #1
+\cs_new:Npn \__wisper_load_features:n #1
   {
     \str_if_eq:nnT {#1} { before-font }
       {
-        \__wisper_load_package:n {babel}
-        \__wisper_load_package:n {fontenc}
+          \__wisper_load_feature:n
       }
     \str_if_eq:nnT {#1} { main }
       {
-        % Suppress inputenc warning for utf8 engines
-        \bool_if:nF { \sys_if_engine_xetex_p: || \sys_if_engine_luatex_p: }
-          { \__wisper_load_package:n {inputenc} }
-
-        % load minted before csquotes to suppress a warning due to a common package
-        % they load
-        \__wisper_load_package:n {minted}
-        \__wisper_load_package:n {csquotes}  % context-sensitive quotes
-        \__wisper_load_package:n {microtype}
-
-        \__wisper_load_package:n {sidenotes}
-
-        \IfDocClassF {beamer}
-          { \__wisper_load_package:n {enumitem} }  % doesn't play well with overlay specifications
-        \__wisper_load_package:n {float}
-        \__wisper_load_package:n {calc}
-        \__wisper_load_package:n {fancyhdr}
-        \__wisper_load_package:n {ragged2e}
-        \IfDocClassF {beamer}
-          { \__wisper_load_package:n {url} }  % loaded early by hyperref which is loaded way to early by beamer...
-
-        % colors
-        \__wisper_load_package:n {xcolor}
-
-        % tables
-        \__wisper_load_package:n {rotating}
-        \__wisper_load_package:n {booktabs}
-        \__wisper_load_package:n {array}
-        \__wisper_load_package:n {multirow}
-        \__wisper_load_package:n {tabu}
-
-        % Graphics
-        \__wisper_load_package:n {graphicx}  % advanced key=value arguments for \includegraphics
-        \__wisper_load_package:n {caption}
-        \__wisper_load_package:n {subcaption}
-
-        \__wisper_load_package:n {biblatex}
-
-        % Packages that need to be loaded last [[[2
-        \__wisper_load_package:n {hyperref}
-        \__wisper_load_package:n {showlabels}
-
-        % TODO: if twoside, maybe only if sidenotes/book?
-        \__wisper_load_package:n {changepage}
-
-        \__wisper_load_package:n {bigfoot}
+          \__wisper_load_feature:n
       }
+  }
+
+% TODO: automatically set these clists from \__wisper_declare_feature:
+\clist_gset:Nn \g__wisper_all_features_early_packages_clist
+  {
+    babel,
+    fontenc,
+  }
+\clist_new:n \g__wisper_all_features_font_clist
+\clist_gset:Nn \g__wisper_all_features_main_packages_clist
+  {
+    inputenc ,
+
+    % load minted before csquotes to suppress a warning due to a common package
+    % they load
+    minted,
+    csquotes,  % context-sensitive quotes
+    microtype,
+
+    sidenotes,
+
+    enumitem,
+    float,
+    calc,
+    fancyhdr,
+    ragged2e,
+    url,
+
+    % colors
+    xcolor,
+
+    % tables
+    rotating,
+    booktabs,
+    array,
+    multirow,
+    tabu,
+
+    % Graphics
+    graphicx,  % advanced key=value arguments for \includegraphics
+    caption,
+    subcaption,
+
+    biblatex,
+
+    % Packages that need to be loaded last [[[2
+    hyperref,
+    showlabels,
+
+    changepage,
+
+    bigfoot,
+  }
+\clist_new:n \g__wisper_all_features_main_clist
+
+\cs_new:Npn \__wisper_load_features:n #1
+  {
+    \clist_map_inline:cn {g__wisper_all_features_ #1 _clist}
+      { \__wisper_load_feature:n {##1} }
   }
 
 % New packages to investigate
@@ -1141,19 +1191,22 @@
       }
   }
 
+
 % TODO: remember to set locale correctly!!
 %\sisetup{%
 %  separate-uncertainty=true,
 %  %locale = DE,
 %  %per-mode = symbol
 %}
-\NewDocumentCommand \Preamble { o }
+\NewDocumentCommand \Preamble { m }
   {
+    \__wisper_enable_features:n {#1}
+
     \DocumentStyle{type=scrbook}
     \__wisper_load_document_class:
 
     % Early Package loads
-    \__wisper_load_packages:n { before-font }
+    \__wisper_load_features:n { early_packages }
     \__wisper_load_features:n { font }
     % Adjust layout.
     \__wisper_if_document_class:nT {koma}
@@ -1168,7 +1221,7 @@
       { \__wisper_select_package_preset:nn {biblatex} {book} }
     \__wisper_select_package_preset:nn {hyperref} {pale-colors}
     % here: enable features
-    \__wisper_load_packages:n { main }
+    \__wisper_load_features:n { main_packages }
     \__wisper_load_features:n { main }
   }
 
