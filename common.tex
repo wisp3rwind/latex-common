@@ -138,31 +138,31 @@
 \cs_new:Npn \__wisper_switch_engine:n #1
   {
     \exp:w
-    \__str_case:nnTF {#1} { } { }
+    \__wisper_switch_engine_aux:nTF {#1} { } { }
   }
 \cs_new:Npn \__wisper_switch_engine:nT #1#2
   {
     \exp:w
-    \__str_case:nnTF {#1} {#2} { }
+    \__wisper_switch_engine_aux:nTF {#1} {#2} { }
   }
 \cs_new:Npn \__wisper_switch_engine:nF #1
   {
     \exp:w
-    \__str_case:nnTF {#1} { }
+    \__wisper_switch_engine_aux:nTF {#1} { }
   }
 \cs_new:Npn \__wisper_switch_engine:nTF #1
   {
     \exp:w
-    \__str_case:nnTF {#1}
+    \__wisper_switch_engine_aux:nTF {#1}
   }
 
-\cs_new:Npn \__wisper_switch_engine:nTF #1#2#3
+\cs_new:Npn \__wisper_switch_engine_aux:nTF #1#2#3
   { \__wisper_switch_engine_aux:VnTF \c_sys_engine_str {#1} {#2} {#3} }
-\cs_new:Npn \__wisper_switch_engine_aux:nnTF #1#2#3ä4
+\cs_new:Npn \__wisper_switch_engine:nnTF #1#2#3#4
   { \__wisper_switch_engine:nw {#1} #2 {#1} { } \q_mark {#3} \q_mark {#4} \q_stop }
 \cs_generate_variant:Nn \__wisper_switch_engine_aux:nnTF { VnTF }
 
-\cs_new:Npn __wisper_switch_engine:nw #1#2#3
+\cs_new:Npn \__wisper_switch_engine:nw #1#2#3
   {
     \__strlist_if_in:nnTF {#2} {#1}
       { \__prg_case_end:nw {#3} }
@@ -343,7 +343,7 @@
         features/#1/disabled .bool_gset_inverse:c = {g__wisper_package_ #1 _enabled_bool},
         features/#1/disabled .default:n = true,
 
-        features/#1/requires .clist_gset:c {g__wisper_feature_ #1 _features_clist}
+        features/#1/requires .clist_gset:c = {g__wisper_feature_ #1 _features_clist},
 
         features/#1/options / unknown .code:n =
           { \msg_error:nn { wisper } { no-such-feature-option } },
@@ -364,6 +364,7 @@
 
       \__wisper_set_feature_config:nn {#1} {#2}
   }
+
 \cs_new:Npn \__wisper_set_feature_config:nn #1#2
   { \__wisper_keys_set_doc:nn { features/#1 } {#2} }
 \cs_new:Npn \__wisper_set_feature_config:nnn #1#2#3
@@ -392,6 +393,20 @@
         \use:n {##2}
       }
   }
+
+\cs_new:Npn \__wisper_declare_mutually_exclusive_features:n #1
+  {
+    % TODO: implement
+  }
+
+% "Normal" features [[[2
+\seq_new:N \g__wisper_all_features_main_seq
+\cs_new:Npn \__wisper_declare_feature:nnn #1#2#3
+  {
+    \seq_put_right:Nn \g__wisper_all_features_main_seq {#1}
+    \__wisper_declare_feature_aux:nnn {#1} {#2} {#3}
+  }
+
 % Feature loading [[[2
 \prg_new_conditional:Npnn \__wisper_should_load_feature:n #1 { T, F, TF }
   {
@@ -418,18 +433,19 @@
   }
 
 % Special case features: packages [[[2
-\cs_new_Npn \__wisper_declare_package:nnn #1#2#3
+\seq_new:N \g__wisper_all_features_packages_seq
+\cs_new:Npn \__wisper_declare_package:nnn #1#2#3
   {
-    \clist_put_right:Nn \g__wisper_all_features_packages_clist {#1}
-    \__wisper_declare_feature:nnn {#1} {#2}
+    \seq_put_right:Nn \g__wisper_all_features_packages_seq {#1}
+    \__wisper_keys_define_doc:n
+      {
+        features/#1/options .code:n =
+          { \__wisper_pass_options_to_package:Vn \l_keys_key_tl {#1} },
+      }
+    \__wisper_declare_feature_aux:nnn {#1} {#2}
       {
         \usepackage{#1}
         #3
-      }
-    \__wisper_keys_define_doc:n
-      {
-        features/#1/options / unknown .code:n =
-          { \__wisper_pass_options_to_package:Vn \l_keys_key_tl {#1} },
       }
   }
 \cs_new:Npn \__wisper_declare_package:nn #1#2
@@ -472,9 +488,9 @@
   }  % ]]]
 \__wisper_declare_feature:nnn { font-fira }  % [[[
   {
-    requires = { FiraMono, FiraSans },
-    options = {
-      FiraSans = sfdefault
+    requires = {
+      FiraMono,
+      FiraSans = sfdefault,
     },
   }
   {
@@ -484,8 +500,7 @@
   }  % ]]]
   \__wisper_declare_feature:nnn { font-garamond }  % [[[
   {
-    requires = { mathdesign },
-    options = {
+    requires = {
       mathdesign = urw-garamond,
     },
   }
@@ -499,8 +514,7 @@
   }  % ]]]
   \__wisper_declare_feature:nnn { font-palatino }  % [[[
   {
-    requires = { mathpazo },
-    options = {
+    requires = {
       mathpazo = osf,
     },
   }
@@ -509,8 +523,9 @@
   }  % ]]]
 \__wisper_declare_feature:nnn { font-TexGyre }  % [[[
   {
-    requires = { amsthm, newpxmath, newpxtext, fontspec },
-    options = {
+    requires = {
+      amsthm,
+      newpxtext,
       newpxmath = vvarbb,
       fontspec = no-math,
     },
@@ -582,13 +597,10 @@
     },
     fancyhdr,
     amsthm,
-    bigfoot,
-    changepage = enabled,
-    showlabels,
   }
 
-\__wisper_declare_feature:nnnn { nonnum-section-commands }
-  {} {}
+\__wisper_declare_feature:nnn { nonnum-section-commands }
+  {}
   {
     % unnumbered section that shows up in the TOC
     \newcommand{\tocsection}[1]{\section*{#1}\addcontentsline{toc}{section}{#1}}
@@ -600,8 +612,8 @@
   }
 
 % Colors  [[[2
-\__wisper_declare_feature:nnnn {sron-mark-colors}
-  { xcolor } {}
+\__wisper_declare_feature:nnn {sron-mark-colors}
+  { requires = xcolor }
   {
     % define a few highlighting colors, from https://personal.sron.nl/~pault/
     \definecolor{marklightblue}{HTML}{BBCCEE}
@@ -635,7 +647,7 @@
     options = { hyperref=true },
   }
 
-\__wisper_declare_feature:nn { biblatex-backref }
+\__wisper_declare_feature:nnn { biblatex-backref } {}
   {
     disabled,
     requires = {
@@ -645,7 +657,7 @@
     },
   }
 
-\__wisper_declare_feature:nn { biblatex-default-verbosity }
+\__wisper_declare_feature:nnn { biblatex-default-verbosity } {}
   {
     disabled,
     requires = {
@@ -659,7 +671,7 @@
     },
   }
 
-\__wisper_declare_feature:nn { biblatex-alphabetic }
+\__wisper_declare_feature:nnn { biblatex-alphabetic } {}
   {
     disabled,
     requires = {
@@ -672,7 +684,7 @@
     },
   }
 
-\__wisper_declare_feature:nn { biblatex-numeric-supercite }
+\__wisper_declare_feature:nnn { biblatex-numeric-supercite } {}
   {
     disabled,
     requires = {
@@ -687,20 +699,19 @@
     },
   }
 
-\__wisper_declare_feature:nn { biblatex-alphabetic-supercite }
+\__wisper_declare_feature:nnn { biblatex-alphabetic-supercite } {}
   {
     % FIXME: implement
   }
 
-\__wisper_declare_feature:nnnn {footnotecite}
-  { multiple-footnotes }
-  {}
+\__wisper_declare_feature:nnn {footnotecite}
+  { requires = multiple-footnotes }
   {
     \DeclareNewFootnote{Cite}
   }
 
-\__wisper_declare_feature:nnnn { supershortnotecite }
-  {} {}
+\__wisper_declare_feature:nnn { supershortnotecite }
+  {}
   {
     % From http://www.khirevich.com/latex/footnote_citation/
     % new command \sjcitep prints footnote citation above punctuation
@@ -722,10 +733,8 @@
 
 
 % Page-layout: one-/twoside etc [[[2
-\__wisper_declare_package:nn { changepage }
-  {
-    disabled,
-  }
+\__wisper_declare_packages:n
+  { changepage }
 
 \__wisper_declare_feature:nnn { oneside }
   % This feature mostly exists to provide dummy commands for justification etc.
@@ -739,7 +748,7 @@
       { \bgroup \flushleft }
       { \egroup }
   }
-\__wisper_declare_feature:nn { twoside }
+\__wisper_declare_feature:nnn { twoside } {}
   {
     disabled,
     classoptions = { twoside },
@@ -748,7 +757,7 @@
     },
   }
   {
-    \cs_new:Nn \raggedoutside
+    \cs_new:Npn \raggedoutside
       {
         \checkoddpage
         \ifoddpage
@@ -862,7 +871,7 @@
   }
 
 % Hyperref [[[2
-\__wisper_declare_feature:nn { hyperref-bookmarks-default }
+\__wisper_declare_feature:nnn { hyperref-bookmarks-default } {}
   {
     enabled,
     requires = {
@@ -872,7 +881,7 @@
       }
     },
   }
-\__wisper_declare_feature:nn { hyperref-black }
+\__wisper_declare_feature:nnn { hyperref-black } {}
   {
     requires = {
       hyperref = {
@@ -880,7 +889,7 @@
       }
     },
   }
-\__wisper_declare_feature:nn { hyperref-pale-colors }
+\__wisper_declare_feature:nnn { hyperref-pale-colors } {}
   {
     enabled,
     requires = {
@@ -897,9 +906,6 @@
 \__wisper_declare_mutually_exclusive_features:n
   { hyperref-black, hyperref-pale-colors }
 
-\__wisper_declare_package:nn { showlabels }
-  { options = inner }
-
 % Code display [[[2
 \__wisper_declare_packages:n
   { minted }
@@ -912,14 +918,14 @@
     \input{common_code.tex}
   }
 
-\__wisper_declare_feature:nnnn { listings }
-  { minted } {}
+\__wisper_declare_feature:nnn { listings }
+  { requires = minted }
   {
   }
 
 % Math, physics [[[2
-\__wisper_declare_feature:nnnn { math }
-  {} {}
+\__wisper_declare_feature:nnn { math }
+  {}
   {
     \input{common_math.tex}
     \MathStyle
@@ -929,8 +935,8 @@
       }
   }
 
-\__wisper_declare_feature:nnnn { phys }
-  {} {}
+\__wisper_declare_feature:nnn { phys }
+  {}
   {
     \input{common_phys.tex}
   }
@@ -949,8 +955,8 @@
     graphicx = enabled,
   }
 
-\__wisper_declare_feature:nnnn {array-par-columns}
-  { array } {}
+\__wisper_declare_feature:nnn {array-par-columns}
+  { requires = array }
   {
     % https://tex.stackexchange.com/a/2442/111880
     % https://tex.stackexchange.com/a/12712/111880
@@ -959,8 +965,8 @@
     \newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
   }
 
-\__wisper_declare_feature:nnnn { twoside-floats }
-  { caption } {}
+\__wisper_declare_feature:nnn { twoside-floats }
+  { requires = caption }
   {
     \DeclareCaptionStyle{myfigure}{font=footnotesize,%
                                    labelfont=sc,%
@@ -1000,8 +1006,8 @@
 
 % Drafts [[[2
 
-\__wisper_declare_feature:nnnn { showlabels }
-  { showlabels } {}
+\__wisper_declare_package:nnn { showlabels }
+  { options = inner }
   {
     \renewcommand{\showlabelfont}{\tiny\ttfamily}
     \showlabels{cite}
@@ -1009,8 +1015,8 @@
     \showlabels{begin}
   }
 
-\__wisper_declare_feature:nnnn { draft-tools }
-  {} {}
+\__wisper_declare_feature:nnn { draft-tools }
+  {}
   {
     \newcounter{todonotecounter}
     \NewDocumentCommand \margintodo {s o m} 
@@ -1036,7 +1042,7 @@
     babel,
     fontenc,
   }
-\clist_new:n \g__wisper_all_features_font_clist
+\clist_new:N \g__wisper_all_features_font_clist
 \clist_gset:Nn \g__wisper_all_features_main_packages_clist
   {
     inputenc ,
@@ -1081,7 +1087,7 @@
 
     bigfoot,
   }
-\clist_new:n \g__wisper_all_features_main_clist
+\clist_new:N \g__wisper_all_features_main_clist
 
 \NewDocumentCommand \Preamble { m }
   {
