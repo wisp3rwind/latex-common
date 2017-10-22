@@ -107,6 +107,41 @@
   }
 \cs_generate_variant:Nn \__wisper_if_engine:nTF { vTF }
 
+% Code mostly borrowed from \__str_case:nnTF
+\cs_new:Npn \__wisper_switch_engine:n #1
+  {
+    \exp:w
+    \__str_case:nnTF {#1} { } { }
+  }
+\cs_new:Npn \__wisper_switch_engine:nT #1#2
+  {
+    \exp:w
+    \__str_case:nnTF {#1} {#2} { }
+  }
+\cs_new:Npn \__wisper_switch_engine:nF #1
+  {
+    \exp:w
+    \__str_case:nnTF {#1} { }
+  }
+\cs_new:Npn \__wisper_switch_engine:nTF #1
+  {
+    \exp:w
+    \__str_case:nnTF {#1}
+  }
+
+\cs_new:Npn \__wisper_switch_engine:nTF #1#2#3
+  { \__wisper_switch_engine_aux:VnTF \c_sys_engine_str {#1} {#2} {#3} }
+\cs_new:Npn \__wisper_switch_engine_aux:nnTF #1#2#3ä4
+  { \__wisper_switch_engine:nw {#1} #2 {#1} { } \q_mark {#3} \q_mark {#4} \q_stop }
+\cs_generate_variant:Nn \__wisper_switch_engine_aux:nnTF { VnTF }
+
+\cs_new:Npn __wisper_switch_engine:nw #1#2#3
+  {
+    \__strlist_if_in:nnTF {#2} {#1}
+      { \__prg_case_end:nw {#3} }
+      { \__wisper_switch_engine:nw {#1} }
+  }
+
 % Convenience funtions for the key-value interface [[[1
 \cs_new:Npn \__wisper_keys_define:n #1 { \keys_define:nn { wisper } {#1} }
 
