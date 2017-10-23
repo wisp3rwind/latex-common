@@ -195,6 +195,7 @@
 % TODO: port \Sum and \Prod, too, and write starred versions that use \limits
 % TODO: \Int{f}{x,1,3;y,0,10}
 % TODO: \Iint, \Iiint, \Iiiint, \Idotsint{f(x_1,\ldots,x_n)}{x_1,0,\infty;...;x_j,\R;...;x_n,0,\infty}
+% TODO: \Union, \Intersection, \Infimum, \Supremum, \Limes
 
 % COOL prints the '=' also if the second argument is empty...
 \NewDocumentCommand\SumInternal{m m m m}{%
@@ -237,9 +238,11 @@
 
 % Differential symbol for use in integrals or in differential forms
 \NewDocumentCommand\difsymbol{m m o g d()}{%
-    % {#1} - boolean: whether to disable automatic spacing
-    % {#2} - the symbol
-    % [#3] - optional exponent, e.g. d^3 r
+%\NewDocumentCommand\difsymbol{s m m o g d()}{%
+    % {#1} - (star) unstarred: dx³, starred: d³x
+    % {#2} - boolean: whether to disable automatic spacing
+    % {#3} - the symbol
+    % [--] - optional exponent, e.g. d^3 r
     % {#4} - the variable
     % (#5) - long form, e.g. d(cos x)
     \IfBooleanTF{#1}{\let\difspacing\nodifspacing}{\let\difspacing\mathinner}
