@@ -76,6 +76,31 @@
 % \idxrange{1}[1][2][3][5]{n}
 \newcommand{\idxrange}[3]{{#1}_{#2}\dots{#1}_{#3}}
 \newcommand{\idxrangec}[3]{{#1}_{#2},\dots,{#1}_{#3}}  % comma-separated
+\ExplSyntaxOn
+\NewDocumentCommand \Idxrange { m > { \SplitList { , } } m }
+  {
+    \__wisper_idxrange_aux:nnn {#1} #2 \q_recursion_tail \q_recursion_tail \q_recursion_stop
+  }
+\cs_new:Npn \__wisper_idxrange_aux:nnn #1#2#3
+  {
+    %\tl_show:n {#1}
+    %\tl_show:n {#2}
+    %\tl_show:n {#3}
+    \quark_if_recursion_tail_stop:n {#2}
+    \__wisper_idxrange_aux:n {#1} {#2}
+    % if this was the last item, stop now and do not append a comma
+    \quark_if_recursion_tail_stop:n {#3}
+    % else append the comma
+    ,
+    \__wisper_idxrange_aux:nnn {#1} {#3}
+  }
+\cs_new:Npn \__wisper_idxrange_aux:n #1#2
+  {
+    \tl_if_eq:nnTF {#2} {.}
+      { \dots }
+      { {#1} \c_math_subscript_token {#2} }
+  }
+\ExplSyntaxOff
 
 % complex numbers [[[1
 \newcommand{\conj}[1]{#1^{\ast}}
