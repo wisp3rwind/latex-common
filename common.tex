@@ -322,7 +322,7 @@
             math,
             phys,
           }
-      }
+      },
 
     type / unknown .code:n =
       {
@@ -667,7 +667,8 @@
     % unnumbered section that shows up in the TOC
     \newcommand{\tocsection}[1]{\section*{#1}\addcontentsline{toc}{section}{#1}}
     % non-numbered subsection that works properly with hyperref
-    \newcommand{\nonumchapter}[1]{\phantomsection\addcontentsline{toc}{chapter}{#1}}
+    \IfDocClassT { book, scrbook }
+      { \newcommand{\nonumchapter}[1]{\phantomsection\addcontentsline{toc}{chapter}{#1}} }
     \newcommand{\nonumsection}[1]{\phantomsection\addcontentsline{toc}{section}{#1}}
     \newcommand{\nonumsubsection}[1]{\phantomsection\addcontentsline{toc}{subsection}{#1}}
     \newcommand{\nonumsubsubsection}[1]{\phantomsection\addcontentsline{toc}{subsubsection}{#1}}
@@ -854,7 +855,8 @@
         \setkomafont{disposition}{\normalfont\bfseries}
         \KOMAoptions{headings=normal}
         % Fix fonts in the toc
-        \setkomafont{chapterentry}{\normalfont\bfseries}
+        \IfDocClassT {scrbook}
+          { \setkomafont{chapterentry}{\normalfont\bfseries} }
         % fix item font in descriptions and enumerates
         \setkomafont{descriptionlabel}{\normalfont\bfseries}
         \setkomafont{labelinglabel}{\normalfont\bfseries}
@@ -873,7 +875,8 @@
         % Header/Footer
         \usepackage[draft=false]{scrlayer-scrpage}
         \pagestyle{scrheadings}
-        \automark[chapter]{chapter}
+        \IfDocTypeT { scrbook }
+          { \automark[chapter]{chapter} }
         \automark*[section]{}
         \ihead{}
         \chead{\headmark}
@@ -1158,7 +1161,6 @@
   {
     \__wisper_enable_features:n {#1}
 
-    \DocumentStyle{type=scrbook}
     \__wisper_load_document_class:
 
     % Early Package loads
