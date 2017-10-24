@@ -283,6 +283,7 @@
         \str_set:Nn \g__wisper_document_type_str {letter}
         \str_set:Nn \g__wisper_classname_str {scrlttr2}
         \prop_put:Nnn \g__wisper_classopts_prop {a4paper} {}
+        \__wisper_enable_features:n { koma-misc }
       },
     type / book .code:n = 
       {
@@ -298,7 +299,31 @@
         \prop_put:Nnn \g__wisper_classopts_prop {BCOR} {0mm}
         \prop_put:Nnn \g__wisper_classopts_prop {DIV} {10}
         \prop_put:Nnn \g__wisper_classopts_prop {pagesize} {}
+        \__wisper_enable_features:n { koma-misc }
       },
+    type / scrartcl .code:n =
+      {
+        \str_set:Nn \g__wisper_document_type_str {scrartcl}
+        \str_set:Nn \g__wisper_classname_str {scrartcl}
+        \prop_put:Nnn \g__wisper_classopts_prop {a4paper} {}
+        \prop_put:Nnn \g__wisper_classopts_prop {BCOR} {0mm}
+        \prop_put:Nnn \g__wisper_classopts_prop {DIV} {10}
+        \prop_put:Nnn \g__wisper_classopts_prop {pagesize} {}
+        \__wisper_enable_features:n { koma-misc }
+      },
+
+    type / exercise .code:n =
+      {
+        \__wisper_keys_set_doc:n {type/scrartcl}
+        \str_set:Nn \g__wisper_document_type_str {exercise}
+        \__wisper_enable_features:n
+          {
+            font-TexGyre,
+            math,
+            phys,
+          }
+      }
+
     type / unknown .code:n =
       {
         \msg_error:nnnnn { wisper } { unknown-choice }
