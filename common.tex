@@ -185,22 +185,13 @@
 \cs_new:Npn \__wisper_keys_define_internal:n #1 { \keys_define:nn { wisper/internal } {#1} }
 \cs_new:Npn \__wisper_keys_define_doc:n #1 { \keys_define:nn { wisper/document } {#1} }
 \cs_new:Npn \__wisper_keys_define_doc:nn #1#2 { \keys_define:nn { wisper/document/#1 } {#2} }
-\cs_new:Npn \__wisper_keys_define_math:n #1 { \keys_define:nn { wisper/mathematics } {#1} }
-\cs_new:Npn \__wisper_keys_define_code:n #1 { \keys_define:nn { wisper/code } {#1} }
-\cs_new:Npn \__wisper_keys_define_phys:n #1 { \keys_define:nn { wisper/physics } {#1} }
 
 \cs_new:Npn \__wisper_keys_set_internal:n #1 { \keys_set:nn { wisper/internal } {#1} }
 \cs_new:Npn \__wisper_keys_set_doc:n #1 { \keys_set:nn { wisper/document } {#1} }
 \cs_new:Npn \__wisper_keys_set_doc:nn #1#2 { \keys_set:nn { wisper/document/#1 } {#2} }
-\cs_new:Npn \__wisper_keys_set_math:n #1 { \keys_set:nn { wisper/mathematics } {#1} }
-\cs_new:Npn \__wisper_keys_set_code:n #1 { \keys_set:nn { wisper/code } {#1} }
-\cs_new:Npn \__wisper_keys_set_phys:n #1 { \keys_set:nn { wisper/physics } {#1} }
 
 % User-accessible aliases.
-\NewDocumentCommand \DocumentStyle {m} { \keys_set:nn { wisper/document } {#1} }
-%\NewDocumentCommand \MathStyle {m} { \keys_set:nn { wisper/math } {#1} }
-%\NewDocumentCommand \CodeStyle {m} { \keys_set:nn { wisper/code } {#1} }
-%\NewDocumentCommand \PhysStyle {m} { \keys_set:nn { wisper/phys } {#1} }
+\cs_new_eq:NN \DocumentStyle \__wisper_keys_set_doc:n
 
 % Document class handling [[[1
 

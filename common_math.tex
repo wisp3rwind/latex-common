@@ -16,8 +16,6 @@
 
 \cs_new:Npn \__wisper_keys_define_math:n #1 { \keys_define:nn { wisper/math } {#1} }
 \cs_new:Npn \__wisper_keys_set_math:n #1 { \keys_set:nn { wisper/math } {#1} }
-
-%\NewDocumentCommand \MathStyle {m} { \keys_set:nn { wisper/math } {#1} }
 \cs_new_eq:NN \MathStyle \__wisper_keys_set_math:n
 
 \ExplSyntaxOff

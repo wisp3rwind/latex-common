@@ -1,5 +1,15 @@
 % TODO: R, ROOT, C, C++, bash, yaml
 
+\usepackage{xparse}
+
+\ExplSyntaxOn
+
+\cs_new:Npn \__wisper_keys_define_code:n #1 { \keys_define:nn { wisper/code } {#1} }
+\cs_new:Npn \__wisper_keys_set_code:n #1 { \keys_set:nn { wisper/code } {#1} }
+\cs_new_eq:NN \CodeStyle \__wisper_keys_set_code:n
+
+\ExplSyntaxOff
+
 % Minted requires \verb|\write18| and \verb|pygmentize|, but produces fancier
 % output than \verb|listings|.
 %\usepackage{listings}
