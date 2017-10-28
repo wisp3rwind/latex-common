@@ -258,8 +258,8 @@
       },
     main_language .code:n =
       {
-        \__wisper_set_package_options:nn {babel} {main=#1}
-        \prop_put:Nnn \g__wisper_classopts_prop {#1} {}
+        \__wisper_pass_options_to_package:nn {main=#1} {babel} 
+        %\prop_put:Nnn \g__wisper_classopts_prop {#1} {}
       },
 
     languages .initial:n = {english},
@@ -647,7 +647,8 @@
     },
     hyperref = enabled,
     sidenotes,
-    babel = { enabled, options = { main=english } },
+    %babel = { enabled, options = { main=english } },
+    babel = { enabled },
     fontenc = { enabled, options = { T1 } },
     csquotes = enabled,
     microtype = enabled,
