@@ -19,6 +19,46 @@
 \cs_new:Npn \__wisper_keys_set_math:n #1 { \keys_set:nn { wisper/math } {#1} }
 \cs_new_eq:NN \MathStyle \__wisper_keys_set_math:n
 
+% Variants [[[1
+%\cs_new:Npn \exp_last_unbraced:NcNo
+%  { \::c \::N \::o_unbraced \::: }
+\cs_new:Npn \exp_last_unbraced:NcNo #1#2#3#4
+  { \exp_after:wN #1 \cs:w #2 \exp_after:wN \cs_end: \exp_after:wN #3 #4 }
+
+  % clist tools [[[1
+% Copy & pasted \clist_map_inline:nn with slight changes to prevent unbracing
+% the items.
+\cs_new:Npn \__wisper_null {}  % vanishes after one expansion
+\cs_new:Npn \__wisper_clist_map_function_no_unbrace:Nw #1#2 ,
+  {
+    % The first token in #2 is \__wisper_null, expand that once so it vanishes
+    \exp_after:wN \__quark_if_recursion_tail_break:nN
+      \exp_after:wN {#2}
+      \clist_map_break:
+    \exp_after:wN #1
+      \exp_after:wN {#2}
+    \__wisper_clist_map_function_no_unbrace:Nw #1 \__wisper_null
+  }
+\cs_new_protected:Npn \__wisper_clist_map_inline_no_unbrace:Nn #1#2
+  {
+    \clist_if_empty:NF #1
+      {
+        \int_gincr:N \g__prg_map_int
+        \cs_gset_protected:cpn
+          { __prg_map_ \int_use:N \g__prg_map_int :w } ##1 {#2}
+        \exp_last_unbraced:NcNo \__wisper_clist_map_function_no_unbrace:Nw
+          { __prg_map_ \int_use:N \g__prg_map_int :w }
+          \__wisper_null #1 , \q_recursion_tail ,
+        \__prg_break_point:Nn \clist_map_break:
+          { \int_gdecr:N \g__prg_map_int }
+      }
+  }
+\cs_new_protected:Npn \__wisper_clist_map_inline_no_unbrace:nn #1
+  {
+    \clist_set:Nn \l__clist_internal_clist {#1}
+    \__wisper_clist_map_inline_no_unbrace:Nn \l__clist_internal_clist
+  }
+
 \ExplSyntaxOff
 
 % helpers [[[1
@@ -453,7 +493,7 @@
         { \seq_put_right:Nx \l_non_integer_order_seq {#2} }
     \fi:
   }
-\NewDocumentCommand \deriv {o m m o >{\SplitList{;}}m} {%
+\NewDocumentCommand \deriv {o m m o m} {%
     % #1 - command to wrap the result in (i.e. parenthesis, ...)
     % #2 - deriv sign
     % #3 - function
@@ -469,7 +509,7 @@
     \tl_clear_new:N \l_denominator_tl
 
     % Construct denominator, sum up exponents
-    \tl_map_inline:nn {#5}
+    \__wisper_clist_map_inline_no_unbrace:nn {#5}
       {
         %\tl_show:n {##1}
         \tl_put_right:Nn \l_denominator_tl {\mathop{}\!#2 ##1}
