@@ -99,9 +99,15 @@
 
 
 % norms etc. [[[1
-\let\Abs\undefined
-\DeclarePairedDelimiter\Abs{\lvert}{\rvert}
-\DeclarePairedDelimiter\Norm{\lVert}{\rVert}
+\ExplSyntaxOn
+
+\cs_undefine:N \Abs
+\DeclarePairedDelimiterX \Abs[1] \lvert \rvert
+  { \tl_if_empty:nTF {#1} { \: \cdot \: } { #1 } }
+\DeclarePairedDelimiterX \Norm[1] \lVert \rVert
+  { \tl_if_empty:nTF {#1} { \: \cdot \: } { #1 } }
+
+\ExplSyntaxOff
 
 
 % Equivalence relations, quotient spaces, ... [[[1
