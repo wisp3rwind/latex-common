@@ -424,58 +424,99 @@
 
 %------------------------------------------------------------
 
-% TODO: in non-numeric cases, add the integer exponents and join everything with '+'
-%   keep the overwrite though (the order might not turn out as intended for example)
-%   Also add single-character exponents, i.e {x^n;y^n} -> d^{2n}
-\newcounter{derivordercounter}
+\ExplSyntaxOn
+\regex_gset:Nn \g__wisper_integer_regex { [+-]?\d+ }
+\prg_new_protected_conditional:Npnn \__wisper_if_integer:n #1 { T, F, TF }
+  {
+    \regex_match:NnTF \g__wisper_integer_regex {#1}
+      { \prg_return_true: }
+      { \prg_return_false: }
+  }
+\cs_generate_variant:Nn \__wisper_if_integer:nTF { xTF }
+\ExplSyntaxOff
+
+% TODO: Starred version of the command that disables all of the exponent processing
 % example: \deriv{\dif}{f}{x^2;y^3}
 % example: \deriv{\partial}{f}{x^n;y^m}[n+m]  with an optional argument to overwrite the count
+\ExplSyntaxOn
+\int_new:N \l__wisper_derivative_order_int
+\cs_new_protected:Npn \__wisper_deriv_process_denominator_aux:w #1^#2 #3 \q_stop
+  {
+    \tl_show:n {#1}
+    \tl_show:n {#2}
+    \tl_show:n {#3}
+    \if_meaning:w \q_mark #2
+      \int_incr:N \l__wisper_derivative_order_int 
+    \else:
+      \__wisper_if_integer:xTF {#2}
+        { \int_add:Nn \l__wisper_derivative_order_int {#2} }
+        { \seq_put_right:Nx \l_non_integer_order_seq {#2} }
+    \fi:
+  }
 \NewDocumentCommand \deriv {o m m o >{\SplitList{;}}m} {%
     % #1 - command to wrap the result in (i.e. parenthesis, ...)
     % #2 - deriv sign
     % #3 - function
     % #4 - exponent overwrite for non-numerical cases
     % #5 - semicolon-separated list of variables, exponents given as usual with ^
-    \IfValueT{#1}{#1}{%
-        \IfNoValueTF{#4}{%
-            % no \addtocounter overwrite: determine order, no output yet
-            \ProcessList{#5}{\derivcountingsplitter}
-            \frac{%
-                \ifnum\value{derivordercounter}>1%
-                    % nothing, i.e. do not show exponent if it is 1
-                    #2^{\thederivordercounter}\!#3
-                \else
-                    #2 #3
-                \fi%
-            }{%
-                \let\derivsign#2
-                \ProcessList{#5}{\derivadd}
-            }
-            \setcounter{derivordercounter}{0}
-        }{%  else
-            % FIXME: Why has the negative space been there (and above)? If the
-            % Override is empty, the spacing between #2 and #3 would be wrong.
-            %\frac{#2[#4]\!#3}{%
-            \frac{#2[#4]#3}{%
-                \let\derivsign#2
-                \ProcessList{#5}{\derivadd}
-            }
-        }
-    }
+    % wrap in a group such that the counter is properly scoped when nesting
+    % derivatives (TODO: verify that nesting works)
+    \group_begin:
+
+    \int_zero:N \l__wisper_derivative_order_int
+    \seq_clear_new:N \l_non_integer_order_seq
+    \tl_clear_new:N \l_numerator_tl
+    \tl_clear_new:N \l_denominator_tl
+
+    % Construct denominator, sum up exponents
+    \tl_map_inline:nn {#5}
+      {
+        \tl_show:n {##1}
+        \tl_put_right:Nx \l_denominator_tl {\mathop{}\!#2 ##1}
+        \__wisper_deriv_process_denominator_aux:w ##1 ^ \q_mark \q_stop
+      }
+
+    % Construct exponent
+    \IfNoValueTF{#4}
+      {
+        \tl_set:Nx \l_numerator_tl
+          {
+            \seq_if_empty:NTF \l_non_integer_order_seq
+              {
+                \int_compare:nNnT { \l__wisper_derivative_order_int } { > } { 1 }
+                  {
+                    \c_math_superscript_token
+                    \int_use:N \l__wisper_derivative_order_int
+                    \!
+                  }
+              }
+              {
+                % TODO: order this sequence and add them if occuring multiple
+                % times, i.e. n + n -> 2n
+                \c_math_superscript_token
+                \seq_use:Nn \l_non_integer_order_seq { + }
+                \int_compare:nNnT { \l__wisper_derivative_order_int } { > } { 0 }
+                  { + \int_use:N \l__wisper_derivative_order_int }
+                \!
+              }
+          }
+      }
+      {
+        \tl_set:Nn \l_numerator_tl {#4}
+      }
+
+    \IfValueT{#1}{#1}
+      {
+        \frac
+          % No need to expand these explicitly
+          { #2 \l_numerator_tl }
+          { \l_denominator_tl }
+      }
+
+    \group_end:
 }
 
-\NewDocumentCommand \derivcountingsplitter {>{\SplitArgument{1}{^}}m} {%
-    \derivcount#1
-}
 
-\NewDocumentCommand \derivcount {m m} {%
-    \addtocounter{derivordercounter}{\IfNoValueTF{#2}{1}{#2}}
-}
-
-\NewDocumentCommand \derivadd {m} {\mathop{}\!\derivsign #1}
-
-
-\ExplSyntaxOn
 \DeclarePairedDelimiter \EvaluateNoStar {} {\rvert}
 \DeclarePairedDelimiter \EvaluateStar {.} {\rvert}
 \DeclareDocumentCommand \Evaluate { s }
