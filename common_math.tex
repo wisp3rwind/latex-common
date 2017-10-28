@@ -475,6 +475,18 @@
 \NewDocumentCommand \derivadd {m} {\mathop{}\!\derivsign #1}
 
 
+\ExplSyntaxOn
+\DeclarePairedDelimiter \EvaluateNoStar {} {\rvert}
+\DeclarePairedDelimiter \EvaluateStar {.} {\rvert}
+\DeclareDocumentCommand \Evaluate { s }
+  {
+    \IfBooleanTF {#1}
+      { \EvaluateStar* }
+      { \EvaluateNoStar }
+  }
+\cs_new_eq:NN \Eval \Evaluate
+\ExplSyntaxOff
+
 % equation numbering [[[1
 %http://tex.stackexchange.com/questions/42726/align-but-show-one-equation-number-at-the-end
 \newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
