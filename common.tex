@@ -852,15 +852,18 @@
   {
     \IfDocClassT{koma}
       {
+        % TODO: make the use of boldmath configurable, cf. 
+        % https://tex.stackexchange.com/questions/108894/typesetting-formulas-in-section-titles-title-bold-toc-entry-isnt#comment238645_108894
+        % https://tex.stackexchange.com/questions/41379/automatically-typeset-math-in-section-headings-in-bold-face#124311
         % Fix chapter/section titles defaulting to sans (i.e. CM) fonts
-        \setkomafont{disposition}{\normalfont\bfseries}
+        \setkomafont{disposition}{\normalfont\bfseries\boldmath}
         \KOMAoptions{headings=normal}
         % Fix fonts in the toc
         \IfDocClassT {scrbook}
-          { \setkomafont{chapterentry}{\normalfont\bfseries} }
+          { \setkomafont{chapterentry}{\normalfont\bfseries\boldmath} }
         % fix item font in descriptions and enumerates
-        \setkomafont{descriptionlabel}{\normalfont\bfseries}
-        \setkomafont{labelinglabel}{\normalfont\bfseries}
+        \setkomafont{descriptionlabel}{\normalfont\bfseries\boldmath}
+        \setkomafont{labelinglabel}{\normalfont\bfseries\boldmath}
         % Suppress warnings on font fallback
         \renewcommand\labelitemi{{\fontfamily{cmr}\selectfont\textbullet}}
         \renewcommand\labelitemiii{{\fontfamily{cmr}\selectfont\textasteriskcentered}}
