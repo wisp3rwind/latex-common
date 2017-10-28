@@ -57,16 +57,45 @@
 
 
 % sets [[[1
-\newcommand{\N}{\ensuremath{\mathbb{N}}}
-\newcommand{\Z}{\ensuremath{\mathbb{Z}}}
-\newcommand{\R}{\ensuremath{\mathbb{R}}}
-\newcommand{\Q}{\ensuremath{\mathbb{Q}}}
-\newcommand{\C}{\ensuremath{\mathbb{C}}}
+\newcommand{\N}{\ensuremath{\mathbb{N}}}  % natural numbers
+\newcommand{\Z}{\ensuremath{\mathbb{Z}}}  % integers
+\newcommand{\R}{\ensuremath{\mathbb{R}}}  % real numbers
+\newcommand{\Q}{\ensuremath{\mathbb{Q}}}  % rational numbers
+\newcommand{\C}{\ensuremath{\mathbb{C}}}  % complex numbers
+%\newcommand{\Sphere}{\ensuremath{\mathbb{S}}}  % \S^n \subset \R^{n+1}
+\newcommand{\Sphere}{\ensuremath{S}}  % \S^n \subset \R^{n+1}
 
 \newcommand{\nats}{\N} % natural numbers
 \newcommand{\natsz}{\ensuremath{\nats_{\mathrm{0}}}} % natural numbers incl. zero
 
 \newcommand{\Pset}[1]{\ensuremath{\mathcal{P}\left(#1\right)}}
+
+\ExplSyntaxOn
+
+\cs_new:Npn \__wisper_mid_vert:n #1
+  {
+    % TODO: understand this spacing construction (specfically look up \nonscript)
+    \nonscript\:
+    #1\vert
+    \allowbreak
+    \nonscript\:
+    \mathopen{}
+  }
+
+\cs_undefine:N \Set
+\DeclarePairedDelimiterX \Set[1] \lbrace \rbrace
+  {
+    \cs_set:Npn \given { \__wisper_mid_vert:n { \delimsize } }
+    \nonscript\, #1 \nonscript\,
+  }
+
+\cs_new_eq:NN \union \cup
+\cs_new_eq:NN \intersection \cap
+
+\cs_new_eq:NN \Union \bigcup
+\cs_new_eq:NN \Intersection \bigcap
+
+\ExplSyntaxOff
 
 
 % norms etc. [[[1
@@ -214,6 +243,14 @@
 \newcommand\uvc{\uvec}
 
 \newcommand{\colvec}[1]{\begin{pmatrix}#1\end{pmatrix}}
+
+
+%\DeclareMathOperator {\dim} {dim}
+\NewDocumentCommand \Dim { m }
+  { \dim (#1) }
+\DeclareMathOperator {\spanX} {span}
+\NewDocumentCommand \Span { m }
+  { \spanX (#1) }
 
 \__wisper_keys_define_math:n
   {
