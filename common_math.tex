@@ -48,6 +48,14 @@
 \newcommand{\const}{\mathrm{const}}
 
 
+% maps [[[1
+\DeclareMathOperator {\image} {Im}
+\NewDocumentCommand \Image { m }
+  {
+    \image (#1)
+  }
+
+
 % sets [[[1
 \newcommand{\N}{\ensuremath{\mathbb{N}}}
 \newcommand{\Z}{\ensuremath{\mathbb{Z}}}
@@ -274,6 +282,9 @@
 \cs_new_eq:NN \Adj \Adjoint
 \NewDocumentCommand \Operator { m } { \hat{#1} }
 \cs_new_eq:NN \Op \Operator
+
+\cs_new_eq:NN \composed \circ
+
 \ExplSyntaxOff
 
 % vector calculus [[[1
