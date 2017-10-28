@@ -485,7 +485,7 @@
               {
                 \int_compare:nNnTF { \l__wisper_derivative_order_int } { > } { 1 }
                   {
-                    #2[\int_use:N \l__wisper_derivative_order_int] \! #3
+                    #2[\int_use:N \l__wisper_derivative_order_int] #3
                   }
                   {
                     #2 #3
@@ -498,12 +498,12 @@
                       \seq_use:Nn \l_non_integer_order_seq { + }
                       \int_compare:nNnT { \l__wisper_derivative_order_int } { > } { 0 }
                         { + \int_use:N \l__wisper_derivative_order_int }
-                    ] \! #3
+                    ] #3
               }
           }
       }
       {
-        \tl_set:Nn \l_numerator_tl {#2[#4] \! #3}
+        \tl_set:Nn \l_numerator_tl {#2[#4] #3}
       }
 
     \IfValueT{#1}{#1}
