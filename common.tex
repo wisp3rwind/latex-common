@@ -870,7 +870,8 @@
         \renewcommand\labelitemiv{{\fontfamily{cmr}\selectfont\textperiodcentered}}
         
         % Titlepage
-        \KOMAoptions{titlepage=firstiscover}
+        \IfDocTypeT { scrbook }
+          { \KOMAoptions{titlepage=firstiscover} }
         
         % Footnotes
         \KOMAoptions{footnotes=multiple}  % comma-separate footnote superscripts
