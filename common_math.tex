@@ -453,7 +453,10 @@
             }
             \setcounter{derivordercounter}{0}
         }{%  else
-            \frac{#2[#4]\!#3 }{%
+            % FIXME: Why has the negative space been there (and above)? If the
+            % Override is empty, the spacing between #2 and #3 would be wrong.
+            %\frac{#2[#4]\!#3}{%
+            \frac{#2[#4]#3}{%
                 \let\derivsign#2
                 \ProcessList{#5}{\derivadd}
             }
