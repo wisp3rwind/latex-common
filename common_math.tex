@@ -322,8 +322,8 @@
     \IfValueT{#4}{^{#4}}%
     #1%
 }
-\DeclareDocumentCommand\Sum{m >{\SplitArgument{2}{,}}m}{%
-    \SumInternal{#1}#2
+\DeclareDocumentCommand\Sum{ >{\SplitArgument{2}{,}} m m }{%
+    \SumInternal{#2}#1
 }
 
 % combinatorics [[[1
