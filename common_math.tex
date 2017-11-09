@@ -102,6 +102,10 @@
       { \__wisper_parenthesize_aux:n* }
       { \__wisper_parenthesize_aux:n }
   }
+\DeclareMathOperator { \__wisper_operator_trace: } {tr}
+\NewDocumentCommand \Trace { s }
+  { \__wisper_operator_trace: \__wisper_embrace:nn { #1 } }
+\cs_gset_eq:NN \Tr \Trace
 
 \tl_new:N \g__wisper_symbol_identity_tl
 \prop_new:N \g__wisper_symbol_identity_prop
