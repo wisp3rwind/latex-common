@@ -88,6 +88,21 @@
     \image (#1)
   }
 
+\DeclarePairedDelimiter \__wisper_embrace_aux:n \lbrace \rbrace
+\cs_new:Npn \__wisper_embrace:nn #1
+  {
+    \IfBooleanTF {#1}
+      { \__wisper_embrace_aux:n* }
+      { \__wisper_embrace_aux:n }
+  }
+\DeclarePairedDelimiter \__wisper_parenthesize_aux:n \lparen \rparen
+\cs_new:Npn \__wisper_parenthesize:nn #1
+  {
+    \IfBooleanTF {#1}
+      { \__wisper_parenthesize_aux:n* }
+      { \__wisper_parenthesize_aux:n }
+  }
+
 \tl_new:N \g__wisper_symbol_identity_tl
 \prop_new:N \g__wisper_symbol_identity_prop
 \prop_put:Nnn \g__wisper_symbol_identity_prop { id } {\mathrm{id}}
