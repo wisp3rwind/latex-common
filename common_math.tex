@@ -478,6 +478,60 @@
 \newcommand{\deltaf}[1]{\func{\delta} (#1)}
 \DeclareMathOperator{\asinh}{asinh}
 
+\ExplSyntaxOn
+\DeclareMathOperator \__wisper_operator_exp: {exp}
+\DeclareMathOperator \__wisper_operator_log: {ln}
+%\DeclareDocumentCommand { s e{^} d() g } \Exp
+%  {
+%    % #1 - starred, i.e. whether to resize delimiters
+%    % #2 - \Exp^{value} notation. FIXME: implement
+%    % #3 - \Exp(value) notation to get surrounding parenthesis
+%    % #4 - \Exp{value} notation
+%    \IfValueTF {#2}
+%      { \msg_error: }
+%      {
+%        \IfValueTF {#3}
+%          { \__wisper_operator_exp: \__wisper_parenthesize:nn {#1} {#3} }
+%          {
+%            \IfValueT {#4}
+%              { \__wisper_operator_exp: {#3} }
+%          }
+%      }
+%  }
+\NewDocumentCommand \__wisper_operator_exp_power:w { s e{^} }
+  {
+    \IfValueT {#2}
+      { e^{#2} }
+  }
+\NewDocumentCommand \__wisper_operator_exp_parens:ww { m r() }
+  { \__wisper_operator_exp: \__wisper_parenthesize:nn {#1} {#2} }
+\NewDocumentCommand \__wisper_operator_exp_parens:wn { m m }
+  { \__wisper_operator_exp: \__wisper_parenthesize:nn {#1} {#2} }
+\NewDocumentCommand \__wisper_operator_exp:ww { s }
+  {
+    \peek_charcode_ignore_spaces:NTF ^
+      { \__wisper_operator_exp_power:w }
+      {
+        \peek_charcode_ignore_spaces:NTF ( %)
+          { \__wisper_operator_exp_parens:ww {#1} }
+          { \__wisper_operator_exp_parens:wn {#1} }
+      }
+  }
+\cs_gset_eq:NN \Exp \__wisper_operator_exp:ww
+
+\NewDocumentCommand \__wisper_operator_log_parens:nw { m r() }
+  { \__wisper_operator_log: \__wisper_parenthesize:nn {#1} {#2} }
+\NewDocumentCommand \__wisper_operator_log_nodelim:n { m }
+  { \__wisper_operator_log: {#1} }
+\NewDocumentCommand \__wisper_operator_log:ww { s }
+  {
+    \peek_charcode_ignore_spaces:NTF ( %)
+      { \__wisper_operator_log_parens:nw {#1} }
+      { \__wisper_operator_log_nodelim:n }
+  }
+\cs_gset_eq:NN \Log \__wisper_operator_log:ww
+\ExplSyntaxOff
+
 % replace the useless Max{} from the `cool` package
 \RenewDocumentCommand\Max{m m}{%
     \max_{#2} \; {#1}%
