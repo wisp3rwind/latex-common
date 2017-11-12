@@ -17,6 +17,7 @@
 
 \cs_new:Npn \__wisper_keys_define_math:n #1 { \keys_define:nn { wisper/math } {#1} }
 \cs_new:Npn \__wisper_keys_set_math:n #1 { \keys_set:nn { wisper/math } {#1} }
+\cs_new:Npn \__wisper_keys_set_math:nn #1#2 { \keys_set:nn { wisper/math/#1 } {#2} }
 \cs_new_eq:NN \MathStyle \__wisper_keys_set_math:n
 
 % Variants [[[1
@@ -375,6 +376,9 @@
           { \! \__wisper_dif:nnnn {##1} {\BooleanFalse} {##3} {##2} \mathop{} \! ##4 }
       },
     integrate/displayfunc .initial:n = inset,
+    % shorthands
+    integrate / outset .meta:n = { integrate/displayfunc = outset },
+    integrate / inset .meta:n = { integrate/displayfunc = inset },
   }
 
 \NewDocumentCommand \__wisper_integrate_aux:nnnnn { >{\SplitArgument{1}{^}}m m m m m }
@@ -392,8 +396,9 @@
   { \__wisper_integrate_aux:nnnnn #1 {} {#2} }
 \NewDocumentCommand \__wisper_integrate:nw { >{ \SplitArgument{2}{,} } r() m }
   { \__wisper_integrate_aux:nnnnn #1 { \__wisper_parenthesize_aux:n } {#2} }
-\cs_gset:Npn \Integrate
+\DeclareDocumentCommand \Integrate { o }
   {
+    \IfValueT {#1} { \__wisper_keys_set_math:nn {integrate} {#1} }
     \peek_charcode_ignore_spaces:NTF (
       { \__wisper_integrate:nw }
       { \__wisper_integrate:nn }

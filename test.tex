@@ -105,7 +105,20 @@ no spacing will applied.
   \item \verb|\dif[3]{x} \dif[3] x \dif^3 x| \begin{displaymath} \dif[3]{x} \quad \dif[3] x \quad \dif^3 x \end{displaymath}
   \item \verb|\dif \Dif \del \var| \begin{displaymath} \dif \quad \Dif \quad \del \quad \var \end{displaymath}
   \item \verb|\int\dif{x} x^2 \int x^2 \dif{x}| \begin{displaymath} \int\dif{x} x^2 \qquad \int x^2 \dif{x} \end{displaymath}
-\item \verb|\MathStyle{integrate/displayfunc=outset}\Int{x^2}{x}| \\\verb|\MathStyle{integrate/displayfunc=inset}\Int{x^2}{x}| \begin{displaymath} \MathStyle{integrate/displayfunc=outset}\Int{x^2}{x} \qquad \MathStyle{integrate/displayfunc=inset}\Int{x^2}{x} \end{displaymath}
+  \item
+    \verb|\MathStyle{integrate/displayfunc=outset} \Int{x^2}{x} \qquad| \\
+    \verb|\MathStyle{integrate/displayfunc=inset} \Int{x^2}{x}|
+    \begin{displaymath}
+      \MathStyle{integrate/displayfunc=outset} \Int{x^2}{x} \qquad
+      \MathStyle{integrate/displayfunc=inset} \Int{x^2}{x}
+    \end{displaymath}
+  \item
+    \verb|\Int[outset]{x^2}{x} \qquad| \\
+    \verb|\Int[inset]{x^2}{x}|
+    \begin{displaymath}
+      \Int[outset]{x^2}{x} \qquad
+      \Int[inset]{x^2}{x}
+    \end{displaymath}
   \item \verb|\MathStyle{integrate/displayfunc=outset}| \\ \verb|\var S = \Int{t}{\Int{\vc r^3}{\vc{r}} \lagr(t, \vc{r}, \dvc{r})} |
   \begin{displaymath} 
     \MathStyle{integrate/displayfunc=outset}
