@@ -377,19 +377,19 @@
     integrate/displayfunc .initial:n = inset,
   }
 
-\NewDocumentCommand \IntegrateInternal { m >{\SplitArgument{1}{^}}m m m }
+\NewDocumentCommand \IntegrateInternal { >{\SplitArgument{1}{^}}m m m m }
   {
-    \IfNoValueTF{#3}
+    \IfNoValueTF{#2}
       {\int}
-      {\IfNoValueTF{#4}%
-          {\int \c_math_subscript_token {#3}}
-          {\int \c_math_subscript_token {#3} \c_math_superscript_token {#4}}
+      {\IfNoValueTF{#3}%
+          {\int \c_math_subscript_token {#2}}
+          {\int \c_math_subscript_token {#2} \c_math_superscript_token {#3}}
       }
-    \__wisper_integrate_integrand:nnn {#1} #2
+    \__wisper_integrate_integrand:nnn {#4} #1
   }
 
-\DeclareDocumentCommand \Integrate{ m >{\SplitArgument{2}{,}}m }{%
-    \IntegrateInternal {#1} #2
+\DeclareDocumentCommand \Integrate{ >{\SplitArgument{2}{,}}m m }{%
+    \IntegrateInternal #1 {#2}
 }
 
 \cs_gset_eq:NN \Int \Integrate
