@@ -43,7 +43,10 @@
 
 
 % general quantum theory [[[1
-\newcommand{\comm}[2]{\left[ #1, #2 \right]}
+\ExplSyntaxOn
+\DeclarePairedDelimiterX \comm[2] \lbrack \rbrack
+  { \__wisper_argument_or_empty:n {#1}, \__wisper_argument_or_empty:n {#2} }
+\ExplSyntaxOff
 
 \newcommand{\paulimx}{\begin{pmatrix}0 & 1 \\ 1 & 0\end{pmatrix}}
 \newcommand{\paulimy}{\begin{pmatrix}-i & 0 \\ 0 & i\end{pmatrix}}

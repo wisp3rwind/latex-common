@@ -79,6 +79,16 @@
 \newcommand{\diffD}{\mathrm{D}}
 \newcommand{\const}{\mathrm{const}}
 
+\ExplSyntaxOn
+% TODO: use for all appropriate operators
+\cs_new:Npn \__wisper_argument_or_empty:n #1
+  {
+    \tl_if_empty:nTF
+      { \: \cdot \: }
+      {#1}
+  }
+\ExplSyntaxOff
+
 
 % maps [[[1
 \ExplSyntaxOn
@@ -102,7 +112,9 @@
       { \__wisper_parenthesize_aux:n* }
       { \__wisper_parenthesize_aux:n }
   }
+% TODO style variants: \MathStyle{trace-symbol = tr|Tr}
 \DeclareMathOperator { \__wisper_operator_trace: } {tr}
+% TODO style variants: \MathStyle{trace-parens = parenthesis|curly|square|none}
 \NewDocumentCommand \Trace { s }
   { \__wisper_operator_trace: \__wisper_embrace:nn { #1 } }
 \cs_gset_eq:NN \Tr \Trace
@@ -133,6 +145,8 @@
   }
 \ExplSyntaxOff
 
+% misc [[[1
+\newcommand{\supposed}{\stackrel{!}{=}}
 
 % sets [[[1
 \newcommand{\N}{\ensuremath{\mathbb{N}}}  % natural numbers
@@ -181,9 +195,9 @@
 
 \cs_undefine:N \Abs
 \DeclarePairedDelimiterX \Abs[1] \lvert \rvert
-  { \tl_if_empty:nTF {#1} { \: \cdot \: } { #1 } }
+{ \__wisper_argument_or_empty:n {#1} }
 \DeclarePairedDelimiterX \Norm[1] \lVert \rVert
-  { \tl_if_empty:nTF {#1} { \: \cdot \: } { #1 } }
+{ \__wisper_argument_or_empty:n {#1} }
 
 \ExplSyntaxOff
 
