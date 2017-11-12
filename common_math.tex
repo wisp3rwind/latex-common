@@ -83,7 +83,7 @@
 % TODO: use for all appropriate operators
 \cs_new:Npn \__wisper_argument_or_empty:n #1
   {
-    \tl_if_empty:nTF
+    \tl_if_empty:nTF {#1}
       { \: \cdot \: }
       {#1}
   }
