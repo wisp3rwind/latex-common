@@ -71,15 +71,15 @@ Bold vectors usually look better, \verb|\vc| is a shorthand:
 
 \paragraph{Advanced variable/exponent specification}
 \begin{itemize}
-  \item \verb|\pderiv{f}{x^2;y;z^2}| \begin{displaymath} \pderiv{f}{x^2;y;z^2} \end{displaymath}
-  \item \verb|\pderiv{f}[n+m+1]{x^n;y;z^m}| \begin{displaymath} \pderiv{f}[n+m+1]{x^n;y;z^m} \end{displaymath}
-  \item \verb|\pderiv{f}{x^n;y;z^m}| \begin{displaymath} \pderiv{f}[n+m+1]{x^n;y;z^m} \end{displaymath}
+  \item \verb|\pderiv{f}{x^2,y,z^2}| \begin{displaymath} \pderiv{f}{x^2,y,z^2} \end{displaymath}
+  \item \verb|\pderiv{f}[n+m+1]{x^n,y,z^m}| \begin{displaymath} \pderiv{f}[n+m+1]{x^n,y,z^m} \end{displaymath}
+  \item \verb|\pderiv{f}{x^n,y,z^m}| \begin{displaymath} \pderiv{f}[n+m+1]{x^n,y,z^m} \end{displaymath}
 \end{itemize}
 
 \paragraph{Shorthands for wrapping in parenthesis or brackets}
 \begin{itemize}
-  \item \verb|\ppderiv{f}{x^2;y;z^2}| \begin{displaymath} \ppderiv{f}{x^2;y;z^2} \end{displaymath}
-  \item \verb|\bpderiv{f}[n+m+1]{x^n;y;z^m}| \begin{displaymath} \bpderiv{f}[n+m+1]{x^n;y;z^m} \end{displaymath}
+  \item \verb|\ppderiv{f}{x^2,y,z^2}| \begin{displaymath} \ppderiv{f}{x^2,y,z^2} \end{displaymath}
+  \item \verb|\bpderiv{f}[n+m+1]{x^n,y,z^m}| \begin{displaymath} \bpderiv{f}[n+m+1]{x^n,y,z^m} \end{displaymath}
 \end{itemize}
 
 \iftesting
@@ -88,11 +88,11 @@ Bold vectors usually look better, \verb|\vc| is a shorthand:
   \item \verb|\deriv{\dif}{}{x}| $\deriv{\dif}{}{x}$
   \item \verb|\deriv{\dif}{f}{x}| $\deriv{\dif}{f}{x}$
   \item \verb|\deriv{\dif}{f(x)}{x}| $\deriv{\dif}{f(x)}{x}$
-  \item \verb|\deriv{\dif}{f}{x;y}| $\deriv{\dif}{f}{x;y}$
+  \item \verb|\deriv{\dif}{f}{x,y}| $\deriv{\dif}{f}{x,y}$
   \item \verb|\deriv{\dif}{}{x^2}| $\deriv{\dif}{}{x^2}$
   \item \verb|\deriv{\dif}{f}{x^2}| $\deriv{\dif}{f}{x^2}$
   \item \verb|\deriv{\dif}{}[3]{x^2}| $\deriv{\dif}{}[3]{x^2}$
-  \item \verb|\deriv{\dif}{}[3]{x^2;y}| $\deriv{\dif}{}[3]{x^2;y}$
+  \item \verb|\deriv{\dif}{}[3]{x^2,y}| $\deriv{\dif}{}[3]{x^2,y}$
   \item $\deriv[\parenthesize]{\dif}{}{x}$
 \end{itemize}
 \fi
@@ -106,17 +106,25 @@ no spacing will applied.
   \item \verb|\dif \Dif \del \var| \begin{displaymath} \dif \quad \Dif \quad \del \quad \var \end{displaymath}
   \item \verb|\int\dif{x} x^2 \int x^2 \dif{x}| \begin{displaymath} \int\dif{x} x^2 \qquad \int x^2 \dif{x} \end{displaymath}
 \item \verb|\MathStyle{integrate/displayfunc=outset}\Int{x^2}{x}| \\\verb|\MathStyle{integrate/displayfunc=inset}\Int{x^2}{x}| \begin{displaymath} \MathStyle{integrate/displayfunc=outset}\Int{x^2}{x} \qquad \MathStyle{integrate/displayfunc=inset}\Int{x^2}{x} \end{displaymath}
-  \item \verb|\var S = \int\dif{t} \int\dif[3]{\vc{r}} \lagr(t, \vc{r}, \dot{\vc{r}})| \begin{displaymath} \var S = \int\dif{t} \int\dif[3]{\vc{r}} \lagr(t, \vc{r}, \dot{\vc{r}}) \end{displaymath}
+  \item \verb|\MathStyle{integrate/displayfunc=outset}| \\ \verb|\var S = \Int{t}{\Int{\vc r^3}{\vc{r}} \lagr(t, \vc{r}, \dvc{r})} |
+  \begin{displaymath} 
+    \MathStyle{integrate/displayfunc=outset}
+    \var S = \Int{t}{\Int{\vc r^3}{\vc{r}} \lagr(t, \vc{r}, \dot{\vc{r}})}
+  \end{displaymath}
   \item \verb|\int \dif(\cos\theta) x^2 \int x^2 \dif(\cos\theta)| \begin{displaymath} \int \dif(\cos\theta) x^2 \qquad \int f(\theta) \dif(\cos\theta) \end{displaymath}
   \item \verb|\dif{f} = \pderiv{f}{x} \dif{x} + \pderiv{f}{y} \dif y| (note the incorrect spacing of $\dif y$) \begin{displaymath} \dif{f} = \pderiv{f}{x} \dif{x} + \pderiv{f}{y} \dif y \end{displaymath}
 \end{itemize}
 
-\begin{gather}
+\begin{gather*}
   \MathStyle{integrate/displayfunc=inset}
-  \Int{f(x)}{x^3,-\infty,\infty} \\
+  \Int{x^3,-\infty,\infty}{f(x)}
+  \qquad
+  \Int(\cos t,-\infty,\infty){f(t)} \\
   \MathStyle{integrate/displayfunc=outset}
-  \Int{f(x)}{x^3,-\infty,\infty}
-\end{gather}
+  \Int{x^3,-\infty,\infty}{f(x)}
+  \qquad
+  \Int(\cos t,-\infty,\infty){f(t)} \\
+\end{gather*}
 
 
 \subsection{Symbols}

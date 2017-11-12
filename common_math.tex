@@ -366,18 +366,18 @@
     integrate/displayfunc .choice:,
     integrate/displayfunc / inset .code:n =
       {
-        \cs_gset:Npn \__wisper_integrate_integrand:nnn ##1##2##3
-          {##1 \mathop{}\!\expandafter\dif\IfValueT{##3}{[##3]}{##2}}
+        \cs_gset:Npn \__wisper_integrate_integrand:nnnn ##1##2##3##4
+          { ##4 \mathop{} \! \__wisper_dif:nnnn {##1} {\BooleanFalse} {##3} {##2} }
       },
     integrate/displayfunc / outset .code:n =
       {
-        \cs_gset:Npn \__wisper_integrate_integrand:nnn ##1##2##3
-          {\!\expandafter\dif\IfValueT{##3}{[##3]}{##2}\mathop{}\! ##1}
+        \cs_gset:Npn \__wisper_integrate_integrand:nnnn ##1##2##3##4
+          { \! \__wisper_dif:nnnn {##1} {\BooleanFalse} {##3} {##2} \mathop{} \! ##4 }
       },
     integrate/displayfunc .initial:n = inset,
   }
 
-\NewDocumentCommand \IntegrateInternal { >{\SplitArgument{1}{^}}m m m m }
+\NewDocumentCommand \__wisper_integrate_aux:nnnnn { >{\SplitArgument{1}{^}}m m m m m }
   {
     \IfNoValueTF{#2}
       {\int}
@@ -385,13 +385,19 @@
           {\int \c_math_subscript_token {#2}}
           {\int \c_math_subscript_token {#2} \c_math_superscript_token {#3}}
       }
-    \__wisper_integrate_integrand:nnn {#4} #1
+    \__wisper_integrate_integrand:nnnn {#4} #1 {#5}
   }
 
-\DeclareDocumentCommand \Integrate{ >{\SplitArgument{2}{,}}m m }{%
-    \IntegrateInternal #1 {#2}
-}
-
+\NewDocumentCommand \__wisper_integrate:nn { >{ \SplitArgument{2}{,} } m m }
+  { \__wisper_integrate_aux:nnnnn #1 {} {#2} }
+\NewDocumentCommand \__wisper_integrate:nw { >{ \SplitArgument{2}{,} } r() m }
+  { \__wisper_integrate_aux:nnnnn #1 { \__wisper_parenthesize_aux:n } {#2} }
+\cs_gset:Npn \Integrate
+  {
+    \peek_charcode_ignore_spaces:NTF (
+      { \__wisper_integrate:nw }
+      { \__wisper_integrate:nn }
+  }
 \cs_gset_eq:NN \Int \Integrate
 
 \ExplSyntaxOff
@@ -451,36 +457,78 @@
 
 % calculus [[[1
 
-% no-op helper
-\NewDocumentCommand\nodifspacing{m}{#1}
-
 % Differential symbol for use in integrals or in differential forms
-\NewDocumentCommand\difsymbol{m m o g d()}{%
-%\NewDocumentCommand\difsymbol{s m m o g d()}{%
-    % {#1} - (star) unstarred: dx³, starred: d³x
-    % {#2} - boolean: whether to disable automatic spacing
-    % {#3} - the symbol
-    % [--] - optional exponent, e.g. d^3 r
-    % {#4} - the variable
-    % (#5) - long form, e.g. d(cos x)
-    \IfBooleanTF{#1}{\let\difspacing\nodifspacing}{\let\difspacing\mathinner}
-    \IfNoValueTF{#4}{%
-        \IfNoValueTF{#5}{%
-% Never apply spacing if no argument is given
-            #2 \IfValueT{#3}{^{#3}}
-        }{%
-% long form
-            \difspacing{#2 \IfValueT{#3}{^{#3}} (#5)}
-        }
-    }{%
-% normal form
-        \difspacing{#2 \IfValueT{#3}{^{#3}} #4}
-    }
-}
-\DeclareDocumentCommand\dif{s}{\difsymbol{#1}{\diffd}}
-\DeclareDocumentCommand\Dif{s}{\difsymbol{#1}{\diffD}}
-\DeclareDocumentCommand\del{s}{\difsymbol{#1}{\partial}}
-\DeclareDocumentCommand\var{s}{\difsymbol{#1}{\delta}}
+\ExplSyntaxOn
+% no-op helper
+\cs_new:Npn \nodifspacing #1 {#1}
+\cs_new:Npn \__wisper_dif_spacing:nn #1
+  {
+    \IfBooleanTF{#1}
+      {\nodifspacing}
+      {\mathinner}
+  }
+\cs_new:Npn \__wisper_difsymbol:NNnnn #1#2#3#4#5
+  {
+    % #1 - the symbol
+    % #2 - surrounding
+    % #3 - boolean: whether to disable automatic spacing
+    % #4 - the exponent (possibly \NoValue)
+    % #5 - the variable
+    \tl_show:n {foobar}
+    \tl_show:n {#1}
+    \tl_show:n {#2}
+    \tl_show:n {#3}
+    \tl_show:n {#4}
+    \tl_show:n {#5}
+    \IfNoValueTF {#5}
+      {
+        % Never apply spacing if no argument is given
+        #1 \IfValueT{#4}{ \c_math_superscript_token {#4} }
+      }
+      {
+        \__wisper_dif_spacing:nn {#3}
+          {
+            #1
+            \IfValueT {#4} { \c_math_superscript_token {#4} }
+            #2 {#5}
+          }
+      }
+  }
+\cs_new:Npn \__wisper_declare_difsymbol:nN #1#2
+  {
+    \cs_new:cpn { __wisper_ #1 :nnnn }
+      {
+        % #1 - surrounding
+        % #2 - disable spacing
+        % #3 - exponent
+        % #4 - variable
+        \__wisper_difsymbol:NNnnn #2
+      }
+    \exp_args:Nc \NewDocumentCommand { __wisper_ #1 _normal:nnn } { m m g }
+      { \__wisper_difsymbol:NNnnn #2 {} {##1} {##2} {##3} }
+    \exp_args:Nc \NewDocumentCommand { __wisper_ #1 _long:nnw } { m m r() }
+      { \__wisper_difsymbol:NNnnn #2 { \__wisper_parenthesize_aux:n } {##1} {##2} {##3} }
+    \exp_args:Nc \NewDocumentCommand { #1 } { s e{^} }
+      % Full syntax:
+      % \dif^3 {x}
+      % \dif {x^3}
+      % \dif^3 (x)
+      % \dif (x^3)
+      % \dif*^3 {x}
+      % \dif* {x^3}
+      % \dif*^3 (x)
+      % \dif* (x^3)
+      % {##1} star (disable spacing)
+      {
+        \peek_charcode_ignore_spaces:NTF (
+          { \use:c { __wisper_ #1 _long:nnw } {##1} {##2} }
+          { \use:c { __wisper_ #1 _normal:nnn } {##1} {##2} }
+      }
+  }
+\__wisper_declare_difsymbol:nN {dif} \diffd
+\__wisper_declare_difsymbol:nN {Dif} \diffD
+\__wisper_declare_difsymbol:nN {del} \partial
+\__wisper_declare_difsymbol:nN {var} \delta
 
 % Lebesgue formalism
 \newcommand{\leb}{\ensuremath{\lambda}}
@@ -631,7 +679,7 @@
               {
                 \int_compare:nNnTF { \l__wisper_derivative_order_int } { > } { 1 }
                   {
-                    #2[\int_use:N \l__wisper_derivative_order_int] #3
+                    #2^{\int_use:N \l__wisper_derivative_order_int} #3
                   }
                   {
                     #2 #3
@@ -640,16 +688,16 @@
               {
                 % TODO: order this sequence and add them if occuring multiple
                 % times, i.e. n + n -> 2n
-                  #2[
+                  #2^{
                       \seq_use:Nn \l_non_integer_order_seq { + }
                       \int_compare:nNnT { \l__wisper_derivative_order_int } { > } { 0 }
                         { + \int_use:N \l__wisper_derivative_order_int }
-                    ] #3
+                    } #3
               }
           }
       }
       {
-        \tl_set:Nn \l_numerator_tl {#2[#4] #3}
+        \tl_set:Nn \l_numerator_tl {#2^{#4} #3}
       }
 
     \IfValueT{#1}{#1}
