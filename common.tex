@@ -547,7 +547,7 @@
     requires = lmodern,
   }
   {
-    \__wisper_load_package:n { lmodern }
+    \__wisper_load_feature:n { lmodern }
   }  % ]]]
 \__wisper_declare_font:nnn { font-fira }  % [[[
   {
@@ -558,8 +558,8 @@
   }
   {
     % Mozilla Fira Sans, requires XeLaTeX or LuaLaTex TODO: raise error
-    \__wisper_load_package:n {FiraSans}
-    \__wisper_load_package:n {FiraMono}
+    \__wisper_load_feature:n {FiraSans}
+    \__wisper_load_feature:n {FiraMono}
   }  % ]]]
 \__wisper_declare_font:nnn { font-garamond }  % [[[
   {
@@ -573,7 +573,7 @@
     % FIXME: maybe drop this? PagellaX is better anyway. At least give a
     % warning.
     % TODO: matching sans font
-    \__wisper_load_package:n {mathdesign}
+    \__wisper_load_feature:n {mathdesign}
   }  % ]]]
 \__wisper_declare_font:nnn { font-palatino }  % [[[
   {
@@ -582,7 +582,7 @@
     },
   }
   {
-    \__wisper_load_package:n {mathpazo}
+    \__wisper_load_feature:n {mathpazo}
   }  % ]]]
 \__wisper_declare_font:nnn { font-TexGyre }  % [[[
   {
