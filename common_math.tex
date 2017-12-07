@@ -199,6 +199,9 @@
 { \__wisper_argument_or_empty:n {#1} }
 \DeclarePairedDelimiterX \Norm[1] \lVert \rVert
 { \__wisper_argument_or_empty:n {#1} }
+\DeclarePairedDelimiterX \InnerProduct[2] \langle \rangle
+{ \__wisper_argument_or_empty:n {#1} , \__wisper_argument_or_empty:n {#2} }
+\cs_gset_eq:NN \IProd \InnerProduct
 
 \ExplSyntaxOff
 
