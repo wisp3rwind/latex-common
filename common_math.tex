@@ -197,8 +197,14 @@
 \cs_undefine:N \Abs
 \DeclarePairedDelimiterX \Abs[1] \lvert \rvert
 { \__wisper_argument_or_empty:n {#1} }
+
 \DeclarePairedDelimiterX \Norm[1] \lVert \rVert
 { \__wisper_argument_or_empty:n {#1} }
+
+\DeclarePairedDelimiterX \ExpectationValue[1] \langle \rangle
+{ \__wisper_argument_or_empty:n {#1} }
+\cs_gset_eq:NN \ExpVal \ExpectationValue
+
 \DeclarePairedDelimiterX \InnerProduct[2] \langle \rangle
 { \__wisper_argument_or_empty:n {#1} , \__wisper_argument_or_empty:n {#2} }
 \cs_gset_eq:NN \IProd \InnerProduct
