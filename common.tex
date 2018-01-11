@@ -277,6 +277,12 @@
       {
         \str_set:Nn \g__wisper_document_type_str {presentation}
         \str_set:Nn \g__wisper_classname_str {beamer}
+        \__wisper_enable_features:n
+          {
+            font-fira,
+            math,
+            phys,
+          }
       },
     type / letter .code:n = 
       {
@@ -310,6 +316,19 @@
         \prop_put:Nnn \g__wisper_classopts_prop {DIV} {10}
         \prop_put:Nnn \g__wisper_classopts_prop {pagesize} {}
         \__wisper_enable_features:n { koma-misc }
+      },
+
+    type / paper .code:n =
+      {
+        \__wisper_keys_set_doc:n {type/scrartcl}
+        \str_set:Nn \g__wisper_document_type_str {paper}
+        \__wisper_enable_features:n
+          {
+            font-TexGyre,
+            math,
+            phys,
+            biblatex-numeric-supercite,
+          }
       },
 
     type / exercise .code:n =
