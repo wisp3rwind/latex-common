@@ -787,7 +787,18 @@
     },
   }
   {
-    \DeclareNewFootnote{Cite}
+    \__wisper_if_document_class:nTF { beamer }
+      {
+        % bigfoot+beamer crashes (incomplete iffalse ...)
+        %\DeclareDocumentCommand \footnotetextCite { r[] } { \footnotetext[#1][frame] }
+        \DeclareDocumentCommand \footnotetextCite { r[] } { \footnotetext[#1] }
+        \cs_gset_eq:NN \footnotemarkCite \footnotemark
+        %\cs_gset_eq:NN \footnotetextCite \footnotetext
+        \cs_gset_eq:NN \footnoteCite \footnote
+      }
+      {
+        \DeclareNewFootnote{Cite}
+      }
   }
 
 \__wisper_declare_feature:nnn { supershortnotecite }
@@ -985,15 +996,15 @@
 % Footnotes [[[2
 \__wisper_declare_package:n { bigfoot }
 
-\bool_new:N \g__wisper_footnotes_multiple_bool
-\__wisper_keys_define_doc:n
+\__wisper_declare_feature:nnn { multiple-footnotes }
   {
-    footnotes/multiple .bool_gset:N = \g__wisper_footnotes_multiple_bool,
+    requires = bigfoot,
+  }
+  {
   }
 
 \__wisper_declare_feature:nnn { alphabetic-default-footnote }
   {
-    requires = { bigfoot },
   }
   {
     \__wisper_if_feature_enabled:n { bigfoot }
