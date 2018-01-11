@@ -384,6 +384,13 @@
 
         features/#1/options / unknown .code:n =
           { \msg_error:nnnx { wisper } { no-such-feature-option } {#1} {\l_keys_key_tl=##1} },
+        features/#1/classoptions .code:n =
+          {
+            % FIXME: implement
+            %\clist_map_inline:nn {##1}
+            %\keyval_parse:NNn
+            %  \prop_put:Nnn \g__wisper_classopts_prop
+          },
 
         features/#1/conflicts / classes .tl_gset:c = {g__wisper_feature_ #1 _conflicting_classes_tl},
         features/#1/conflicts / features .tl_gset:c = {g__wisper_feature_ #1 _conflicting_features_tl},
