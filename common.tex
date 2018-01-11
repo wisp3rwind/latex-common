@@ -489,17 +489,17 @@
   }
 \cs_new:Npn \__wisper_load_features:n #1
   {
-    \clist_map_inline:cn {g__wisper_all_features_ #1 _clist}
+    \seq_map_inline:cn {g__wisper_all_features_ #1 _seq}
       { \__wisper_load_feature:n {##1} }
   }
 
 % Special case features: fonts [[[2
 %\seq_new:N \g__wisper_all_features_font_seq
-\clist_new:N \g__wisper_all_features_font_clist
+\seq_new:N \g__wisper_all_features_font_seq
 \cs_new:Npn \__wisper_declare_font:nnn #1#2#3
   {
     %\seq_put_right:Nn \g__wisper_all_features_font_seq {#1}
-    \clist_put_right:Nn \g__wisper_all_features_font_clist {#1}
+    \seq_put_right:Nn \g__wisper_all_features_font_seq {#1}
     \__wisper_declare_feature_aux:nnn {#1} {#2} {#3}
   }
 % Special case features: packages [[[2
@@ -718,7 +718,7 @@
     options = { hyperref=true },
   }
 
-\__wisper_declare_feature:nnn { biblatex-backref } {}
+\__wisper_declare_feature:nnn { biblatex-backref }
   {
     disabled,
     requires = {
@@ -727,8 +727,9 @@
       },
     },
   }
+  { }
 
-\__wisper_declare_feature:nnn { biblatex-default-verbosity } {}
+\__wisper_declare_feature:nnn { biblatex-default-verbosity }
   {
     disabled,
     requires = {
@@ -741,8 +742,9 @@
       },
     },
   }
+  { }
 
-\__wisper_declare_feature:nnn { biblatex-alphabetic } {}
+\__wisper_declare_feature:nnn { biblatex-alphabetic }
   {
     disabled,
     requires = {
@@ -754,8 +756,9 @@
       biblatex-default-verbosity,
     },
   }
+  { }
 
-\__wisper_declare_feature:nnn { biblatex-numeric-supercite } {}
+\__wisper_declare_feature:nnn { biblatex-numeric-supercite }
   {
     disabled,
     requires = {
@@ -769,20 +772,25 @@
       biblatex-default-verbosity,
     },
   }
+  { }
 
-\__wisper_declare_feature:nnn { biblatex-alphabetic-supercite } {}
+\__wisper_declare_feature:nnn { biblatex-alphabetic-supercite }
+  { }
   {
     % FIXME: implement
   }
 
-\__wisper_declare_feature:nnn {footnotecite}
-  { requires = multiple-footnotes }
+\__wisper_declare_feature:nnn { footnotecite }
+  {
+    requires = {
+      %multiple-footnotes,
+    },
+  }
   {
     \DeclareNewFootnote{Cite}
   }
 
 \__wisper_declare_feature:nnn { supershortnotecite }
-  {}
   {
     requires = {
       biblatex,
@@ -872,7 +880,7 @@
       { \bgroup \flushleft }
       { \egroup }
   }
-\__wisper_declare_feature:nnn { twoside } {}
+\__wisper_declare_feature:nnn { twoside }
   {
     disabled,
     classoptions = { twoside },
@@ -908,7 +916,7 @@
 
 % Layout for KOMA [[[
 \__wisper_declare_feature:nnn { koma-misc }
-  {}
+  { }
   {
     \IfDocClassT{koma}
       {
@@ -1001,7 +1009,7 @@
   }
 
 % Hyperref [[[2
-\__wisper_declare_feature:nnn { hyperref-bookmarks-default } {}
+\__wisper_declare_feature:nnn { hyperref-bookmarks-default }
   {
     enabled,
     requires = {
@@ -1011,7 +1019,8 @@
       }
     },
   }
-\__wisper_declare_feature:nnn { hyperref-black } {}
+  { }
+\__wisper_declare_feature:nnn { hyperref-black }
   {
     requires = {
       hyperref = {
@@ -1019,7 +1028,8 @@
       }
     },
   }
-\__wisper_declare_feature:nnn { hyperref-pale-colors } {}
+  { }
+\__wisper_declare_feature:nnn { hyperref-pale-colors }
   {
     enabled,
     requires = {
@@ -1033,6 +1043,7 @@
       }
     },
   }
+  { }
 \__wisper_declare_mutually_exclusive_features:n
   { hyperref-black, hyperref-pale-colors }
 
@@ -1058,15 +1069,10 @@
   {}
   {
     \input{common_math.tex}
-    \MathStyle
-      {
-        integrate/displayfunc=outset,
-        vecdisplay=bold,
-      }
   }
 
 \__wisper_declare_feature:nnn { phys }
-  { math }
+  { requires = math }
   {
     \input{common_phys.tex}
   }
@@ -1167,13 +1173,13 @@
 % Loading orders [[[1
 
 % TODO: automatically set these clists from \__wisper_declare_feature:
-\clist_gset:Nn \g__wisper_all_features_early_packages_clist
+\seq_gset_from_clist:Nn \g__wisper_all_features_early_packages_seq
   {
     inputenc,
     babel,
     fontenc,
   }
-\clist_gset:Nn \g__wisper_all_features_main_packages_clist
+\seq_gset_from_clist:Nn \g__wisper_all_features_main_packages_seq
   {
     koma-misc,
 
@@ -1221,7 +1227,6 @@
     changepage,
 
   }
-\clist_new:N \g__wisper_all_features_main_clist
 
 \NewDocumentCommand \Preamble { m }
   {
