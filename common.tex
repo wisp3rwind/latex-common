@@ -275,6 +275,9 @@
       },
     type / presentation .code:n = 
       {
+        % TODO: devise a way to properly cite image references, cf.
+        % the cite:online hack.
+        % TODO: move the slide environments here
         \str_set:Nn \g__wisper_document_type_str {presentation}
         \str_set:Nn \g__wisper_classname_str {beamer}
         \__wisper_enable_features:n
@@ -282,7 +285,23 @@
             font-fira,
             math,
             phys,
+            biblatex-numeric-supercite,
           }
+        \let\footnotesize\tiny
+        \let\beamerfootnote\footnote
+        \RenewDocumentCommand \footnote { m }
+          { \beamerfootnote[frame]{#1} }
+        %\NewDocumentCommand \footnotetextCite { m }
+        %  { \footnotetext[frame]{#1} }
+        \usetheme{metropolis}
+        \metroset
+          {
+            sectionpage=none,
+            numbering=fraction,
+            progressbar=frametitle,  % head, foot, frametitle, none
+            block=fill,  % transparent, fill {for theorem and example environments}
+          }
+        \setbeamertemplate{footline}[page number]{}
       },
     type / letter .code:n = 
       {
@@ -321,6 +340,7 @@
     type / paper .code:n =
       {
         \__wisper_keys_set_doc:n {type/scrartcl}
+        \prop_put:Nnn \g__wisper_classopts_prop {twoside} {}
         \str_set:Nn \g__wisper_document_type_str {paper}
         \__wisper_enable_features:n
           {
