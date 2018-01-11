@@ -26,7 +26,7 @@
 \newbibmacro*{notefullcite}{%
   \ifciteseen
     {}
-    {\footnotetext[\thefield{labelnumber}]{%
+    {\footnotetextCite[\thefield{labelnumber}]{%
        \usedriver{}{\thefield{entrytype}}.}}}
 
 %==========================================================%
@@ -49,18 +49,22 @@
   {}%
   {\usebibmacro{cite:dump}}%
 
-\newbibmacro*{superfullcite}{%
-  \ifciteseen%
-    {}%
-    {\xappto\cbx@citehook{%
-       \noexpand\footnotetextCite[\thefield{labelnumber}]{%
-         \entrydata{\thefield{entrykey}}{%
-           %\usedriver{}{\thefield{entrytype}}\printfield{postnote}.}%
-           \usedriver{}{\thefield{entrytype}}}%
-         }%
-       }%
-     }%
-}
+\newbibmacro*{superfullcite}%
+  {%
+    %\ifciteseen%
+    %  {}%
+      %{%
+        \xappto\cbx@citehook%
+          {%
+            \noexpand\footnotetextCite[\thefield{labelnumber}]%
+              {%
+                \entrydata{\thefield{entrykey}}{%
+                  %\usedriver{}{\thefield{entrytype}}\printfield{postnote}.}%
+                  \usedriver{}{\thefield{entrytype}}}%
+              }%
+          }%
+      %}%
+  }
 
 %==========================================================%
 % \DeclareCiteCommand below creates a citation with the  
@@ -87,27 +91,34 @@
 \newbibmacro*{supershortnotecite}{%
   \ifciteseen%
     {}%
-    {\iffieldequalstr{entrytype}{article}% checks if the entry type is "article",
-                                         % and if true, entry fields and punctuation are 
-                                         % printed as specified below; if false, default  
-                                         % biblatex citation scheme is used
-      {%
-        \xappto\cbx@citehook{%
-          \noexpand\footnotetextCite[\thefield{labelnumber}]{%
-            \entrydata{\thefield{entrykey}}{%
-            \usebibmacro{author/translator+others}\addperiod\addspace%
-            \mkbibemph{\printfield{title}}\addspace%
-            \mkbibemph{\iffieldundef{shortjournal}%
-              {\printfield{journaltitle}}%
-              {\printfield{shortjournal}}%
-            }\addspace%
-            \printfield{volume}\addspace%
-            \mkbibparens{\printfield{year}}\addcomma
-            \usebibmacro{chapter+pages}%
-          }%
-        }}%
-      }%
-      {\usebibmacro{superfullcite}}}}%
+    {%
+      % checks if the entry type is "article", and if true, entry fields and
+      % punctuation are printed as specified below; if false, default  biblatex
+      % citation scheme is used
+      \iffieldequalstr{entrytype}{article}%
+        {%
+          \xappto\cbx@citehook%
+            {%
+              \noexpand\footnotetextCite[\thefield{labelnumber}]%
+                {%
+                  \entrydata{\thefield{entrykey}}%
+                    {%
+                      \usebibmacro{author/translator+others}\addperiod\addspace%
+                      \mkbibemph{\printfield{title}}\addspace%
+                      \mkbibemph{\iffieldundef{shortjournal}%
+                        {\printfield{journaltitle}}%
+                        {\printfield{shortjournal}}%
+                      }\addspace%
+                      \printfield{volume}\addspace%
+                      \mkbibparens{\printfield{year}}\addcomma
+                      \usebibmacro{chapter+pages}%
+                    }%
+                }%
+            }%
+        }%
+        {\usebibmacro{superfullcite}}%
+    }%
+}%
 
 %==========================================================%
 \newrobustcmd{\cbx@superscript}[1]{%
