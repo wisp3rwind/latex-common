@@ -62,6 +62,8 @@
 % Common messages [[[1
 \msg_new:nnn { wisper } { unknown-choice }
   { Unknown~#1~'#2'.~Valid~choices~are~\clist_use:nn{#3}{,~}. }
+\msg_new:nnn { wisper } { disabling-feature }
+  { Disabling~feature~'#1'. }
 \msg_new:nnn { wisper } { check-loading-feature }
   { Checking~whether~to~load~feature~'#1'. }
 \msg_new:nnn { wisper } { loading-feature }
@@ -409,6 +411,7 @@
     \bool_gset_false:c {g__wisper_feature_ #1 _loaded_bool}
     \clist_new:c {g__wisper_feature_ #1 _features_clist}
     \tl_gset:cn {g__wisper_feature_ #1 _code_tl} {#3}
+    \clist_new:c {g__wisper_feature_ #1 _conflicting_features_clist}
 
     \__wisper_keys_define_doc:n
       {
@@ -440,9 +443,9 @@
           },
 
         features/#1/conflicts / classes .tl_gset:c = {g__wisper_feature_ #1 _conflicting_classes_tl},
-        features/#1/conflicts / features .tl_gset:c = {g__wisper_feature_ #1 _conflicting_features_tl},
+        %features/#1/conflicts / features .clist_gset:c = {g__wisper_feature_ #1 _conflicting_features_clist},
         features/#1/conflicts / classes .initial:n = {},
-        features/#1/conflicts / features .initial:n = {},
+        %features/#1/conflicts / features .initial:n = {},
 
         % e.g. document classes can prevent loading a feature, should raise an
         % error if enabled explicitly in some place.
@@ -466,13 +469,24 @@
     \__wisper_enable_feature:n {#1}
     \__wisper_set_feature_config:nn {#1}  {options={#2}}
   }
-
+\cs_new:Npn \__wisper_disable_feature:n #1
+  {
+    \msg_warning:nnn { wisper } { disabling-feature } {#1}
+    \bool_gset_false:c {g__wisper_feature_ #1 _enabled_bool}
+  }
 \cs_new:Npn \__wisper_enable_feature:n #1
   {
     \bool_if:cF {g__wisper_feature_ #1 _enabled_bool}
       {
+        %\clist_show:c {g__wisper_feature_ #1 _conflicting_features_clist}
+        \clist_map_inline:cn {g__wisper_feature_ #1 _conflicting_features_clist}
+          {
+            \__wisper_disable_feature:n {##1}
+          }
         \bool_gset_true:c {g__wisper_feature_ #1 _enabled_bool}
         %\tl_show:c {g__wisper_feature_ #1 _features_clist}
+        % TODO: only enable dependencies immediately before loading the first
+        % features. Otherwise, later disabling will not unload the dependencies.
         \keyval_parse:NNv
           \__wisper_enable_feature:n
           \__wisper_enable_feature_set_options:nn
@@ -496,7 +510,13 @@
 
 \cs_new:Npn \__wisper_declare_mutually_exclusive_features:n #1
   {
-    % TODO: implement
+    % When enabling one such feature, disable all of the others
+    \clist_map_inline:nn {#1}
+      {
+        \clist_put_right:cn {g__wisper_feature_ ##1 _conflicting_features_clist}
+          {#1}
+        \clist_gremove_duplicates:c {g__wisper_feature_ ##1 _conflicting_features_clist}
+      }
   }
 
 % "Normal" features [[[2
