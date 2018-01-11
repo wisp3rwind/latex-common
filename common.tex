@@ -104,7 +104,11 @@
       }
     \exp_args:Noo \__wisper_load_with_optional_arg_aux:Nnn #1
       {
-        \clist_use:Nn \l__tmpa_clist { ,~ }
+        % Previously, this code introduced an additional space ( { ,~ } ). This
+        % will apparently not be stripped when loading the document class with
+        % the result that _all_ option will be ignored (and result in the 
+        % warning "Unused global options [...]".
+        \clist_use:Nn \l__tmpa_clist { , }
       }
       { #3 }
   }
