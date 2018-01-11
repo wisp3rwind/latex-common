@@ -495,12 +495,12 @@
     % #3 - boolean: whether to disable automatic spacing
     % #4 - the exponent (possibly \NoValue)
     % #5 - the variable
-    \tl_show:n {foobar}
-    \tl_show:n {#1}
-    \tl_show:n {#2}
-    \tl_show:n {#3}
-    \tl_show:n {#4}
-    \tl_show:n {#5}
+    %\tl_show:n {foobar}
+    %\tl_show:n {#1}
+    %\tl_show:n {#2}
+    %\tl_show:n {#3}
+    %\tl_show:n {#4}
+    %\tl_show:n {#5}
     \IfNoValueTF {#5}
       {
         % Never apply spacing if no argument is given
@@ -640,9 +640,10 @@
 %------------------------------------------------------------
 
 \ExplSyntaxOn
-\regex_gset:Nn \g__wisper_integer_regex { [+-]?\d+ }
+\regex_gset:Nn \g__wisper_integer_regex { \A[+\-]?\d+\Z }
 \prg_new_protected_conditional:Npnn \__wisper_if_integer:n #1 { T, F, TF }
   {
+    %\tl_show:n {#1}
     \regex_match:NnTF \g__wisper_integer_regex {#1}
       { \prg_return_true: }
       { \prg_return_false: }
