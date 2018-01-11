@@ -147,7 +147,14 @@
 \ExplSyntaxOff
 
 % misc [[[1
+\ExplSyntaxOn
 \newcommand{\supposed}{\stackrel{!}{=}}
+\DeclareMathOperator { \__wisper_operator_order: }{ \mathcal{O} }
+\NewDocumentCommand \Order { s m }
+  {
+    \__wisper_operator_order: \__wisper_parenthesize:nn {#1} {#2}
+  }
+\ExplSyntaxOff
 
 % sets [[[1
 \newcommand{\N}{\ensuremath{\mathbb{N}}}  % natural numbers
