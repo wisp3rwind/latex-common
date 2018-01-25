@@ -62,8 +62,16 @@
 % Common messages [[[1
 \msg_new:nnn { wisper } { unknown-choice }
   { Unknown~#1~'#2'.~Valid~choices~are~\clist_use:nn{#3}{,~}. }
+\msg_new:nnn { wisper } { feature-multiply-declared }
+  { Feature~'#1'~already~declared. }
+\msg_new:nnn { wisper } { enabling-feature }
+  { Enabling~feature~'#1'. }
 \msg_new:nnn { wisper } { disabling-feature }
   { Disabling~feature~'#1'. }
+\msg_new:nnn { wisper } { check-activating-feature }
+  { Checking~whether~to~activate~feature~'#1'. }
+\msg_new:nnn { wisper } { activating-feature }
+  { Activating~feature~'#1'. }
 \msg_new:nnn { wisper } { check-loading-feature }
   { Checking~whether~to~load~feature~'#1'. }
 \msg_new:nnn { wisper } { loading-feature }
@@ -86,31 +94,30 @@
 
     \prop_map_inline:Nn #1
       {
-        \clist_put_right:Nx #2
-          {
-            \str_if_eq:nnTF {##2} {}
-              {##1,}
-              {##1=##2,}
-          }
+        \tl_if_novalue:nTF {##2}
+          { \clist_put_right:Nn #2 {##1} }
+          { \clist_put_right:Nn #2 {##1=##2} }
       }
   }
 
 \cs_new:Npn \__wisper_load_with_optional_arg:NNn #1#2#3
   {
-    \clist_clear:N \l__tmpa_clist
-    \__wisper_build_clist_from_prop:NN #2 \l__tmpa_clist
+    \clist_clear:N \l_tmpa_clist
+    \__wisper_build_clist_from_prop:NN #2 \l_tmpa_clist
+    %\clist_show:N \l_tmpa_clist
     \__wisper_if_debug:nT { loader }
       {
-        \clist_show:N \l__tmpa_clist
+        \clist_show:N \l_tmpa_clist
         \str_show:n {#3}
       }
+    %\exp_args:Nx \tl_show:n { \clist_use:Nn \l_tmpa_clist { , } }
     \exp_args:Noo \__wisper_load_with_optional_arg_aux:Nnn #1
       {
         % Previously, this code introduced an additional space ( { ,~ } ). This
         % will apparently not be stripped when loading the document class with
         % the result that _all_ option will be ignored (and result in the 
         % warning "Unused global options [...]".
-        \clist_use:Nn \l__tmpa_clist { , }
+        \clist_use:Nn \l_tmpa_clist { , }
       }
       { #3 }
   }
@@ -260,7 +267,7 @@
     languages .code:n =
       {
         \clist_map_inline:nn {#1}
-          { \prop_put:Nnn \g__wisper_classopts_prop {##1} {} }
+          { \__wisper_store_classopt:n {##1} }
       },
     main_language .code:n =
       {
@@ -268,130 +275,33 @@
         %\prop_put:Nnn \g__wisper_classopts_prop {#1} {}
       },
 
-    languages .initial:n = {english},
+    %languages .initial:n = {english},
 
     %landscape .bool:,
-
-    type .choice:,
-    type / article .code:n = 
-      {
-        \str_set:Nn \g__wisper_document_type_str {article}
-        \str_set:Nn \g__wisper_classname_str {article}
-        \prop_put:Nnn \g__wisper_classopts_prop {a4paper} {}
-      },
-    type / presentation .code:n = 
-      {
-        % TODO: devise a way to properly cite image references, cf.
-        % the cite:online hack.
-        % TODO: move the slide environments here
-        \str_set:Nn \g__wisper_document_type_str {presentation}
-        \str_set:Nn \g__wisper_classname_str {beamer}
-        \__wisper_enable_features:n
-          {
-            font-fira,
-            math,
-            phys,
-            biblatex-numeric-supercite,
-          }
-        \let\footnotesize\tiny
-        \let\beamerfootnote\footnote
-        \RenewDocumentCommand \footnote { m }
-          { \beamerfootnote[frame]{#1} }
-        %\NewDocumentCommand \footnotetextCite { m }
-        %  { \footnotetext[frame]{#1} }
-        \usetheme{metropolis}
-        \metroset
-          {
-            sectionpage=none,
-            numbering=fraction,
-            progressbar=frametitle,  % head, foot, frametitle, none
-            block=fill,  % transparent, fill {for theorem and example environments}
-          }
-        \setbeamertemplate{footline}[page number]{}
-      },
-    type / letter .code:n = 
-      {
-        \str_set:Nn \g__wisper_document_type_str {letter}
-        \str_set:Nn \g__wisper_classname_str {scrlttr2}
-        \prop_put:Nnn \g__wisper_classopts_prop {a4paper} {}
-        \__wisper_enable_features:n { koma-misc }
-      },
-    type / book .code:n = 
-      {
-        \str_set:Nn \g__wisper_document_type_str {book}
-        \str_set:Nn \g__wisper_classname_str {book}
-        \prop_put:Nnn \g__wisper_classopts_prop {a4paper} {}
-      },
-    type / scrbook .code:n = 
-      {
-        \str_set:Nn \g__wisper_document_type_str {scrbook}
-        \str_set:Nn \g__wisper_classname_str {scrbook}
-        \prop_put:Nnn \g__wisper_classopts_prop {a4paper} {}
-        \prop_put:Nnn \g__wisper_classopts_prop {BCOR} {0mm}
-        \prop_put:Nnn \g__wisper_classopts_prop {DIV} {10}
-        \prop_put:Nnn \g__wisper_classopts_prop {pagesize} {}
-        \__wisper_enable_features:n { koma-misc }
-      },
-    type / scrartcl .code:n =
-      {
-        \str_set:Nn \g__wisper_document_type_str {scrartcl}
-        \str_set:Nn \g__wisper_classname_str {scrartcl}
-        \prop_put:Nnn \g__wisper_classopts_prop {a4paper} {}
-        \prop_put:Nnn \g__wisper_classopts_prop {BCOR} {0mm}
-        \prop_put:Nnn \g__wisper_classopts_prop {DIV} {10}
-        \prop_put:Nnn \g__wisper_classopts_prop {pagesize} {}
-        \__wisper_enable_features:n { koma-misc }
-      },
-
-    type / paper .code:n =
-      {
-        \__wisper_keys_set_doc:n {type/scrartcl}
-        \prop_put:Nnn \g__wisper_classopts_prop {twoside} {}
-        \prop_put:Nnn \g__wisper_classopts_prop {twocolumn} {}
-        \str_set:Nn \g__wisper_document_type_str {paper}
-        \__wisper_enable_features:n
-          {
-            font-TexGyre,
-            math,
-            phys,
-            biblatex-numeric-supercite,
-          }
-      },
-
-    type / exercise .code:n =
-      {
-        \__wisper_keys_set_doc:n {type/scrartcl}
-        \str_set:Nn \g__wisper_document_type_str {exercise}
-        \__wisper_enable_features:n
-          {
-            font-TexGyre,
-            math,
-            phys,
-          }
-      },
-
-    type / unknown .code:n =
-      {
-        \msg_error:nnnnn { wisper } { unknown-choice }
-          { document~type }
-          {#1}
-          { article, presentation, letter, book, scrbook } % TODO: Don't hardcode
-      },
   }
+%\__wisper_declare_feature:nnn { language }
+%  {
+%    declare~options =
+%      {
+%        main = 
+%      }
+%  }
+%  {
+%  }
 
 % Conditionals [[[2
-\prg_new_conditional:Npnn \__wisper_if_document_type:n #1
-  { p, T, F, TF}
-  { 
-    \clist_if_in:nVTF {#1} \g__wisper_document_type_str
-      { \prg_return_true: }
-      { \prg_return_false: }
-  }
+%\prg_new_conditional:Npnn \__wisper_if_document_type:n #1
+%  { p, T, F, TF}
+%  { 
+%    \clist_if_in:nVTF {#1} \g__wisper_document_type_str
+%      { \prg_return_true: }
+%      { \prg_return_false: }
+%  }
 
 % User-accessible aliases.
-\cs_new_eq:NN \IfDocTypeT \__wisper_if_document_type:nT
-\cs_new_eq:NN \IfDocTypeF \__wisper_if_document_type:nF
-\cs_new_eq:NN \IfDocTypeTF \__wisper_if_document_type:nTF
+%\cs_new_eq:NN \IfDocTypeT \__wisper_if_document_type:nT
+%\cs_new_eq:NN \IfDocTypeF \__wisper_if_document_type:nF
+%\cs_new_eq:NN \IfDocTypeTF \__wisper_if_document_type:nTF
 
 \cs_new_eq:NN \IfDocClassT \__wisper_if_document_class:nT
 \cs_new_eq:NN \IfDocClassF \__wisper_if_document_class:nF
@@ -401,18 +311,22 @@
 \prop_new:N \g__wisper_feature_features_prop
 \prop_new:N \g__wisper_feature_code_prop
 \tl_new:N \g__wisper_feature_code_tl
+\seq_new:N \g__wisper_all_features_all_seq
 
 % #1 - name
 % #2 - keyvals
 % #3 - code
 \cs_new:Npn \__wisper_declare_feature_aux:nnn #1#2#3
   {
-    \cs_if_exist:cF {g__wisper_feature_ #1 _enabled_bool}
-      { \bool_gset_false:c {g__wisper_feature_ #1 _enabled_bool} }
+    \cs_if_exist:cT {g__wisper_feature_ #1 _enabled_bool}
+      { \msg_error:nnn { wisper } { feature-multiply-declared } {#1} }
+    \bool_gset_false:c {g__wisper_feature_ #1 _enabled_bool}
+    \bool_gset_false:c {g__wisper_feature_ #1 _activated_bool}
     \bool_gset_false:c {g__wisper_feature_ #1 _loaded_bool}
     \clist_new:c {g__wisper_feature_ #1 _features_clist}
     \tl_gset:cn {g__wisper_feature_ #1 _code_tl} {#3}
     \clist_new:c {g__wisper_feature_ #1 _conflicting_features_clist}
+    \seq_put_right:Nn \g__wisper_all_features_all_seq {#1}
 
     \__wisper_keys_define_doc:n
       {
@@ -427,7 +341,29 @@
           { },
         features/#1/disabled .value_forbidden:n = true,
 
+        features/#1/groups .code:n =
+          {
+            \clist_map_inline:nn {##1}
+              {
+                \seq_if_exist:cF {g__wisper_all_features_ ####1 _seq}
+                  { \seq_new:c {g__wisper_all_features_ ####1 _seq} }
+                \seq_gput_right:cn {g__wisper_all_features_ ####1 _seq} {#1}
+              }
+          },
+
         features/#1/requires .clist_gset:c = {g__wisper_feature_ #1 _features_clist},
+          %{ \clist_gput_right:cn = {g__wisper_feature_ #1 _features_clist} {##1} },
+        % FIXME: Cannot work since the conditional must be parsed when at least
+        % the document class has been loaded. Maybe restrict the conditonals
+        % that are allowed here to document classes.
+        %features/#1/requires-conditional .code:n =
+        %  {
+        %    \bool_if:xT { \tl_head:n {##1} }
+        %      {
+        %        \clist_gput_right:cx {g__wisper_feature_ #1 _features_clist}
+        %          { \tl_tail:n {##1} }
+        %      }
+        %  },
 
         features/#1/options / unknown .code:n =
           { \msg_error:nnnx { wisper } { no-such-feature-option } {#1} {\l_keys_key_tl=##1} },
@@ -435,13 +371,7 @@
           {
             \__wisper_keys_define_doc:nn { features/#1/options } { ##1 }
           },
-        features/#1/classoptions .code:n =
-          {
-            % FIXME: implement
-            %\clist_map_inline:nn {##1}
-            %\keyval_parse:NNn
-            %  \prop_put:Nnn \g__wisper_classopts_prop
-          },
+        features/#1/classoptions .clist_gset:c = {g__wisper_feature_ #1 _classopts_clist},
 
         features/#1/conflicts / classes .tl_gset:c = {g__wisper_feature_ #1 _conflicting_classes_tl},
         %features/#1/conflicts / features .clist_gset:c = {g__wisper_feature_ #1 _conflicting_features_clist},
@@ -472,9 +402,18 @@
   }
 \cs_new:Npn \__wisper_disable_feature:n #1
   {
-    \msg_warning:nnn { wisper } { disabling-feature } {#1}
+    \__wisper_if_debug:nT { features }
+      { \msg_warning:nnn { wisper } { disabling-feature } {#1} }
     \bool_gset_false:c {g__wisper_feature_ #1 _enabled_bool}
   }
+\cs_new:Npn \__wisper_disable_features_group_except_group:nn #1#2
+  {
+    \__wisper_loop_features_groups:nn {#1}
+      {
+        \seq_if_in:cnF {g__wisper_all_features_ #2 _seq} {##1}
+          { \__wisper_disable_feature:n {##1} }
+      }
+    }
 \cs_new:Npn \__wisper_enable_feature:n #1
   {
     \bool_if:cF {g__wisper_feature_ #1 _enabled_bool}
@@ -482,22 +421,80 @@
         %\clist_show:c {g__wisper_feature_ #1 _conflicting_features_clist}
         \clist_map_inline:cn {g__wisper_feature_ #1 _conflicting_features_clist}
           {
+            % TODO: error out if activated already
             \__wisper_disable_feature:n {##1}
           }
+        \__wisper_if_debug:nT { features }
+          { \msg_warning:nnn { wisper } { enabling-feature } {#1} }
         \bool_gset_true:c {g__wisper_feature_ #1 _enabled_bool}
-        %\tl_show:c {g__wisper_feature_ #1 _features_clist}
-        % TODO: only enable dependencies immediately before loading the first
-        % features. Otherwise, later disabling will not unload the dependencies.
-        \keyval_parse:NNv
-          \__wisper_enable_feature:n
-          \__wisper_enable_feature_set_options:nn
-          {g__wisper_feature_ #1 _features_clist}
+      }
+  }
+\cs_new:Npn \__wisper_activate_feature_dep_set_options:nn #1#2
+  {
+    %\msg_warning:nnn { wisper } { enabling-feature } {Dep:~#1}
+    \__wisper_enable_feature:n {#1}
+    \__wisper_set_feature_config:nn {#1}  {options={#2}}
+    % Recursively activate dependencies.
+    \__wisper_activate_feature:n {#1}
+  }
+\cs_new:Npn \__wisper_activate_feature_dep:n #1
+  {
+    %\msg_warning:nnn { wisper } { enabling-feature } {Dep:~#1}
+    \__wisper_enable_feature:n {#1}
+    % Recursively activate dependencies.
+    \__wisper_activate_feature:n {#1}
+  }
+\cs_new:Npn \__wisper_activate_feature:n #1
+  {
+    \__wisper_if_debug:nT { features }
+      { \msg_warning:nnn { wisper } { check-activating-feature } {#1} }
+    %\bool_show:c {g__wisper_feature_ #1 _enabled_bool}
+    %\bool_show:c {g__wisper_feature_ #1 _loaded_bool}
+    %\bool_show:x { \__wisper_if_engine_p:v {g__wisper_feature_ #1 _deactivated_for_engines_strlist} }
+    %\bool_show:x { \__wisper_if_document_class_p:v {g__wisper_feature_ #1 _deactivated_for_classes_strlist} }
+    \__wisper_should_load_feature:nT {#1}
+      {
+        \__wisper_if_debug:nT { features }
+          { \msg_warning:nnn { wisper } { activating-feature } {#1} }
+        \bool_if:cF {g__wisper_feature_ #1 _activated_bool}
+          {
+            \__wisper_if_debug:nT { features }
+              { \msg_warning:nnn { wisper } { activating-feature } {#1} }
+            %\tl_show:c {g__wisper_feature_ #1 _features_clist}
+            % TODO: only enable dependencies immediately before loading the first
+            % features. Otherwise, later disabling will not unload the dependencies.
+            \keyval_parse:NNv
+              \__wisper_activate_feature_dep:n
+              \__wisper_activate_feature_dep_set_options:nn
+              {g__wisper_feature_ #1 _features_clist}
+            \__wisper_store_classoptions:v {g__wisper_feature_ #1 _classopts_clist}
+            \bool_gset_true:c {g__wisper_feature_ #1 _activated_bool}
+          }
       }
   }
 \cs_new:Npn \__wisper_enable_features:n #1
   {
     \clist_map_function:nN {#1} \__wisper_enable_feature:n
   }
+\cs_new:Npn \__wisper_activate_features:n #1
+  {
+    \clist_map_function:nN {#1} \__wisper_activate_feature:n
+  }
+\cs_new:Npn \__wisper_loop_features_groups:nN #1#2
+  {
+    \clist_map_inline:nn {#1}
+      {
+        \seq_map_inline:cn {g__wisper_all_features_ ##1 _seq}
+          { #2 {####1} }
+      }
+  }
+\cs_new:Npn \__wisper_loop_features_groups:nn #1#2
+  {
+    \cs_set:Npn \l_tmpa_cs:n ##1 { #2 }
+    \__wisper_loop_features_groups:nN {#1} \l_tmpa_cs:n
+  }
+\cs_new:Npn \__wisper_activate_features_group:n #1
+  { \__wisper_loop_features_groups:nN {#1} \__wisper_activate_feature:n }
 \msg_new:nnn { wisper } { feature-executing } { Executing~feature-code~'#1'. }
 \cs_new:Nn \__wisper_load_features: 
   {
@@ -541,25 +538,24 @@
         { \bool_not_p:v {g__wisper_feature_ #1 _enabled_bool} }
         { \bool_if_p:v {g__wisper_feature_ #1 _loaded_bool} }
         { \__wisper_if_engine_p:v {g__wisper_feature_ #1 _deactivated_for_engines_strlist} }
-        { \__wisper_if_document_class_p:v {g__wisper_feature_ #1 _deactivated_for_classes_strlist} }
+        %{ \__wisper_if_document_class_p:v {g__wisper_feature_ #1 _deactivated_for_classes_strlist} }
       }
       { \prg_return_false: } { \prg_return_true: }
   }
 \cs_new:Npn \__wisper_load_feature:n #1
   {
-    \msg_warning:nnn { wisper } { check-loading-feature } {#1}
+    \__wisper_if_debug:nT { features }
+      { \msg_warning:nnn { wisper } { check-loading-feature } {#1} }
     \__wisper_should_load_feature:nT {#1}
       {
-        \msg_warning:nnn { wisper } { loading-feature } {#1}
+        \__wisper_if_debug:nT { features }
+          { \msg_warning:nnn { wisper } { loading-feature } {#1} }
         \bool_gset_true:c {g__wisper_feature_ #1 _loaded_bool}
         \use:c {g__wisper_feature_ #1 _code_tl}
       }
   }
-\cs_new:Npn \__wisper_load_features:n #1
-  {
-    \seq_map_inline:cn {g__wisper_all_features_ #1 _seq}
-      { \__wisper_load_feature:n {##1} }
-  }
+\cs_new:Npn \__wisper_load_features_group:n #1
+  { \__wisper_loop_features_groups:nN {#1} \__wisper_load_feature:n }
 
 % Special case features: fonts [[[2
 %\seq_new:N \g__wisper_all_features_font_seq
@@ -568,7 +564,7 @@
   {
     %\seq_put_right:Nn \g__wisper_all_features_font_seq {#1}
     \seq_put_right:Nn \g__wisper_all_features_font_seq {#1}
-    \__wisper_declare_feature_aux:nnn {#1} {#2} {#3}
+    \__wisper_declare_feature_aux:nnn {#1} { #2, groups=font_only } {#3}
   }
 % Special case features: packages [[[2
 \seq_new:N \g__wisper_all_features_packages_seq
@@ -598,24 +594,172 @@
       {#1}
   }
 
+% Special case features: document classes [[[2
+\seq_new:N \g__wisper_all_features_documentclass_seq
+\cs_new:Npn \__wisper_store_classopt:nn #1#2
+  { \prop_put:Nnn \g__wisper_classopts_prop {#1} {#2} }
+\cs_new:Npn \__wisper_store_classopt:n #1
+  % Need to expand this once in order for \tl_if_novalue:nTF to work.
+  { \prop_put:Nno \g__wisper_classopts_prop {#1} {\c_novalue_tl} }
+\cs_new:Npn \__wisper_store_classoptions:n #1
+  {
+    \keyval_parse:NNn
+      \__wisper_store_classopt:n
+      \__wisper_store_classopt:nn
+      {#1}
+  }
+\cs_generate_variant:Nn \__wisper_store_classoptions:n { v }
+\cs_new:Npn \__wisper_declare_documentclass:nn #1#2
+  {
+    \seq_put_right:Nn \g__wisper_all_features_documentclass_seq {class-#1}
+    \__wisper_keys_define_doc:n
+      {
+        % TODO: maybe store this as features/documentclass/options ?
+        features/class-#1/options .meta:n =
+          { features/class-#1/classoptions = {##1} }
+      }
+    \__wisper_declare_feature_aux:nnn {class-#1} {#2}
+      {
+        \str_set:Nn \g__wisper_classname_str {#1}
+        \__wisper_load_document_class:
+      }
+  }
+\cs_new:Npn \__wisper_declare_documentclass:n #1
+  { \__wisper_declare_documentclass:nn {#1} {} }
+
+% Special case features: document types [[[2
+% TODO: maybe rename 'document type' -> 'preset'?
+\seq_new:N \g__wisper_all_features_types_seq
+\cs_new:Npn \__wisper_declare_document_type:nnn #1#2#3
+  {
+    \seq_put_right:Nn \g__wisper_all_features_types_seq {#1}
+    \__wisper_declare_feature_aux:nnn {#1} {#2}
+      {
+        \str_set:Nn \g__wisper_document_type_str {#1}
+        #3
+      }
+  }
+\cs_new:Npn \__wisper_declare_document_type:nn #1#2
+  { \__wisper_declare_document_type:nnn {#1} {#2} { } }
+
 % Feature declarations [[[1
-% TODO: package option presets!
+
+% Document classes [[[2
+% TODO: raise an error if not documentclass is enabled
+\__wisper_declare_documentclass:n { article }
+\__wisper_declare_documentclass:n { beamer }
+\__wisper_declare_documentclass:n { scrbook }
+\__wisper_declare_documentclass:n { scrartcl }
+\__wisper_declare_documentclass:n { scrlttr2 }
+\exp_args:Nx \__wisper_declare_mutually_exclusive_features:n
+  { \seq_use:Nn \g__wisper_all_features_documentclass_seq { , } }
+
+% One feature per document class with things there's no good reason not to load
+% with that class. [[[2
+\__wisper_declare_document_type:nn { article }
+  {
+    classoptions = { a4paper },
+    requires = { class-article },
+  }
+\__wisper_declare_document_type:nn { book }
+  {
+    classoptions = { a4paper },
+    requires = { class-book },
+  }
+\__wisper_declare_document_type:nn { scrbook }
+  {
+    classoptions = { a4paper, BCOR=0mm, DIV=10, pagesize },
+    requires = { class-scrbook, koma-misc },
+  }
+\__wisper_declare_document_type:nn { scrartcl }
+  {
+    classoptions = { a4paper, BCOR=0mm, DIV=10, pagesize },
+    requires = { class-scrartcl, koma-misc },
+  }
+\__wisper_declare_document_type:nn { scrlttr2 }
+  {
+    classoptions = { a4paper },
+    requires = { class-scrlttr2, koma-misc },
+  }
+
+% Document types, i.e. feature presets [[[2
+\__wisper_declare_document_type:nn { exercise }  % [[[3
+  {
+    requires =
+      {
+        scrartcl,
+        font-TexGyre,
+        math,
+        phys,
+      },
+  }
+\__wisper_declare_document_type:nn { paper }  % [[[3
+  {
+    % TODO: remove english after implementing languages properly
+    classoptions = { twocolumn, english, DIV=14, fontsize=10pt },
+    requires =
+      {
+        scrartcl,
+        font-TexGyre,
+        math,
+        phys,
+        biblatex-numeric-supercite,
+      },
+  }
+\__wisper_declare_document_type:nnn { presentation }  % [[[3
+  {
+    requires = { beamer, font-fira, math, phys, biblatex-numeric-supercite, },
+  }
+  {
+    % TODO: devise a way to properly cite image references, cf.
+    % the cite:online hack.
+    % TODO: move the slide environments here
+    \let\footnotesize\tiny
+    \let\beamerfootnote\footnote
+    \RenewDocumentCommand \footnote { m }
+      { \beamerfootnote[frame]{#1} }
+    %\NewDocumentCommand \footnotetextCite { m }
+    %  { \footnotetext[frame]{#1} }
+    \usetheme{metropolis}
+    \metroset
+      {
+        sectionpage=none,
+        numbering=fraction,
+        progressbar=frametitle,  % head, foot, frametitle, none
+        block=fill,  % transparent, fill {for theorem and example environments}
+      }
+    \setbeamertemplate{footline}[page number]{}
+  }
+\__wisper_declare_document_type:nn {tufte-book}  % [[[3
+  {
+    requires =
+      {
+        scrbook,
+        twoside,
+        twoside-floats,
+        sidenotes,
+        biblatex-numeric-supercite,
+      },
+  }
+
 
 % Fonts [[[2
 % Packages [[[
 \__wisper_declare_packages:n
   {
     % These packages are not supposed to be loaded in
-    % \__wisper_load_features:n { main },
-    % but manually in \__wisper_load_features:n { font }
-    newpxmath,
-    fontspec,
-    newpxtext,
-    lmodern,
-    FiraSans,
-    FiraMono,
-    mathdesign,
-    mathpazo,
+    % \__wisper_load_features_group:n { main },
+    % but manually in \__wisper_load_features_group:n { font }
+    newpxmath = { groups=font_only },
+    fontspec = { groups=font_only },
+    newpxtext = { groups=font_only },
+    lmodern = { groups=font_only },
+    FiraSans = { groups=font_only },
+    FiraMono = { groups=font_only },
+    mathdesign = { groups=font_only },
+    mathpazo = { groups=font_only },
+    cabin = { groups=font_only },
+    beramono = { groups=font_only },
   }  % ]]]
 \__wisper_declare_font:nnn { font-lmodern }  % [[[
   {
@@ -666,10 +810,15 @@
       newpxtext = largesc,
       newpxmath = vvarbb,
       fontspec = no-math,
+      %cabin = type1,
+      %beramono = {scaled=.85},
     },
   }
   {
     % preload amsthm to suppress error due to newpxmath redfining \openbox
+    \renewcommand{\rmdefault}{zpltlf}
+    %\__wisper_should_load_feature:n {beramono}  % used only by \mathtt
+    %\__wisper_should_load_feature:n {cabin}  % used only by \mathsf
     \__wisper_load_feature:n {amsthm}
     \__wisper_load_feature:n {newpxmath}
 
@@ -712,29 +861,31 @@
     },
     calc = enabled,
     ragged2e = enabled,
-    xcolor = enabled,
+    xcolor = { enabled, groups=font_only },
     url = {
       enabled,
       options = { hyphens },
       % loaded early by hyperref which is loaded way to early by beamer...
       % loading it again gives an option clash.
       deactivate_for_classes = { beamer },
+      groups=font_only,
     },
     hyperref = enabled,
     sidenotes,
     %babel = { enabled, options = { main=english } },
-    babel = { enabled },
-    fontenc = { enabled, options = { T1 } },
-    csquotes = enabled,
-    microtype = enabled,
+    babel = { enabled },  %, groups=font_only },
+    fontenc = { enabled, options = { T1 }, groups=font_only },
+    csquotes = { enabled },  %, groups=font_only },
+    microtype = { enabled, groups=font_only },
     inputenc = {
       enabled,
       options = { utf8 },
       % Suppress inputenc warning for utf8 engines
       deactivate_for_engines = { luatex, xetex },
+      groups=font_only,
     },
     fancyhdr,
-    amsthm,
+    amsthm = { groups = font_only },
   }
 
 \__wisper_declare_feature:nnn { nonnum-section-commands }
@@ -752,7 +903,7 @@
 
 % Colors  [[[2
 \__wisper_declare_feature:nnn {sron-mark-colors}
-  { requires = xcolor }
+  { requires = xcolor, groups=font_only }
   {
     % define a few highlighting colors, from https://personal.sron.nl/~pault/
     \definecolor{marklightblue}{HTML}{BBCCEE}
@@ -912,10 +1063,19 @@
   }  % ]]]3
 
 \__wisper_declare_feature:nnn { footnotecite }
-{  % [[[3
+  {  % [[[3
     requires = {
       %multiple-footnotes,
     },
+    %requires-conditional = {
+    %  multiple-footnotes = {
+    %    { ! \__wisper_if_document_class_p:n { beamer} }
+    %    { }
+    %  }
+    %},
+    %requires-conditional = {
+    %  multiple-footnotes = { { !beamer } { } },
+    %},
   }
   {  % [[[3
     \__wisper_if_document_class:nTF { beamer }
@@ -928,6 +1088,11 @@
         \cs_gset_eq:NN \footnoteCite \footnote
       }
       {
+        % FIXME: ugly hack...
+        \__wisper_enable_feature:n {multiple-footnotes}
+        \__wisper_activate_feature:n {multiple-footnotes}
+        \__wisper_load_feature:n {bigfoot}
+        \__wisper_load_feature:n {multiple-footnotes}
         \DeclareNewFootnote{Cite}
       }
   }  % ]]]3
@@ -1007,7 +1172,7 @@
         \renewcommand\labelitemiv{{\fontfamily{cmr}\selectfont\textperiodcentered}}
         
         % Titlepage
-        \IfDocTypeT { scrbook }
+        \IfDocClassT { scrbook }  % TODO: better conditional
           { \KOMAoptions{titlepage=firstiscover} }
         
         % Footnotes
@@ -1017,9 +1182,14 @@
         % Header/Footer
         \usepackage[draft=false]{scrlayer-scrpage}
         \pagestyle{scrheadings}
-        \IfDocTypeT { scrbook }
-          { \automark[chapter]{chapter} }
-        \automark*[section]{}
+        \IfDocClassTF { scrbook }  % TODO: better conditional
+          {
+            \automark[chapter]{chapter}
+            \automark*[section]{}
+          }
+          {
+            \automark[section]{section}
+          }
         \ihead{}
         \chead{\headmark}
         \ohead{\pagemark}
@@ -1030,26 +1200,6 @@
         %\KOMAoptions{footsepline=:0.5\textwidth, olines}
       }
     }  % ]]]
-
-% Tufte-style
-\__wisper_keys_define_doc:n
-  {
-    tufte .meta:n =
-      {
-        cite/style = super,
-        cite/enable~footnote,
-      },
-
-    internal/load~sidenotes .code:n = {},
-    sidenotes/enable .meta:n =
-      {
-        internal/load~sidenotes .code:n =
-          {
-            \__wisper_if_document_type:nT {book, scrbook}
-              { \usepackage{sidenotes} }
-          }
-      },
-  }
 
 % Footnotes [[[2
 \__wisper_declare_package:n { bigfoot }
@@ -1102,10 +1252,12 @@
   {
     enabled,
     requires = {
+      sron-mark-colors,
       hyperref = {
         % TODO: this required another package!
         colorlinks=true,
-        linkcolor=black,  % for internal links, color is just too much
+        %linkcolor=black,  % for internal links, color is just too much
+        linkcolor=markdarkgreen,
         citecolor=markdarkteal,
         filecolor=markdarkgreen,
         urlcolor=markdarkblue,
@@ -1135,13 +1287,13 @@
 
 % Math, physics [[[2
 \__wisper_declare_feature:nnn { math }
-  {}
+  { groups=font_only }
   {
     \input{common_math.tex}
   }
 
 \__wisper_declare_feature:nnn { phys }
-  { requires = math }
+  { requires = math, groups=font_only }
   {
     \input{common_phys.tex}
   }
@@ -1160,7 +1312,7 @@
     graphicx = enabled,
   }
 
-\__wisper_declare_feature:nnn {array-par-columns}
+\__wisper_declare_feature:nnn { array-par-columns }
   { requires = array }
   {
     % https://tex.stackexchange.com/a/2442/111880
@@ -1178,8 +1330,7 @@
                                    }
     \captionsetup{style=myfigure}  % default
 
-    % TODO: as for changepage: better conditional, cf. above
-    \__wisper_if_document_type:nT {book, scrbook}
+    \__wisper_if_feature_enabled:nT {twoside}
       {
         \DeclareCaptionJustification{raggedoutside}{\raggedoutside}
 
@@ -1297,15 +1448,31 @@
 
   }
 
+\__wisper_declare_feature:nnn { font-only }
+  { groups = font_only }
+  { \__wisper_disable_features_group_except_group:nn { all } { font_only } }
+
 \NewDocumentCommand \Preamble { m }
   {
     \__wisper_enable_features:n {#1}
 
-    \__wisper_load_document_class:
+    % Traverse dependencies.
+    \__wisper_activate_features_group:n { types }
+    \__wisper_activate_features_group:n { documentclass }
+    \__wisper_activate_features_group:n { early_packages }
+    \__wisper_activate_features_group:n { font }
+    \__wisper_activate_features_group:n { main_packages }
+    \__wisper_activate_features_group:n { main }
+
+    \__wisper_load_feature:n { font-only }
+
+    %\__wisper_pass_classoptions:
+    \__wisper_load_features_group:n { documentclass }
+    \__wisper_load_features_group:n { types }
 
     % Early Package loads
-    \__wisper_load_features:n { early_packages }
-    \__wisper_load_features:n { font }
+    \__wisper_load_features_group:n { early_packages }
+    \__wisper_load_features_group:n { font }
     % Adjust layout.
     \__wisper_if_document_class:nT {koma}
       { \KOMAoptions{DIV=last} }
@@ -1320,8 +1487,8 @@
     %  { \__wisper_select_package_preset:nn {biblatex} {book} }
     %\__wisper_select_package_preset:nn {hyperref} {pale-colors}
     % here: enable features
-    \__wisper_load_features:n { main_packages }
-    \__wisper_load_features:n { main }
+    \__wisper_load_features_group:n { main_packages }
+    \__wisper_load_features_group:n { main }
   }
 
 \ExplSyntaxOff
