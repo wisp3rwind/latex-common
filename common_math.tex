@@ -2,6 +2,7 @@
 % TODO: Remove macros already provided by the cool package
 % TODO: re-implement physics.sty and braket.sty
 
+\usepackage{xparse}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{mathtools}
 \usepackage{cancel}
@@ -9,7 +10,11 @@
 \usepackage{cool}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta}
-\usepackage{xparse}
+\usetikzlibrary{calc,arrows.meta,bending}  % current texlive version of witharrows fails to load if not preloading these...
+\usepackage{witharrows}
+\WithArrowsOptions{displaystyle}
+\usepackage{xcolor}
+\usepackage{empheq}
 
 
 % Use l3keys to configure style (cf. \Style from the cool package) [[[1
@@ -749,7 +754,13 @@
 
 
 % boxes, highlighting, ... [[[1
-% https://tex.stackexchange.com/questions/20575/attractive-boxed-equations
+% TODO: https://tex.stackexchange.com/questions/20575/attractive-boxed-equations
+\ExplSyntaxOn
+\definecolor { myblue } { rgb } { .8, .8, 1 }
+\cs_new:Npn \__wisper_equation_box:n #1
+  { \colorbox { myblue } { \hspace{1em} #1 \hspace{1em} } }
+\empheqset{outerbox=\__wisper_equation_box:n}
+\ExplSyntaxOff
 
 
 % Quick quad text (math-mode text with \quad spacing). [[[1
