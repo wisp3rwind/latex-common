@@ -1,0 +1,143 @@
+\Preamble{presentation, plots, biblatex-pictures-sources}
+
+%\setbeameroption{show notes on second screen}
+
+\usepackage{textcomp}
+
+\makeatletter
+
+\let\@mpfootnotetext=\beamer@framefootnotetext
+%\def\thefootnote{\@arabic\c@footnote}
+%\def\thempfootnote{{\itshape\@alph\c@mpfootnote}}
+\def\thempfootnote{\@arabic\c@mpfootnote}
+
+%\renewcommand<>\beamer@framefootnotetext[1][\@empty]{%
+%  \global\setbox\beamer@footins\vbox{%
+%    \hsize\framewidth
+%    \textwidth\hsize
+%    \columnwidth\hsize
+%    \unvbox\beamer@footins
+%    \reset@font\footnotesize
+%    \@parboxrestore
+%    \ifx\@empty#1
+%      \protected@edef\@currentlabel
+%           {\csname p@footnote\endcsname\@thefnmark}%
+%    \else
+%      \protected@edef\@currentlabel
+%           {\csname p@footnote\endcsname#1}%
+%    \fi
+%    \color@begingroup
+%      \uncover#3{\@makefntext{%
+%        \rule\z@\footnotesep\ignorespaces#2\@finalstrut\strutbox}}%
+%    \color@endgroup}}
+
+\makeatother
+
+%\setbeamertemplate{navigation symbols}{}
+%\setbeamertemplate{caption}[numbered]
+%\setbeamertemplate{footline}[frame number]
+%\usetheme{hsrm}
+
+
+\ExplSyntaxOn
+%\NewDocumentEnvironment { slide } { o }
+\newenvironment{slide}[1][]
+  {
+    \tl_set:Nx \l__tmpa_tl
+      {[
+        environment=slide,
+        \IfValueT{#1}{#1}
+      ]}
+    %\tl_show:N \l__tmpa_tl
+    \exp_last_unbraced:Nno \begin{frame} \l__tmpa_tl
+      % \secname and \subsecname are not documented. \insertsection and
+      % \insertsubsection include font changes though (at least color schemes
+      % are broken if using them...)
+      \clist_if_in:nnF {#1} {standout}
+        {
+          %\frametitle[]{\secname}
+          \frametitle[]{\subsecname}
+          %\frametitle[]{\secname\ ---\ \subsecname}
+          \framesubtitle{\subsecname}
+        }
+  }
+  {
+    \end{frame}
+  }
+\newenvironment{topslide}{%
+  \begin{frame}[t,environment=topslide,fragile]
+    % \secname and \subsecname are not documented. \insertsection and
+    % \insertsubsection include font changes though (at least color schemes
+    % are broken if using them...)
+    %\frametitle[]{\secname}
+    \frametitle[]{\subsecname}
+    %\frametitle[]{\secname\ ---\ \subsecname}
+    \framesubtitle{\subsecname}
+  }{%
+  \end{frame}
+}
+\ExplSyntaxOff
+
+\newcommand{\Title}{Title}
+\newcommand{\Subtitle}{Report}
+\newcommand{\Author}{Someone}
+\hypersetup{%
+  pdftitle = {\Title},
+  pdfsubject = {\Subtitle},
+  pdfauthor = {\Author},
+  pdfkeywords = {},
+  baseurl = {},
+  pdfdisplaydoctitle = true
+}
+
+\addbibresource{references.bib}
+\usepackage{filecontents}  % the LaTeX built-in doesn't overwrite existing files
+\begin{filecontents}{pictures.bib}
+\end{filecontents}
+\addbibresource{pictures.bib}
+
+\title{\Title}
+\subtitle{\Subtitle}
+\date{\today}
+\author{\Author}
+\institute
+  {
+    Institute \\
+    {Supervisor: Someone else}
+  }
+
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame} 
+
+
+\section*{Historical Context}
+\subsection*{Historical Context --- Slide 1}
+\begin{slide}
+\end{slide}
+
+\section*{Overview}
+\subsection*{Overview}
+\begin{slide}
+  \setcounter{tocdepth}{1}
+  \tableofcontents
+\end{slide} 
+
+\section{Section (in TOC)}
+\subsection{Subsection (slide title)}
+\begin{slide}
+\end{slide}
+
+\begin{slide}[standout]
+  Thank you!
+\end{slide}
+
+%\begin{slide}
+%  \printbibliography
+%\end{slide}
+
+
+\end{document}
