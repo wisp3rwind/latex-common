@@ -1,20 +1,47 @@
 \input{common.tex}
+\Preambe{paper}
 
+\usepackage{textcomp}
+\graphicspath{{./pictures/}}
+
+% TODO: provide as parameters to the preamble
+\newcommand{\Title}{Title}
+\newcommand{\Subtitle}{Thesis}
+\newcommand{\Author}{Some Author}
 \hypersetup{%
-  pdfauthor = {Someone},
+  pdftitle = {\Title},
+  pdfsubject = {\Subtitle},
+  pdfauthor = {\Author},
+  pdfkeywords = {},
+  baseurl = {},
   pdfdisplaydoctitle = true
 }
 
 \addbibresource{references.bib}
 
-\title{}
-\date{}
-\author{}
+\title{\Title}
+\date{\today}
+\author{\Author}
+\titlehead
+  {
+    Institute \\
+    {Supervisor: Mr. Someone}
+  }
 
 
 \begin{document}
 
 \maketitle
+\begin{abstract}
+  \itshape
+  \ldots
+\end{abstract}
 
+\section*{Introduction}
+
+\section{...}
+
+\raggedright
+\printbibliography
 
 \end{document}
