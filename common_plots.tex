@@ -1,0 +1,64 @@
+\usepackage{filemod}
+\usepackage{shellesc}
+
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.15}
+\usepackage[subpreambles,sort]{standalone}
+%\usepackage{tikzexternal}
+%\tikzexternalize[prefix=./build/externalized/]
+
+\ExplSyntaxOn
+\tl_new:N \__plot_width_tl
+\tl_new:N \__plot_preamble_tl
+\keys_define:nn { plots }
+  {
+    width .tl_set:N = \__plot_width_tl,
+    preamble .tl_set:N = \__plot_preamble_tl,
+  }
+\cs_new:Npn \__plot_default_options:
+  {
+    \keys_set:nn { plots }
+      {
+        width = \the\linewidth,
+        preamble =
+          {
+            \noexpand\input{common.tex}
+            \noexpand\Preamble{paper, font_only}
+          }
+      },
+  }
+\cs_new:Npn \__plot_build_preamble:
+  {
+  }
+\cs_new:Npn \__plot_remake:n #1
+  {
+    \ShellEscape{python3~"#1"~"\__plot_filename_tl"~"\__plot_width_tl"~"\__plot_preamble_tl"}
+  }
+\NewDocumentCommand \IncludePlot { o m }
+  {
+    \begingroup
+      \__plot_default_options:
+      \tl_if_novalue:nF {#1}
+        { \keys_set:nn { plots } {#1} }
+      \tl_set:Nn \__plot_filename_tl {#2-\__plot_width_tl}
+      \IfFileExists{\__plot_filename_tl.pdf}
+        {
+          %\tl_show:n {remake~1}
+          %\filemodCmp{#2}{\jobname.pdf}
+          \filemodCmp{\__plot_filename_tl.pdf}{#2}
+            { }
+            {
+              % render if the python script is newer than the output
+              \__plot_remake:n {#2}
+            }
+        }
+        {
+          % render if the plot doesn't exist
+          %\tl_show:n {remake~2}
+          \__plot_remake:n {#2}
+        }
+        \includegraphics{{\__plot_filename_tl}.pdf}
+    \endgroup
+  }
+\ExplSyntaxOff
+
