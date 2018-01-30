@@ -937,6 +937,34 @@
     options = { hyperref=true },
   }
 
+\__wisper_declare_feature:nnn { biblatex-picture-sources }
+  % Usage:
+  %\usepackage{filecontents}
+  %\begin{filecontents}{pictures.bib}
+  %@online {pic:source:foo,
+  %  title = {Figure~\ref{pic:foo}},
+  %  url = {https://example.com/pic.jpg},
+  %  urldate = {2018-01-05},
+  %}
+  %\end{filecontents}
+  %\addbibresource{pictures.bib}
+  % ...
+  %\begin{document}
+  % ...
+  % \caption{...\cite{pic:source:foo}}
+  { }
+  {
+    \DeclareBibliographyDriver{cite:online}
+    {
+      \usebibmacro{author+title}
+      %\usebibmacro{note+pages}
+      \setunit{\addperiod\addspace}
+      %\usebibmacro{url+urldate}
+      \usebibmacro{url}
+      \usebibmacro{finentry}
+    }
+  }
+
 \__wisper_declare_feature:nnn { biblatex-backref }
   {
     disabled,
