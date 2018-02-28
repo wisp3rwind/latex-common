@@ -914,21 +914,8 @@
   }
 
 % Colors  [[[2
-\__wisper_declare_feature:nnn {sron-mark-colors}
-  { requires = xcolor, groups=font_only }
-  {
-    % define a few highlighting colors, from https://personal.sron.nl/~pault/
-    \definecolor{marklightblue}{HTML}{BBCCEE}
-    \definecolor{marklightteal}{HTML}{CCEEFF}
-    \definecolor{marklightgreen}{HTML}{CCDDAA}
-    \definecolor{marklightsand}{HTML}{EEEEBB}
-    \definecolor{marklightred}{HTML}{FFCCCC}
-    \definecolor{markdarkblue}{HTML}{222255}
-    \definecolor{markdarkteal}{HTML}{225555}
-    \definecolor{markdarkgreen}{HTML}{225522}
-    \definecolor{markdarksand}{HTML}{666633}
-    \definecolor{markdarkred}{HTML}{663333}
-  }
+\__wisper_declare_package:nn { paul-tol-colors }
+  { disabled, groups=font_only }
 
 % Bibliography [[[2
 \__wisper_declare_package:nn { biblatex }
@@ -1292,7 +1279,7 @@
   {
     enabled,
     requires = {
-      sron-mark-colors,
+      paul-tol-colors,
       hyperref = {
         % TODO: this required another package!
         colorlinks=true,
