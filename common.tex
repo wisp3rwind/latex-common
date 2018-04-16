@@ -927,20 +927,20 @@
 
 \__wisper_declare_feature:nnn { biblatex-picture-sources }
   % Usage:
-  %\usepackage{filecontents}
-  %\begin{filecontents}{pictures.bib}
+  %\usepackage{filecont ents}
+  %\begin{filecontent s}{pictures.bib}
   %@online {pic:source:foo,
   %  title = {Figure~\ref{pic:foo}},
   %  url = {https://example.com/pic.jpg},
   %  urldate = {2018-01-05},
   %}
-  %\end{filecontents}
+  %\end{filecont ents}
   %\addbibresource{pictures.bib}
   % ...
   %\begin{document}
   % ...
   % \caption{...\cite{pic:source:foo}}
-  { }
+  { requires = biblatex }
   {
     \DeclareBibliographyDriver{cite:online}
     {
