@@ -846,6 +846,7 @@
             % TODO: where appropriate, check for \liningnumtext to be defined and
             % use it.
             \newfontfamily\liningnumtext{TeXGyrePagellaX}[Numbers=Lining]
+            \tl_gset:Nn \PlotFont { \sffamily }
           }
         { xetex }
           {
@@ -1329,6 +1330,7 @@
   { }
   {
     \input{common_plots.tex}
+    \tl_if_exist:NF \PlotFont { \tl_gclear:N \PlotFont }
   }
 
 % Tables, figures [[[2
