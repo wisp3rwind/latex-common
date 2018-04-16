@@ -711,7 +711,7 @@
     \captionsetup{
       format=plain,
       %font=small,
-      font=footnotesize,
+      font={sf,footnotesize},
       labelfont=sc,
       margin=0.1\linewidth,
       justification=RaggedRight
@@ -1185,11 +1185,11 @@
         % https://tex.stackexchange.com/questions/108894/typesetting-formulas-in-section-titles-title-bold-toc-entry-isnt#comment238645_108894
         % https://tex.stackexchange.com/questions/41379/automatically-typeset-math-in-section-headings-in-bold-face#124311
         % Fix chapter/section titles defaulting to sans (i.e. CM) fonts
-        \setkomafont{disposition}{\normalfont\bfseries\boldmath}
+        \setkomafont{disposition}{\sffamily\bfseries\boldmath}
         \KOMAoptions{headings=normal}
         % Fix fonts in the toc
         \IfDocClassT {scrbook}
-          { \setkomafont{chapterentry}{\normalfont\bfseries\boldmath} }
+          { \setkomafont{chapterentry}{\sffamily\bfseries\boldmath} }
         % fix item font in descriptions and enumerates
         \setkomafont{descriptionlabel}{\normalfont\bfseries\boldmath}
         \setkomafont{labelinglabel}{\normalfont\bfseries\boldmath}
@@ -1355,6 +1355,8 @@
     \newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
   }
 
+% TODO: caption-font feature option to specify font/labelfont/... from the
+% document type feature and only set the alignment here
 \__wisper_declare_feature:nnn { twoside-floats }
   { requires = caption }
   {
@@ -1368,17 +1370,17 @@
         \DeclareCaptionJustification{raggedoutside}{\raggedoutside}
 
         \DeclareCaptionStyle{marginfigure}{justification=raggedoutside,%
-                                           font=footnotesize,%
+                                           font={sf,footnotesize},%
                                            labelfont=sc,%
                                            }
 
         \DeclareCaptionStyle{margintable}{justification=raggedoutside,%
-                                          font=footnotesize,%
+                                          font={sf,footnotesize},%
                                           labelfont=sc,%
                                           }
 
         \DeclareCaptionStyle{sidecaption}{justification=raggedoutside,%
-                                          font=footnotesize,%
+                                          font={sf,footnotesize},%
                                           labelfont=sc,%
                                           }
         \newlength{\realmarginparwidth}
@@ -1386,7 +1388,7 @@
         \addtolength{\realmarginparwidth}{\marginparsep}
 
         \DeclareCaptionStyle{widetable}{%justification=raggedoutside,%
-                                        font=footnotesize,%
+                                        font={sf,footnotesize},%
                                         labelfont=sc,%
                                         margin={0pt, \realmarginparwidth}
                                         }
