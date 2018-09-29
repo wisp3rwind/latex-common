@@ -38,23 +38,24 @@
 \cs_new:Npn \__wisper_clist_map_function_no_unbrace:Nw #1#2 ,
   {
     % The first token in #2 is \__wisper_null, expand that once so it vanishes
-    \exp_after:wN \__quark_if_recursion_tail_break:nN
+    \exp_after:wN \quark_if_recursion_tail_break:nN
       \exp_after:wN {#2}
       \clist_map_break:
     \exp_after:wN #1
       \exp_after:wN {#2}
     \__wisper_clist_map_function_no_unbrace:Nw #1 \__wisper_null
   }
+\int_new:N \g__wisper_prg_map_int
 \cs_new_protected:Npn \__wisper_clist_map_inline_no_unbrace:nn #1#2
   {
-    \int_gincr:N \g__prg_map_int
+    \int_gincr:N \g__wisper_prg_map_int
     \cs_gset_protected:cpn
-      { __prg_map_ \int_use:N \g__prg_map_int :w } ##1 {#2}
+      { __wisper_prg_map_ \int_use:N \g__wisper_prg_map_int :w } ##1 {#2}
     \exp_args:Nc \__wisper_clist_map_function_no_unbrace:Nw
-      { __prg_map_ \int_use:N \g__prg_map_int :w }
+      { __wisper_prg_map_ \int_use:N \g__wisper_prg_map_int :w }
       \__wisper_null #1 , \q_recursion_tail ,
-    \__prg_break_point:Nn \clist_map_break:
-      { \int_gdecr:N \g__prg_map_int }
+    \prg_break_point:Nn \clist_map_break:
+      { \int_gdecr:N \g__wisper_prg_map_int }
   }
 
 \ExplSyntaxOff
