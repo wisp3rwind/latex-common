@@ -300,20 +300,6 @@
 %  {
 %  }
 
-% Conditionals [[[2
-%\prg_new_conditional:Npnn \__wisper_if_document_type:n #1
-%  { p, T, F, TF}
-%  { 
-%    \clist_if_in:nVTF {#1} \g__wisper_document_type_str
-%      { \prg_return_true: }
-%      { \prg_return_false: }
-%  }
-
-% User-accessible aliases.
-%\cs_new_eq:NN \IfDocTypeT \__wisper_if_document_type:nT
-%\cs_new_eq:NN \IfDocTypeF \__wisper_if_document_type:nF
-%\cs_new_eq:NN \IfDocTypeTF \__wisper_if_document_type:nTF
-
 \cs_new_eq:NN \IfDocClassT \__wisper_if_document_class:nT
 \cs_new_eq:NN \IfDocClassF \__wisper_if_document_class:nF
 \cs_new_eq:NN \IfDocClassTF \__wisper_if_document_class:nTF
