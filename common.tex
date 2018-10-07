@@ -40,8 +40,6 @@
 \ExplSyntaxOn
 
 % Variants [[[1
-\cs_generate_variant:Nn \clist_use:Nn {nn}
-\cs_generate_variant:Nn \prop_get:cnN { cvN }
 %\cs_new_eq:NN \__wisper_pass_options_to_package:nn \PassOptionsToPackage
 \cs_generate_variant:Nn \bool_not_p:n { v }
 \cs_generate_variant:Nn \bool_if_p:n { v }
@@ -61,7 +59,7 @@
 
 % Common messages [[[1
 \msg_new:nnn { wisper } { unknown-choice }
-  { Unknown~#1~'#2'.~Valid~choices~are~\clist_use:nn{#3}{,~}. }
+  { Unknown~#1~'#2'.~Valid~choices~are~\clist_use:Nn #3 { ,~ }. }
 \msg_new:nnn { wisper } { feature-multiply-declared }
   { Feature~'#1'~already~declared. }
 \msg_new:nnn { wisper } { enabling-feature }
@@ -262,10 +260,11 @@
 % -> Ensure that all keys can be set multiple times without issues.
 
 % Key-value interface to pre-defined document layouts ('document types'). [[[2
+\clist_gset:Nn \g__wisper_valid_paper_formats_clist { a4paper, a5paper }
 \__wisper_keys_define_doc:n
   {
-    paper .choices:nn =
-      { a4paper, a5paper }
+    paper .choices:Vn =
+      \g__wisper_valid_paper_formats_clist
       {
         \__wisper_store_classopt:nV \l_keys_choice_tl
       },
@@ -274,7 +273,7 @@
         \msg_error:nnnnn { wisper } { unknown-choice }
           { paper~format }
           {#1}
-          { a4paper, a5paper} % TODO: Don't hardcode
+          \g__wisper_valid_paper_formats_clist
       },
     languages .code:n =
       {
