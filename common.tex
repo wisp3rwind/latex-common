@@ -267,7 +267,7 @@
     paper .choices:nn =
       { a4paper, a5paper }
       {
-        \prop_put:NnV \g__wisper_classopts_prop {paper} \l_keys_choice_tl
+        \__wisper_store_classopt:nV \l_keys_choice_tl
       },
     paper / unknown .code:n =
       {
@@ -479,7 +479,7 @@
               \__wisper_activate_feature_dep:n
               \__wisper_activate_feature_dep_set_options:nn
               {g__wisper_feature_ #1 _features_clist}
-            \__wisper_store_classoptions:v {g__wisper_feature_ #1 _classopts_clist}
+            \__wisper_store_classopts_from_clist:v {g__wisper_feature_ #1 _classopts_clist}
             \bool_gset_true:c {g__wisper_feature_ #1 _activated_bool}
           }
       }
@@ -620,17 +620,18 @@
 \seq_new:N \g__wisper_all_features_documentclass_seq
 \cs_new:Npn \__wisper_store_classopt:nn #1#2
   { \prop_put:Nnn \g__wisper_classopts_prop {#1} {#2} }
+\cs_generate_variant:Nn \__wisper_store_classopt:nn { nV }
 \cs_new:Npn \__wisper_store_classopt:n #1
   % Need to expand this once in order for \tl_if_novalue:nTF to work.
   { \prop_put:Nno \g__wisper_classopts_prop {#1} {\c_novalue_tl} }
-\cs_new:Npn \__wisper_store_classoptions:n #1
+\cs_new:Npn \__wisper_store_classopts_from_clist:n #1
   {
     \keyval_parse:NNn
       \__wisper_store_classopt:n
       \__wisper_store_classopt:nn
       {#1}
   }
-\cs_generate_variant:Nn \__wisper_store_classoptions:n { v }
+\cs_generate_variant:Nn \__wisper_store_classopts_from_clist:n { v }
 \cs_new:Npn \__wisper_declare_documentclass:nn #1#2
   {
     \seq_put_right:Nn \g__wisper_all_features_documentclass_seq {class-#1}
