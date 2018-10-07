@@ -440,6 +440,11 @@
         \bool_gset_true:c {g__wisper_feature_ #1 _enabled_bool}
       }
   }
+\prg_new_conditional:Npnn \__wisper_if_feature_enabled:n #1 { T, F, TF }
+  {
+    \bool_if:cTF {g__wisper_feature_ #1 _enabled_bool}
+      { \prg_return_true: } { \prg_return_false: }
+  }
 \cs_new:Npn \__wisper_activate_feature_dep_set_options:nn #1#2
   {
     %\msg_warning:nnn { wisper } { enabling-feature } {Dep:~#1}
