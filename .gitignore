@@ -1,5 +1,6 @@
 !test.pdf
 todo.md
+preamble.tex
 
 ### From here on: default tex gitignore provided by github
 ## Core latex/pdflatex auxiliary files:
