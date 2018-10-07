@@ -42,8 +42,7 @@
 % Variants [[[1
 \cs_generate_variant:Nn \clist_use:Nn {nn}
 \cs_generate_variant:Nn \prop_get:cnN { cvN }
-\cs_new_eq:NN \__wisper_pass_options_to_package:nn \PassOptionsToPackage
-\cs_generate_variant:Nn \__wisper_pass_options_to_package:nn { Vn }
+%\cs_new_eq:NN \__wisper_pass_options_to_package:nn \PassOptionsToPackage
 \cs_generate_variant:Nn \bool_not_p:n { v }
 \cs_generate_variant:Nn \bool_if_p:n { v }
 \cs_generate_variant:Nn \keyval_parse:NNn { NNv }
@@ -284,7 +283,7 @@
       },
     main_language .code:n =
       {
-        \__wisper_pass_options_to_package:nn {main=#1} {babel} 
+        \PassOptionsToPackage {main=#1} {babel} 
         %\prop_put:Nnn \g__wisper_classopts_prop {#1} {}
       },
 
@@ -594,7 +593,7 @@
     \__wisper_keys_define_doc:n
       {
         features/#1/options .code:n =
-          { \__wisper_shipout:n { \__wisper_pass_options_to_package:nn {##1} {#1} } },
+          { \__wisper_shipout:n { \PassOptionsToPackage {##1} {#1} } },
       }
     \__wisper_declare_feature_aux:nnn {#1} {#2}
       {
@@ -1583,9 +1582,12 @@
     \iow_open:Nn \__wisper_preamble_iow {preamble.tex}
     \seq_map_inline:Nn \g__wisper_preamble_seq
       {
-        \iow_now:Nx \__wisper_preamble_iow
+        \tl_if_empty:nF {##1}
           {
-            \exp_not:n {##1} \iow_newline:
+            \iow_now:Nx \__wisper_preamble_iow
+            {
+              \exp_not:n {##1} % \iow_newline:
+            }
           }
       }
     \iow_close:N \__wisper_preamble_iow
