@@ -86,7 +86,7 @@
         \seq_show:N \g__wisper_preamble_seq
       }
   }
-\cs_generate_variant:Nn \__wisper_shipout:n { v }
+\cs_generate_variant:Nn \__wisper_shipout:n { v, x }
 
 % Common helper functions for package and document class loading [[[1
 % Helper function to get the square brackets for passing optional arguments.
@@ -540,7 +540,41 @@
     \seq_put_right:Nn \g__wisper_all_features_main_seq {#1}
     \__wisper_declare_feature_aux:nnn {#1} {#2} {#3}
   }
+\cs_generate_variant:Nn \__wisper_declare_feature:nnn { nnx }
 \cs_generate_variant:Nn \bool_show:n { x }
+\cs_new:Npn \__wisper_declare_feature_expand_conditional:nnn #1#2#3
+  {
+    % Regex magic adapted from @egreg's code, https://tex.stackexchange.com/a/283944/111880
+    \tl_set:Nn \l_tmpa_tl {#3}
+    % prefix any cs in the tl with \noexpand
+    \regex_replace_all:nnN { (\cC.) } { \c{exp_not:N}\1 } \l_tmpa_tl
+    % remove the \noexpand from selected cs'
+    \clist_map_inline:nn
+      {
+        __wisper_if_feature_enabled:nTF,
+        __wisper_if_feature_enabled:nF,
+        __wisper_if_feature_enabled:nT,
+        __wisper_disable_features_group_except_group:nn,
+        __wisper_if_document_class:nTF,
+        __wisper_if_document_class:nF,
+        __wisper_if_document_class:nT,
+        __wisper_enable_feature:n,
+        __wisper_activate_feature:n,
+        __wisper_load_feature:n,
+        IfDocClassTF,
+        IfDocClassF,
+        IfDocClassT,
+      }
+      {
+        \regex_replace_all:nnN { \c{exp_not:N}(\c{##1}) } { \1 } \l_tmpa_tl
+      }
+    \__wisper_declare_feature:nnx {#1} {#2}
+      {
+        % Actually expand the conditonals only when the feature is activated.
+        % This ensures that documentclass and the like are actually set.
+        \exp_not:N \__wisper_shipout:x { \exp_not:o \l_tmpa_tl }
+      }
+  }
 
 % Feature loading [[[2
 \prg_new_conditional:Npnn \__wisper_should_load_feature:n #1 { T, F, TF }
@@ -1123,7 +1157,7 @@
     % FIXME: implement
   }  % ]]]3
 
-\__wisper_declare_feature:nnn { footnotecite }
+\__wisper_declare_feature_expand_conditional:nnn { footnotecite }
   {  % [[[3
     requires = {
       %multiple-footnotes,
@@ -1141,15 +1175,12 @@
   {  % [[[3
     \__wisper_if_document_class:nTF { beamer }
       {
-        \__wisper_shipout:n
-          {
-            % bigfoot+beamer crashes (incomplete iffalse ...)
-            %\DeclareDocumentCommand \footnotetextCite { r[] } { \footnotetext[#1][frame] }
-            \DeclareDocumentCommand \footnotetextCite { r[] } { \footnotetext[#1] }
-            \cs_gset_eq:NN \footnotemarkCite \footnotemark
-            %\cs_gset_eq:NN \footnotetextCite \footnotetext
-            \cs_gset_eq:NN \footnoteCite \footnote
-          }
+        % bigfoot+beamer crashes (incomplete iffalse ...)
+        %\DeclareDocumentCommand \footnotetextCite { r[] } { \footnotetext[#1][frame] }
+        \DeclareDocumentCommand \footnotetextCite { r[] } { \footnotetext[#1] }
+        \cs_gset_eq:NN \footnotemarkCite \footnotemark
+        %\cs_gset_eq:NN \footnotetextCite \footnotetext
+        \cs_gset_eq:NN \footnoteCite \footnote
       }
       {
         % FIXME: ugly hack...
@@ -1157,8 +1188,7 @@
         \__wisper_activate_feature:n {multiple-footnotes}
         \__wisper_load_feature:n {bigfoot}
         \__wisper_load_feature:n {multiple-footnotes}
-        \__wisper_shipout:n
-          { \DeclareNewFootnote{Cite} }
+        \DeclareNewFootnote{Cite} 
       }
   }  % ]]]3
 
@@ -1214,7 +1244,7 @@
 \__wisper_declare_mutually_exclusive_features:n { oneside, twoside }
 
 % Layout for KOMA [[[
-\__wisper_declare_ordinary_feature:nnn { koma-misc }
+\__wisper_declare_feature_expand_conditional:nnn { koma-misc }
   { }
   {
     \IfDocClassT{koma}
@@ -1276,25 +1306,19 @@
   {
   }
 
-\__wisper_declare_feature:nnn { alphabetic-default-footnote }
+\__wisper_declare_feature_expand_conditional:nnn { alphabetic-default-footnote }
   {
   }
   {
     \__wisper_if_feature_enabled:nTF { bigfoot }
       {
-        \__wisper_shipout:n
-          {
-            \DeclareNewFootnote{default}[alph]
-            \cs_gset_eq:NN \footnote \footnotedefault
-            \cs_gset_eq:NN \footnotemark \footnotemarkdefault
-            \cs_gset_eq:NN \footnotetext \footnotetextdefault
-          }
+        \DeclareNewFootnote{default}[alph]
+        \cs_gset_eq:NN \footnote \footnotedefault
+        \cs_gset_eq:NN \footnotemark \footnotemarkdefault
+        \cs_gset_eq:NN \footnotetext \footnotetextdefault
       }
       {
-        \__wisper_shipout:n
-          {
-            \cs_gset:Nn \thefootnote { \alph{footnote} }
-          }
+        \cs_gset:Npn \thefootnote { \alph{footnote} }
       }
   }
 
@@ -1402,52 +1426,46 @@
 
 % TODO: caption-font feature option to specify font/labelfont/... from the
 % document type feature and only set the alignment here
-\__wisper_declare_feature:nnn { twoside-floats }
+\__wisper_declare_feature_expand_conditional:nnn { twoside-floats }
   { requires = caption }
   {
-    \__wisper_shipout:n
-      {
-        \DeclareCaptionStyle{myfigure}{
-          font=footnotesize,%
-          labelfont=sc,%
-        }
-        \captionsetup{style=myfigure}  % default
-      }
+    \DeclareCaptionStyle{myfigure}{
+      font=footnotesize,%
+      labelfont=sc,%
+    }
+    \captionsetup{style=myfigure}  % default
 
     \__wisper_if_feature_enabled:nT {twoside}
       {
-        \__wisper_shipout:n
-          {
-            \DeclareCaptionJustification{raggedoutside}{\raggedoutside}
+        \DeclareCaptionJustification{raggedoutside}{\raggedoutside}
 
-            \DeclareCaptionStyle{marginfigure}{
-              justification=raggedoutside,%
-              font={sf,footnotesize},%
-              labelfont=sc,%
-            }
+        \DeclareCaptionStyle{marginfigure}{
+          justification=raggedoutside,%
+          font={sf,footnotesize},%
+          labelfont=sc,%
+        }
 
-            \DeclareCaptionStyle{margintable}{
-              justification=raggedoutside,%
-              font={sf,footnotesize},%
-              labelfont=sc,%
-            }
+        \DeclareCaptionStyle{margintable}{
+          justification=raggedoutside,%
+          font={sf,footnotesize},%
+          labelfont=sc,%
+        }
 
-            \DeclareCaptionStyle{sidecaption}{
-              justification=raggedoutside,%
-              font={sf,footnotesize},%
-              labelfont=sc,%
-            }
-            \newlength{\realmarginparwidth}
-            \setlength{\realmarginparwidth}{\marginparwidth}
-            \addtolength{\realmarginparwidth}{\marginparsep}
+        \DeclareCaptionStyle{sidecaption}{
+          justification=raggedoutside,%
+          font={sf,footnotesize},%
+          labelfont=sc,%
+        }
+        \newlength{\realmarginparwidth}
+        \setlength{\realmarginparwidth}{\marginparwidth}
+        \addtolength{\realmarginparwidth}{\marginparsep}
 
-            \DeclareCaptionStyle{widetable}{
-              %justification=raggedoutside,%
-              font={sf,footnotesize},%
-              labelfont=sc,%
-              margin={0pt, \realmarginparwidth}
-            }
-          }
+        \DeclareCaptionStyle{widetable}{
+          %justification=raggedoutside,%
+          font={sf,footnotesize},%
+          labelfont=sc,%
+          margin={0pt, \realmarginparwidth}
+        }
       }
   }
 
