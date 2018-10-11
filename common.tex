@@ -268,7 +268,9 @@
   }
 \prg_new_conditional:Npnn \__wisper_if_document_class:n #1 { p, T, F, TF }
   { 
-    \clist_map_function:nN { #1 , \q_nil } \__wisper_if_document_class_aux:n
+    % For some reason, not wrapping \q_nil in braces doesn't properly store it
+    % in the clist and breaks the whole mapping
+    \clist_map_function:nN { #1 , {\q_nil} } \__wisper_if_document_class_aux:n
   }
 \cs_generate_variant:Nn \__wisper_if_document_class:nTF { vTF }
 \cs_generate_variant:Nn \__wisper_if_document_class_p:n { v }
