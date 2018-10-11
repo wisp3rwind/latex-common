@@ -157,7 +157,7 @@
 \msg_new:nnn { wisper } { check-activating-feature }
   { Checking~whether~to~activate~feature~'#1'. }
 \msg_new:nnn { wisper } { activating-feature }
-  { Activating~feature~'#1'. }
+  { Activating~feature~'#1'~and~dependencies~'#2'. }
 \msg_new:nnn { wisper } { check-loading-feature }
   { Checking~whether~to~load~feature~'#1'. }
 \msg_new:nnn { wisper } { loading-feature }
@@ -472,12 +472,13 @@
     %\bool_show:x { \__wisper_if_document_class_p:v {g__wisper_feature_ #1 _deactivated_for_classes_strlist} }
     \__wisper_should_load_feature:nT {#1}
       {
-        \__wisper_if_debug:nT { features }
-          { \msg_warning:nnn { wisper } { activating-feature } {#1} }
         \bool_if:cF {g__wisper_feature_ #1 _activated_bool}
           {
             \__wisper_if_debug:nT { features }
-              { \msg_warning:nnn { wisper } { activating-feature } {#1} }
+              {
+                \msg_warning:nnxx { wisper } { activating-feature }
+                  {#1} { \clist_use:cn { g__wisper_feature_ #1 _features_clist } }
+              }
             %\tl_show:c {g__wisper_feature_ #1 _features_clist}
             % TODO: only enable dependencies immediately before loading the first
             % features. Otherwise, later disabling will not unload the dependencies.
