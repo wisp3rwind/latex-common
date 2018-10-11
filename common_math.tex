@@ -25,14 +25,16 @@
 \cs_new:Npn \__wisper_keys_set_math:nn #1#2 { \keys_set:nn { wisper/math/#1 } {#2} }
 \cs_new_eq:NN \MathStyle \__wisper_keys_set_math:n
 
-% Variants [[[1
+% Variants, Additions to l3kernel and non math-specific helpers [[[1
+
 %\cs_new:Npn \exp_last_unbraced:NcNo
 %  { \::c \::N \::o_unbraced \::: }
 %\cs_new:Npn \exp_last_unbraced:NcNo #1#2#3#4
 %  { \exp_after:wN #1 \cs:w #2 \exp_after:wN \cs_end: \exp_after:wN #3 #4 }
+\cs_generate_variant:Nn \tl_if_novalue:nF { VF }
 
-  % clist tools [[[1
-% Copy & pasted \clist_map_inline:nn with slight to prevent unbracing
+% clist tools [[[2
+% Copy & pasted \clist_map_inline:nn with slight modification to prevent unbracing
 % the items. Somewhat simplified since I only need one variant (:nn and not :Nn)
 \cs_new:Npn \__wisper_null {}  % vanishes after one expansion
 \cs_new:Npn \__wisper_clist_map_function_no_unbrace:Nw #1#2 ,
@@ -58,6 +60,22 @@
       { \int_gdecr:N \g__wisper_prg_map_int }
   }
 
+% Use xparse in a programmatic manner [[[2
+\cs_gset_eq:NN \__wisper_new_document_command:Nnn \NewDocumentCommand
+\cs_gset_eq:NN \__wisper_declare_document_command:Nnn \DeclareDocumentCommand
+\cs_generate_variant:Nn \__wisper_new_document_command:Nnn { cnn }
+\cs_generate_variant:Nn \__wisper_declare_document_command:Nnn { cnn }
+
+\regex_gset:Nn \g__wisper_integer_regex { \A[+\-]?\d+\Z }
+\prg_new_protected_conditional:Npnn \__wisper_if_integer:n #1 { T, F, TF }
+  {
+    %\tl_show:n {#1}
+    \regex_match:NnTF \g__wisper_integer_regex {#1}
+      { \prg_return_true: }
+      { \prg_return_false: }
+  }
+\cs_generate_variant:Nn \__wisper_if_integer:nTF { xTF }
+
 \ExplSyntaxOff
 
 % helpers [[[1
@@ -65,8 +83,8 @@
 % http://tex.stackexchange.com/questions/23178/swap-definition-of-starred-and-non-starred-command/23214#23214
 % http://tex.stackexchange.com/questions/278382/cause-declarepaireddelimiter-to-switch-starred-and-nonstarred-versions
 % TODO: cf. `texdoc mathtools` for \parenthesize that is breakable
-\newcommand{\parenthesize}[1]{{\left(#1\right)}}
-\newcommand{\bracketize}[1]{{\left[#1\right]}}
+%\newcommand{\parenthesize}[1]{{\left(#1\right)}}
+%\newcommand{\bracketize}[1]{{\left[#1\right]}}
 
 % stolen from the physics package. Starred versions resize the delimiters
 \DeclareDocumentCommand \argopen {s}{%
@@ -105,19 +123,27 @@
     \image (#1)
   }
 
-\DeclarePairedDelimiter \__wisper_embrace_aux:n \lbrace \rbrace
+\DeclarePairedDelimiter \__wisper_embrace_aux:w \lbrace \rbrace
 \cs_new:Npn \__wisper_embrace:nn #1
   {
     \IfBooleanTF {#1}
-      { \__wisper_embrace_aux:n* }
-      { \__wisper_embrace_aux:n }
+      { \__wisper_embrace_aux:w* }
+      { \__wisper_embrace_aux:w }
   }
-\DeclarePairedDelimiter \__wisper_parenthesize_aux:n \lparen \rparen
+\DeclarePairedDelimiter \__wisper_parenthesize_aux:w \lparen \rparen
 \cs_new:Npn \__wisper_parenthesize:nn #1
   {
     \IfBooleanTF {#1}
-      { \__wisper_parenthesize_aux:n* }
-      { \__wisper_parenthesize_aux:n }
+      { \__wisper_parenthesize_aux:w* }
+      { \__wisper_parenthesize_aux:w }
+  }
+  \cs_new:Npn \__wisper_surround_none:n #1 { #1 }
+\cs_new:Npn \__wisper_surround_none:w
+  {
+    \peek_charcode_remove_ignore_spaces:NTF *
+    % TODO: There should probably be some grouping here
+      { \__wisper_surround_none:n }
+      { \__wisper_surround_none:n }
   }
 % TODO style variants: \MathStyle{trace-symbol = tr|Tr}
 \DeclareMathOperator { \__wisper_operator_trace: } {tr}
@@ -417,7 +443,7 @@
 \NewDocumentCommand \__wisper_integrate:nn { >{ \SplitArgument{2}{,} } m m }
   { \__wisper_integrate_aux:nnnnn #1 {} {#2} }
 \NewDocumentCommand \__wisper_integrate:nw { >{ \SplitArgument{2}{,} } r() m }
-  { \__wisper_integrate_aux:nnnnn #1 { \__wisper_parenthesize_aux:n } {#2} }
+  { \__wisper_integrate_aux:nnnnn #1 { \__wisper_parenthesize_aux:w } {#2} }
 \DeclareDocumentCommand \Integrate { o }
   {
     \IfValueT {#1} { \__wisper_keys_set_math:nn {integrate} {#1} }
@@ -494,30 +520,47 @@
       {\nodifspacing}
       {\mathinner}
   }
-\cs_new:Npn \__wisper_difsymbol:NNnnn #1#2#3#4#5
+\cs_new_protected:Npn \__wisper_difsymbol_process_variable_aux:w #1^#2 #3 \q_stop
+  {
+    \if_meaning:w \q_mark #2
+      \tl_gset_eq:NN \l__wisper_dif_exponent_tl \c_novalue_tl
+      \tl_gset:Nn \l__wisper_dif_variable_tl { #1 }
+    \else:
+      \tl_gset:Nn \l__wisper_dif_exponent_tl { #2 }
+      \tl_gset:Nn \l__wisper_dif_variable_tl { #1 }
+    \fi:
+  }
+\cs_new_protected:Npn \__wisper_difsymbol:NNnnn #1#2#3#4#5
   {
     % #1 - the symbol
     % #2 - surrounding
     % #3 - boolean: whether to disable automatic spacing
     % #4 - the exponent (possibly \NoValue)
     % #5 - the variable
-    %\tl_show:n {foobar}
-    %\tl_show:n {#1}
-    %\tl_show:n {#2}
-    %\tl_show:n {#3}
-    %\tl_show:n {#4}
-    %\tl_show:n {#5}
-    \IfNoValueTF {#5}
+    \tl_if_novalue:nTF {#4}
+      {
+        % If there's no superscript token directly at the \dif, possibly
+        % collect one from the variable
+        \__wisper_difsymbol_process_variable_aux:w #5 ^ \q_mark \q_stop
+      }
+      {
+        \tl_set:Nn \l__wisper_dif_variable_tl { #5 }
+        \tl_set:Nn \l__wisper_dif_exponent_tl { #4 }
+      }
+    \tl_if_novalue:nTF {#5}
       {
         % Never apply spacing if no argument is given
-        #1 \IfValueT{#4}{ \c_math_superscript_token {#4} }
+        #1
+        \tl_if_novalue:VF \l__wisper_dif_exponent_tl
+          { \c_math_superscript_token {\l__wisper_dif_exponent_tl} }
       }
       {
         \__wisper_dif_spacing:nn {#3}
           {
             #1
-            \IfValueT {#4} { \c_math_superscript_token {#4} }
-            #2 {#5}
+            \tl_if_novalue:VF \l__wisper_dif_exponent_tl
+              { \c_math_superscript_token {\l__wisper_dif_exponent_tl} }
+            #2 { \l__wisper_dif_variable_tl }
           }
       }
   }
@@ -531,11 +574,11 @@
         % #4 - variable
         \__wisper_difsymbol:NNnnn #2
       }
-    \exp_args:Nc \NewDocumentCommand { __wisper_ #1 _normal:nnn } { m m g }
-      { \__wisper_difsymbol:NNnnn #2 {} {##1} {##2} {##3} }
-    \exp_args:Nc \NewDocumentCommand { __wisper_ #1 _long:nnw } { m m r() }
-      { \__wisper_difsymbol:NNnnn #2 { \__wisper_parenthesize_aux:n } {##1} {##2} {##3} }
-    \exp_args:Nc \NewDocumentCommand { #1 } { s e{^} }
+    \__wisper_new_document_command:cnn { __wisper_ #1 _normal:nnn } { m m g }
+      { \__wisper_difsymbol:NNnnn #2 \__wisper_surround_none:w {##1} {##2} {##3} }
+    \__wisper_new_document_command:cnn { __wisper_ #1 _long:nnw } { m m r() }
+      { \__wisper_difsymbol:NNnnn #2 \__wisper_parenthesize_aux:w  {##1} {##2} {##3} }
+    \__wisper_new_document_command:cnn { #1 } { s e{^} }
       % Full syntax:
       % \dif^3 {x}
       % \dif {x^3}
@@ -628,45 +671,12 @@
 
 % Derivatives [[[1
 
-% Use gset since `cool` already defines a \pderiv macro
-\ExplSyntaxOn
-\cs_new:Npn \defineDerivateCommand #1#2
-{
-    \cs_gset:cpn {#1 deriv} {\deriv{#2}}
-    % for convenience, wrap in parenthesis
-    \cs_gset:cpn {p #1 deriv} {\deriv[\parenthesize]{#2}}
-    % for convenience, wrap in brackets
-    \cs_gset:cpn {b #1 deriv} {\deriv[\bracketize]{#2}}
-}
-\defineDerivateCommand{t}{\dif}
-\defineDerivateCommand{p}{\del}
-\defineDerivateCommand{f}{\delta}
-\ExplSyntaxOff
-
-%------------------------------------------------------------
-
-\ExplSyntaxOn
-\regex_gset:Nn \g__wisper_integer_regex { \A[+\-]?\d+\Z }
-\prg_new_protected_conditional:Npnn \__wisper_if_integer:n #1 { T, F, TF }
-  {
-    %\tl_show:n {#1}
-    \regex_match:NnTF \g__wisper_integer_regex {#1}
-      { \prg_return_true: }
-      { \prg_return_false: }
-  }
-\cs_generate_variant:Nn \__wisper_if_integer:nTF { xTF }
-\ExplSyntaxOff
-
 % TODO: Starred version of the command that disables all of the exponent processing
 % example: \deriv{\dif}{f}{x^2;y^3}
 % example: \deriv{\partial}{f}{x^n;y^m}[n+m]  with an optional argument to overwrite the count
 \ExplSyntaxOn
-\int_new:N \l__wisper_derivative_order_int
 \cs_new_protected:Npn \__wisper_deriv_process_denominator_aux:w #1^#2 #3 \q_stop
   {
-    %\tl_show:n {#1}
-    %\tl_show:n {#2}
-    %\tl_show:n {#3}
     \if_meaning:w \q_mark #2
       \int_incr:N \l__wisper_derivative_order_int 
     \else:
@@ -675,7 +685,9 @@
         { \seq_put_right:Nx \l_non_integer_order_seq {#2} }
     \fi:
   }
-\NewDocumentCommand \deriv {o m m o m} {%
+
+\cs_new_protected:Npn \__wisper_derivative:NNnnn #1#2#3#4#5
+  {
     % #1 - command to wrap the result in (i.e. parenthesis, ...)
     % #2 - deriv sign
     % #3 - function
@@ -685,7 +697,7 @@
     % derivatives (TODO: verify that nesting works)
     \group_begin:
 
-    \int_zero:N \l__wisper_derivative_order_int
+    \int_zero_new:N \l__wisper_derivative_order_int
     \seq_clear_new:N \l_non_integer_order_seq
     \tl_clear_new:N \l_numerator_tl
     \tl_clear_new:N \l_denominator_tl
@@ -693,13 +705,12 @@
     % Construct denominator, sum up exponents
     \__wisper_clist_map_inline_no_unbrace:nn {#5}
       {
-        %\tl_show:n {##1}
-        \tl_put_right:Nn \l_denominator_tl {\mathop{}\!#2 ##1}
+        \tl_put_right:Nn \l_denominator_tl {\mathop{}\!#2 {##1}}
         \__wisper_deriv_process_denominator_aux:w ##1 ^ \q_mark \q_stop
       }
 
     % Construct exponent
-    \IfNoValueTF{#4}
+    \tl_if_novalue:nTF {#4}
       {
         \tl_set:Nn \l_numerator_tl
           {
@@ -707,10 +718,10 @@
               {
                 \int_compare:nNnTF { \l__wisper_derivative_order_int } { > } { 1 }
                   {
-                    #2^{\int_use:N \l__wisper_derivative_order_int} #3
+                    #2^{\int_use:N \l__wisper_derivative_order_int} {#3}
                   }
                   {
-                    #2 #3
+                    #2 {#3}
                   }
               }
               {
@@ -720,7 +731,7 @@
                       \seq_use:Nn \l_non_integer_order_seq { + }
                       \int_compare:nNnT { \l__wisper_derivative_order_int } { > } { 0 }
                         { + \int_use:N \l__wisper_derivative_order_int }
-                    } #3
+                    } {#3}
               }
           }
       }
@@ -728,14 +739,33 @@
         \tl_set:Nn \l_numerator_tl {#2^{#4} #3}
       }
 
-    \IfValueT{#1}{#1}
-      {
+    % #1 is the command to wrap everything in, e.g. \__wisper_parenthesize_aux:w,
+    % the star makes it resize
+    #1* {
         % No need to expand these explicitly
         \frac { \l_numerator_tl } { \l_denominator_tl }
       }
 
     \group_end:
 }
+
+\cs_new:Npn \__wisper_define_derivative_command:nN #1#2
+  {
+    % Use gset since `cool` already defines a \pderiv macro
+    % The last two cs' are convenience functions, wrapping in parenthesis resp.
+    % brackets
+    \__wisper_declare_document_command:cnn {   #1 deriv } { m o m }
+      { \__wisper_derivative:NNnnn \__wisper_surround_none:w    #2 {##1} {##2} {##3} }
+    \__wisper_declare_document_command:cnn { p #1 deriv } { m o m }
+      { \__wisper_derivative:NNnnn \__wisper_parenthesize_aux:w #2 {##1} {##2} {##3} }
+    \__wisper_declare_document_command:cnn { b #1 deriv } { m o m }
+      { \__wisper_derivative:NNnnn \__wisper_embrace_aux:w     #2 {##1} {##2} {##3} }
+  }
+
+\__wisper_define_derivative_command:nN { t } \dif
+\__wisper_define_derivative_command:nN { p } \del
+\__wisper_define_derivative_command:nN { f } \delta
+\__wisper_define_derivative_command:nN { v } \var
 
 
 \DeclarePairedDelimiter \EvaluateNoStar {} {\rvert}
