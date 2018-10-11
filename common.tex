@@ -39,6 +39,8 @@
 
 \ExplSyntaxOn
 
+
+
 % Variants [[[1
 %\cs_new_eq:NN \__wisper_pass_options_to_package:nn \PassOptionsToPackage
 \cs_generate_variant:Nn \bool_not_p:n { v }
@@ -46,105 +48,22 @@
 \cs_generate_variant:Nn \keyval_parse:NNn { NNv }
 \cs_generate_variant:Nn \msg_error:nnnn { nnnx }
 
-% Debugging helpers [[[1
-\clist_new:N \g__wisper_debug_modules_clist
-\clist_gset:Nn \g__wisper_debug_modules_clist {}
-%\clist_gset:Nn \g__wisper_debug_modules_clist { loader, declaration, shipout, features }
-\prg_new_conditional:Nnn \__wisper_if_debug:n { T, F, TF }
-  { 
-    \clist_if_in:NnTF \g__wisper_debug_modules_clist {#1}
-      { \prg_return_true: }
-      { \prg_return_false: }
-  }
 
-% Common messages [[[1
-\msg_new:nnn { wisper } { unknown-choice }
-  { Unknown~#1~'#2'.~Valid~choices~are~\clist_use:Nn #3 { ,~ }. }
-\msg_new:nnn { wisper } { feature-multiply-declared }
-  { Feature~'#1'~already~declared. }
-\msg_new:nnn { wisper } { enabling-feature }
-  { Enabling~feature~'#1'. }
-\msg_new:nnn { wisper } { disabling-feature }
-  { Disabling~feature~'#1'. }
-\msg_new:nnn { wisper } { check-activating-feature }
-  { Checking~whether~to~activate~feature~'#1'. }
-\msg_new:nnn { wisper } { activating-feature }
-  { Activating~feature~'#1'. }
-\msg_new:nnn { wisper } { check-loading-feature }
-  { Checking~whether~to~load~feature~'#1'. }
-\msg_new:nnn { wisper } { loading-feature }
-  { Loading~feature~'#1'. }
-\msg_new:nnn { wisper } { no-such-feature-option }
-  { No~such~option~('#2')~for~feature~'#1'. }
 
-\seq_new:N \g__wisper_preamble_seq
-\cs_new:Npn \__wisper_shipout:n #1
+% Additions to l3kernel [[[1
+% \__wisper_strlist_if_in:nn, code is very similar to \__prop_if_in [[[2
+\prg_new_conditional:Npnn \__wisper_strlist_if_in:nn #1#2 { p, T, F, TF }
   {
-    \seq_gput_right:Nn \g__wisper_preamble_seq {#1}
-    \__wisper_if_debug:nT { shipout }
-      {
-        \seq_show:N \g__wisper_preamble_seq
-      }
-  }
-\cs_generate_variant:Nn \__wisper_shipout:n { v, x }
-
-% Common helper functions for package and document class loading [[[1
-% Helper function to get the square brackets for passing optional arguments.
-\cs_new:Npn \__wisper_load_with_optional_arg_aux:Nnn #1#2#3
-  {
-    #1[#2]{#3}
-  }
-
-% Helper function to transform the class option property list into a clist.
-\cs_new:Npn \__wisper_build_clist_from_prop:NN #1#2
-  {
-    \__wisper_if_debug:nT { loader }
-      { \prop_show:N #1 }
-
-    \prop_map_inline:Nn #1
-      {
-        \tl_if_novalue:nTF {##2}
-          { \clist_put_right:Nn #2 {##1} }
-          { \clist_put_right:Nn #2 {##1=##2} }
-      }
-  }
-
-\cs_new:Npn \__wisper_load_with_optional_arg:NNn #1#2#3
-  {
-    \clist_clear:N \l_tmpa_clist
-    \__wisper_build_clist_from_prop:NN #2 \l_tmpa_clist
-    %\clist_show:N \l_tmpa_clist
-    \__wisper_if_debug:nT { loader }
-      {
-        \clist_show:N \l_tmpa_clist
-        \str_show:n {#3}
-      }
-    %\exp_args:Nx \tl_show:n { \clist_use:Nn \l_tmpa_clist { , } }
-    \exp_args:Noo \__wisper_load_with_optional_arg_aux:Nnn #1
-      {
-        % Previously, this code introduced an additional space ( { ,~ } ). This
-        % will apparently not be stripped when loading the document class with
-        % the result that _all_ option will be ignored (and result in the 
-        % warning "Unused global options [...]".
-        \clist_use:Nn \l_tmpa_clist { , }
-      }
-      { #3 }
-  }
-\cs_generate_variant:Nn \__wisper_load_with_optional_arg:NNn { NNV, Ncn}
-
-% string list conditional, code is very similar to \__prop_if_in
-\prg_new_conditional:Npnn \__strlist_if_in:nn #1#2 { p, T, F, TF }
-  {
-    \__strlist_if_in:nww { #2 } #1 , #2 , \q_recursion_tail
+    \__wisper_strlist_if_in:nww { #2 } #1 , #2 , \q_recursion_tail
     \__prg_break_point:
   }
-\cs_new:Npn \__strlist_if_in:nww #1 #2 ,
+\cs_new:Npn \__wisper_strlist_if_in:nww #1 #2 ,
   {
     \str_if_eq:nnTF {#1} {#2}
-      { \__strlist_if_in:N }
-      { \__strlist_if_in:nww {#1} }
+      { \__wisper_strlist_if_in:N }
+      { \__wisper_strlist_if_in:nww {#1} }
   }
-\cs_new:Npn \__strlist_if_in:N #1
+\cs_new:Npn \__wisper_strlist_if_in:N #1
   {
     \if_meaning:w \q_recursion_tail #1
       \prg_return_false:
@@ -153,12 +72,13 @@
     \fi:
     \__prg_break:
   }
-\cs_generate_variant:Nn \__strlist_if_in:nnTF { nVTF }
-\cs_generate_variant:Nn \__strlist_if_in_p:nn { nV }
+\cs_generate_variant:Nn \__wisper_strlist_if_in:nnTF { nVTF }
+\cs_generate_variant:Nn \__wisper_strlist_if_in_p:nn { nV }
 
+% \__wisper_if_engine:n, allows checking if on any of the given engines [[[2
 \prg_new_conditional:Npnn \__wisper_if_engine:n #1 { p, T, F, TF }
   {
-    \__strlist_if_in:nVTF {#1} \c_sys_engine_str
+    \__wisper_strlist_if_in:nVTF {#1} \c_sys_engine_str
     %\clist_if_in:nVTF {#1} \c_sys_engine_str
       { \prg_return_true: }
       { \prg_return_false: }
@@ -166,7 +86,7 @@
 \cs_generate_variant:Nn \__wisper_if_engine:nTF { vTF }
 \cs_generate_variant:Nn \__wisper_if_engine_p:n { v }
 
-% Code mostly borrowed from \__str_case:nnTF
+% \__wisper_switch_engine:n switch statement, code mostly borrowed from \__str_case:nnTF [[[2
 \cs_new:Npn \__wisper_switch_engine:n #1
   {
     \exp:w
@@ -197,10 +117,110 @@
   { \exp_end: #1 #4 }
 \cs_new:Npn \__wisper_switch_engine:nw #1#2#3
   {
-    \__strlist_if_in:nnTF {#2} {#1}
+    \__wisper_strlist_if_in:nnTF {#2} {#1}
       { \__wisper_case_end:nw {#3} }
       { \__wisper_switch_engine:nw {#1} }
   }
+% Old, unused code [[[2
+\cs_new:Npn \__wisper_prop_keys_to_clist:NN #1#2
+  {
+    \clist_clear:N #2
+    \prop_map_inline:Nn #1 { \clist_put_right:Nn #2 {##1} }
+  }
+\cs_generate_variant:Nn \__wisper_prop_keys_to_clist:NN { cN }
+
+
+
+% Debugging helpers [[[1
+\clist_new:N \g__wisper_debug_modules_clist
+\clist_gset:Nn \g__wisper_debug_modules_clist {}
+%\clist_gset:Nn \g__wisper_debug_modules_clist { loader, declaration, shipout, features }
+\prg_new_conditional:Nnn \__wisper_if_debug:n { T, F, TF }
+  { 
+    \clist_if_in:NnTF \g__wisper_debug_modules_clist {#1}
+      { \prg_return_true: }
+      { \prg_return_false: }
+  }
+
+
+
+% Common messages [[[1
+\msg_new:nnn { wisper } { unknown-choice }
+  { Unknown~#1~'#2'.~Valid~choices~are~\clist_use:Nn #3 { ,~ }. }
+\msg_new:nnn { wisper } { feature-multiply-declared }
+  { Feature~'#1'~already~declared. }
+\msg_new:nnn { wisper } { enabling-feature }
+  { Enabling~feature~'#1'. }
+\msg_new:nnn { wisper } { disabling-feature }
+  { Disabling~feature~'#1'. }
+\msg_new:nnn { wisper } { check-activating-feature }
+  { Checking~whether~to~activate~feature~'#1'. }
+\msg_new:nnn { wisper } { activating-feature }
+  { Activating~feature~'#1'. }
+\msg_new:nnn { wisper } { check-loading-feature }
+  { Checking~whether~to~load~feature~'#1'. }
+\msg_new:nnn { wisper } { loading-feature }
+  { Loading~feature~'#1'. }
+\msg_new:nnn { wisper } { no-such-feature-option }
+  { No~such~option~('#2')~for~feature~'#1'. }
+
+
+
+% Sequence and helper function to store the generated preamble [[[1
+\seq_new:N \g__wisper_preamble_seq
+\cs_new:Npn \__wisper_shipout:n #1
+  {
+    \seq_gput_right:Nn \g__wisper_preamble_seq {#1}
+    \__wisper_if_debug:nT { shipout }
+      { \seq_show:N \g__wisper_preamble_seq }
+  }
+\cs_generate_variant:Nn \__wisper_shipout:n { x }
+
+
+
+% Common helper functions for package and document class loading [[[1
+% Helper function to get the square brackets for passing optional arguments.
+\cs_new:Npn \__wisper_load_with_optional_arg_aux:Nnn #1#2#3
+  {
+    \__wisper_shipout:n { #1[#2]{#3} }
+  }
+\cs_generate_variant:Nn \__wisper_load_with_optional_arg_aux:Nnn { Nxo }
+
+% Helper function to transform the class option property list into a clist.
+\cs_new:Npn \__wisper_build_clist_from_prop:NN #1#2
+  {
+    \__wisper_if_debug:nT { loader }
+      { \prop_show:N #1 }
+
+    \prop_map_inline:Nn #1
+      {
+        \tl_if_novalue:nTF {##2}
+          { \clist_put_right:Nn #2 {##1} }
+          { \clist_put_right:Nn #2 {##1=##2} }
+      }
+  }
+
+\cs_new:Npn \__wisper_load_with_optional_arg:NNn #1#2#3
+  {
+    \clist_clear:N \l_tmpa_clist
+    \__wisper_build_clist_from_prop:NN #2 \l_tmpa_clist
+    \__wisper_if_debug:nT { loader }
+      {
+        \clist_show:N \l_tmpa_clist
+        \str_show:n {#3}
+      }
+    \__wisper_load_with_optional_arg_aux:Nxo #1
+      {
+        % Previously, this code introduced an additional space ( { ,~ } ). This
+        % will apparently not be stripped when loading the document class with
+        % the result that _all_ option will be ignored (and result in the 
+        % warning "Unused global options [...]".
+        \clist_use:Nn \l_tmpa_clist { , }
+      }
+      { #3 }
+  }
+
+
 
 % Convenience functions for the key-value interface [[[1
 \cs_new:Npn \__wisper_keys_define:n #1 { \keys_define:nn { wisper } {#1} }
@@ -213,53 +233,45 @@
 \cs_new:Npn \__wisper_keys_set_doc:n #1 { \keys_set:nn { wisper/document } {#1} }
 \cs_new:Npn \__wisper_keys_set_doc:nn #1#2 { \keys_set:nn { wisper/document/#1 } {#2} }
 
-% User-accessible aliases.
-\cs_new_eq:NN \DocumentStyle \__wisper_keys_set_doc:n
+
 
 % Document class handling [[[1
 
 % Global storage for class name and options.
-\str_new:N \g__wisper_classname_str
 \prop_new:N \g__wisper_classopts_prop
 
-% Document class loader.   [[[2
-\cs_new:Nn \__wisper_load_document_class:
-  {
-    \__wisper_load_with_optional_arg:NNV
-      \documentclass
-      \g__wisper_classopts_prop
-      \g__wisper_classname_str
-  }
-
 % Conditional for the document class.   [[[2
-\prg_new_conditional:Npnn \__wisper_if_document_class:n #1 { p, T, F, TF}
+\cs_new:Npn \__wisper_if_document_class_aux:n #1
+  {
+    % No match
+    \quark_if_nil:nTF { #1 }
+      { \clist_map_break:n { \prg_return_false: } }
+      {
+        % Recurse for aliases
+        \str_if_eq:nnTF { #1 } { koma }
+          {
+            % koma is an alias for any KOMA-script class
+            \__wisper_if_document_class:nT { scrartcl, scrbook, scrreprt, scrlttr2 }
+              { \clist_map_break:n { \prg_return_true: } }
+          }
+          {
+            % Match
+            \__wisper_if_feature_enabled:nT { class- #1 }
+              { \clist_map_break:n { \prg_return_true: } }
+          }
+      }
+  }
+\prg_new_conditional:Npnn \__wisper_if_document_class:n #1 { p, T, F, TF }
   { 
-    \str_if_eq:nnTF {#1} {koma}
-      {
-        % koma is an alias for any KOMA-script class
-        \__wisper_if_document_class:nTF { scrartcl, scrbook, scrreprt, scrlttr2 }
-           { \prg_return_true: } { \prg_return_false: }
-      }
-      {
-        \__strlist_if_in:nVTF {#1} \g__wisper_classname_str 
-           { \prg_return_true: } { \prg_return_false: }
-      }
+    \clist_map_function:nN { #1 , \q_nil } \__wisper_if_document_class_aux:n
   }
 \cs_generate_variant:Nn \__wisper_if_document_class:nTF { vTF }
 \cs_generate_variant:Nn \__wisper_if_document_class_p:n { v }
 
-\cs_new:Npn \__wisper_prop_keys_to_clist:NN #1#2
-  {
-    \clist_clear:N #2
-    \prop_map_inline:Nn #1 { \clist_put_right:Nn #2 {##1} }
-  }
-\cs_generate_variant:Nn \__wisper_prop_keys_to_clist:NN { cN }
-
+% Key-value interface to pre-defined document layouts ('document types'). [[[2
 % TODO: require values for paper, roman/sans, languages, landscape, tocdepth, type. Or somehow
 % support default values?
 % -> Ensure that all keys can be set multiple times without issues.
-
-% Key-value interface to pre-defined document layouts ('document types'). [[[2
 \clist_gset:Nn \g__wisper_valid_paper_formats_clist { a4paper, a5paper }
 \__wisper_keys_define_doc:n
   {
@@ -300,21 +312,24 @@
 %  {
 %  }
 
+% Features [[[1
+% Aliases to enable features to be coded without using expl3 [[[2
+% TODO: only set them locally when expanding feature code
 \cs_new_eq:NN \IfDocClassT \__wisper_if_document_class:nT
 \cs_new_eq:NN \IfDocClassF \__wisper_if_document_class:nF
 \cs_new_eq:NN \IfDocClassTF \__wisper_if_document_class:nTF
 
-% Features [[[1
+% Feature management [[[2
 \prop_new:N \g__wisper_feature_features_prop
 \prop_new:N \g__wisper_feature_code_prop
 \tl_new:N \g__wisper_feature_code_tl
 \seq_new:N \g__wisper_all_features_all_seq
 
-% #1 - name
-% #2 - keyvals
-% #3 - code
 \cs_new:Npn \__wisper_declare_feature_aux:nnn #1#2#3
   {
+    % #1 - name
+    % #2 - keyvals
+    % #3 - code
     \cs_if_exist:cT {g__wisper_feature_ #1 _enabled_bool}
       { \msg_error:nnn { wisper } { feature-multiply-declared } {#1} }
     \bool_gset_false:c {g__wisper_feature_ #1 _enabled_bool}
@@ -322,21 +337,18 @@
     \bool_gset_false:c {g__wisper_feature_ #1 _loaded_bool}
     \clist_new:c {g__wisper_feature_ #1 _features_clist}
     \tl_gset:cn {g__wisper_feature_ #1 _code_tl} {#3}
+    \bool_gset_false:c {g__wisper_feature_ #1 _expl3_bool}
     \clist_new:c {g__wisper_feature_ #1 _conflicting_features_clist}
     \seq_put_right:Nn \g__wisper_all_features_all_seq {#1}
 
     \__wisper_keys_define_doc:n
       {
-        %features/#1/enabled .bool_gset:c = {g__wisper_package_ #1 _enabled_bool},
-        %features/#1/enabled .default:n = true,
-        features/#1/enabled .code:n = 
-          { \__wisper_enable_feature:n {#1} },
+        features/#1/enabled .code:n = { \__wisper_enable_feature:n {#1} },
         features/#1/enabled .value_forbidden:n = true,
-        %features/#1/disabled .bool_gset_inverse:c = {g__wisper_package_ #1 _enabled_bool},
-        %features/#1/disabled .default:n = true,
-        features/#1/disabled .code:n = 
-          { },
+        features/#1/disabled .code:n = { },
         features/#1/disabled .value_forbidden:n = true,
+
+        features/#1/expl3 .bool_gset:c = { g__wisper_feature_ #1 _expl3_bool },
 
         features/#1/groups .code:n =
           {
@@ -355,10 +367,13 @@
         % that are allowed here to document classes.
         %features/#1/requires-conditional .code:n =
         %  {
-        %    \bool_if:xT { \tl_head:n {##1} }
+        %    \tl_map_inline:nn {##1}
         %      {
-        %        \clist_gput_right:cx {g__wisper_feature_ #1 _features_clist}
-        %          { \tl_tail:n {##1} }
+        %        \bool_if:xT { \use_i:nn ####1 }
+        %          {
+        %            \clist_gput_right:cx {g__wisper_feature_ #1 _features_clist}
+        %              { \use_ii:nn ####1 }
+        %          }
         %      }
         %  },
 
@@ -392,25 +407,12 @@
 \cs_new:Npn \__wisper_set_feature_config:nnn #1#2#3
   { \__wisper_keys_set_doc:nn { features/#1/#2 } {#3} }
 
-\cs_new:Npn \__wisper_enable_feature_set_options:nn #1#2
-  {
-    \__wisper_enable_feature:n {#1}
-    \__wisper_set_feature_config:nn {#1}  {options={#2}}
-  }
 \cs_new:Npn \__wisper_disable_feature:n #1
   {
     \__wisper_if_debug:nT { features }
       { \msg_warning:nnn { wisper } { disabling-feature } {#1} }
     \bool_gset_false:c {g__wisper_feature_ #1 _enabled_bool}
   }
-\cs_new:Npn \__wisper_disable_features_group_except_group:nn #1#2
-  {
-    \__wisper_loop_features_groups:nn {#1}
-      {
-        \seq_if_in:cnF {g__wisper_all_features_ #2 _seq} {##1}
-          { \__wisper_disable_feature:n {##1} }
-      }
-    }
 \cs_new:Npn \__wisper_enable_feature:n #1
   {
     \bool_if:cF {g__wisper_feature_ #1 _enabled_bool}
@@ -431,6 +433,19 @@
     \bool_if:cTF {g__wisper_feature_ #1 _enabled_bool}
       { \prg_return_true: } { \prg_return_false: }
   }
+\cs_new:Npn \__wisper_enable_feature_set_options:nn #1#2
+  {
+    \__wisper_enable_feature:n {#1}
+    \__wisper_set_feature_config:nn {#1}  {options={#2}}
+  }
+\cs_new:Npn \__wisper_disable_features_group_except_group:nn #1#2
+  {
+    \__wisper_loop_features_groups:nn {#1}
+      {
+        \seq_if_in:cnF {g__wisper_all_features_ #2 _seq} {##1}
+          { \__wisper_disable_feature:n {##1} }
+      }
+    }
 \cs_new:Npn \__wisper_activate_feature_dep_set_options:nn #1#2
   {
     %\msg_warning:nnn { wisper } { enabling-feature } {Dep:~#1}
@@ -589,7 +604,11 @@
         \__wisper_if_debug:nT { features }
           { \msg_warning:nnn { wisper } { loading-feature } {#1} }
         \bool_gset_true:c {g__wisper_feature_ #1 _loaded_bool}
+        \bool_if:cT { g__wisper_feature_ #1 _expl3_bool }
+          { \__wisper_shipout:n { \ExplSyntaxOn } }
         \use:c {g__wisper_feature_ #1 _code_tl}
+        \bool_if:cT { g__wisper_feature_ #1 _expl3_bool }
+          { \__wisper_shipout:n { \ExplSyntaxOff } }
       }
   }
 \cs_new:Npn \__wisper_load_features_group:n #1
@@ -667,8 +686,10 @@
       }
     \__wisper_declare_feature_aux:nnn {class-#1} {#2}
       {
-        \str_set:Nn \g__wisper_classname_str {#1}
-        \__wisper_load_document_class:
+        \__wisper_load_with_optional_arg:NNn
+          \documentclass
+          \g__wisper_classopts_prop
+          { #1 }
       }
   }
 \cs_new:Npn \__wisper_declare_documentclass:n #1
@@ -692,7 +713,7 @@
 % Feature declarations [[[1
 
 % Document classes [[[2
-% TODO: raise an error if not documentclass is enabled
+% TODO: raise an error if no documentclass is enabled
 \__wisper_declare_documentclass:n { article }
 \__wisper_declare_documentclass:n { beamer }
 \__wisper_declare_documentclass:n { scrbook }
@@ -803,7 +824,7 @@
 
 
 % Fonts [[[2
-% Packages [[[
+% Packages [[[3
 \__wisper_declare_packages:n
   {
     % These packages are not supposed to be loaded in
@@ -819,15 +840,15 @@
     mathpazo = { groups=font_only },
     cabin = { groups=font_only },
     beramono = { groups=font_only },
-  }  % ]]]
-\__wisper_declare_font:nnn { font-lmodern }  % [[[
+  }
+\__wisper_declare_font:nnn { font-lmodern }  % [[[3
   {
     requires = lmodern,
   }
   {
     \__wisper_load_feature:n { lmodern }
-  }  % ]]]
-\__wisper_declare_font:nnn { font-fira }  % [[[
+  }
+\__wisper_declare_font:nnn { font-fira }  % [[[3
   {
     requires = {
       FiraMono,
@@ -838,8 +859,8 @@
     % Mozilla Fira Sans, requires XeLaTeX or LuaLaTex TODO: raise error
     \__wisper_load_feature:n {FiraSans}
     \__wisper_load_feature:n {FiraMono}
-  }  % ]]]
-\__wisper_declare_font:nnn { font-garamond }  % [[[
+  }
+\__wisper_declare_font:nnn { font-garamond }  % [[[3
   {
     requires = {
       mathdesign = urw-garamond,
@@ -852,8 +873,8 @@
     % warning.
     % TODO: matching sans font
     \__wisper_load_feature:n {mathdesign}
-  }  % ]]]
-\__wisper_declare_font:nnn { font-palatino }  % [[[
+  }
+\__wisper_declare_font:nnn { font-palatino }  % [[[3
   {
     requires = {
       mathpazo = osf,
@@ -861,8 +882,8 @@
   }
   {
     \__wisper_load_feature:n {mathpazo}
-  }  % ]]]
-\__wisper_declare_font:nnn { font-TexGyre }  % [[[
+  }
+\__wisper_declare_font:nnn { font-TexGyre }  % [[[3
   {
     requires = {
       amsthm,
@@ -913,7 +934,7 @@
 
       \__wisper_shipout:n
         { \linespread{1.05} }
-    }  % ]]]
+    }
 
 
 % Generic [[[2
@@ -1034,7 +1055,7 @@
 
 \__wisper_declare_ordinary_feature:nnn { biblatex-wip-interface }
   % TODO: actually implement this.
-  {  % [[[3
+  {
     declare~options =
       {
         style .choice:,
@@ -1051,8 +1072,8 @@
           },
       }
   }
-  {  % [[[3
-  }  % ]]]3
+  {
+  }
 
 \__wisper_declare_ordinary_feature:nnn { biblatex-alphabetic }
   {
@@ -1074,7 +1095,7 @@
   % Inspired and partially copied from
   %   http://www.khirevich.com/latex/footnote_citation/
   % TODO: ensure that this works when there are non-cite footnotes on the same page
-  { % [[[3
+  {
     disabled,
     requires = {
       biblatex = {
@@ -1088,12 +1109,11 @@
       footnotecite,
     },
   }
-  { % [[[3
-    % [[[5  declarations
+  {
     \newlength { \spc }
     \cs_new_eq:NN \__citeX_citecommand: \superfullcite
     %\cs_new_eq:NN \__citeX_citecommand: \supershortnotecite
-    \cs_new:Npn \__citeX_nomove:nnn #1#2#3 % [[[5
+    \cs_new:Npn \__citeX_nomove:nnn #1#2#3
       {
         \tl_if_novalue:nTF {#2}
           { \__citeX_citecommand: {#3} }
@@ -1103,7 +1123,7 @@
               { \__citeX_citecommand:[#1][#2]{#3} }
           }
       }
-    \cs_new:Npn \__citeX_move:nnnN #1#2#3#4 % [[[5
+    \cs_new:Npn \__citeX_move:nnnN #1#2#3#4
       {
         \settowidth \spc {#4}
         \dim_add:Nn \spc { -1.8\spc }
@@ -1112,7 +1132,7 @@
 
         \__citeX_nomove:nnn {#1} {#2} {#3}
       }
-    \NewDocumentCommand \citeX { o o m } % [[[5
+    \NewDocumentCommand \citeX { o o m }
       {
         \peek_charcode_ignore_spaces:NTF .
           { \__citeX_move:nnnN {#1} {#2} {#3} }
@@ -1132,34 +1152,28 @@
               }
           }
       }
-  }  % ]]]3
+  }
 
 \__wisper_declare_ordinary_feature:nnn { biblatex-alphabetic-supercite }
   % This is supposed to do the same as biblatex-numeric-supercite, but
   % with the alphabetic labels in square brackets in the superscripts
   % and footnotes
   { }
-  {  % [[[3
+  {
     % FIXME: implement
-  }  % ]]]3
+  }
 
 \__wisper_declare_feature_expand_conditional:nnn { footnotecite }
-  {  % [[[3
+  {
     requires = {
       %multiple-footnotes,
     },
     %requires-conditional = {
-    %  multiple-footnotes = {
-    %    { ! \__wisper_if_document_class_p:n { beamer} }
-    %    { }
-    %  }
-    %},
-    %requires-conditional = {
-    %  multiple-footnotes = { { !beamer } { } },
+    %  { { ! \__wisper_if_document_class_p:n { beamer} } { multiple-footnotes } }
     %},
   }
-  {  % [[[3
-    \__wisper_if_document_class:nTF { beamer }
+  {
+    \IfDocClassTF { beamer }
       {
         % bigfoot+beamer crashes (incomplete iffalse ...)
         %\DeclareDocumentCommand \footnotetextCite { r[] } { \footnotetext[#1][frame] }
@@ -1176,7 +1190,7 @@
         \__wisper_load_feature:n {multiple-footnotes}
         \DeclareNewFootnote{Cite} 
       }
-  }  % ]]]3
+  }
 
 
 % Page-layout: one-/twoside etc [[[2
@@ -1186,24 +1200,26 @@
 \__wisper_declare_ordinary_feature:nnn { oneside }
   % This feature mostly exists to provide dummy commands for justification etc.
   % so that twoside documents can easily be compiled onesided.
-  {  % [[[3
+  {
     enabled,
+    expl3=true,
   }
-  {  % [[[3
+  {
     \cs_new_eq:NN \raggedoutside \raggedright
     \NewDocumentEnvironment {flushinside} {}
       { \bgroup \flushleft }
       { \egroup }
-  }  % ]]]3
+  }
 \__wisper_declare_ordinary_feature:nnn { twoside }
-  {  % [[[3
+  {
     disabled,
     classoptions = { twoside },
     requires = {
       changepage = strict,
     },
+    expl3=true,
   }
-  {  % [[[3
+  {
     \cs_new:Npn \raggedoutside
       {
         \checkoddpage
@@ -1229,7 +1245,7 @@
   }
 \__wisper_declare_mutually_exclusive_features:n { oneside, twoside }
 
-% Layout for KOMA [[[
+% Layout for KOMA [[[2
 \__wisper_declare_feature_expand_conditional:nnn { koma-misc }
   { }
   {
@@ -1280,7 +1296,7 @@
         %\KOMAoptions{headsepline=true}
         %\KOMAoptions{footsepline=:0.5\textwidth, olines}
       }
-    }  % ]]]
+    }
 
 % Footnotes [[[2
 \__wisper_declare_package:n { bigfoot }
@@ -1294,6 +1310,7 @@
 
 \__wisper_declare_feature_expand_conditional:nnn { alphabetic-default-footnote }
   {
+    expl3=true,
   }
   {
     \__wisper_if_feature_enabled:nTF { bigfoot }
@@ -1496,7 +1513,7 @@
   }
 \seq_gset_from_clist:Nn \g__wisper_all_features_main_packages_seq
   {
-    koma-misc,
+    koma-misc,  % must be after fonts to adjust dimensions
 
     % load minted before csquotes to suppress a warning due to a common package
     % they load
@@ -1547,7 +1564,25 @@
   { groups = font_only }
   { \__wisper_disable_features_group_except_group:nn { all } { font_only } }
 
-\NewDocumentCommand \Preamble { m }
+% TODO: Option to embed any file that is \input
+\cs_new:Npn \__wisper_write_preamble:n #1
+  {
+    \iow_new:N \__wisper_preamble_iow
+    \iow_open:Nn \__wisper_preamble_iow {#1}
+    \seq_map_inline:Nn \g__wisper_preamble_seq
+      {
+        \tl_if_empty:nF {##1}
+          {
+            \iow_now:Nx \__wisper_preamble_iow
+            {
+              \exp_not:n {##1} % \iow_newline:
+            }
+          }
+      }
+    \iow_close:N \__wisper_preamble_iow
+  }
+
+\cs_new:Npn \__wisper_build_preamble:n #1
   {
     \__wisper_enable_features:n {#1}
 
@@ -1563,6 +1598,7 @@
 
     %\__wisper_pass_classoptions:
     \__wisper_load_features_group:n { documentclass }
+    %\__wisper_shipout:n { \ExplSyntaxOn }
 
     % Early Package loads
     \__wisper_load_features_group:n { early_packages }
@@ -1585,24 +1621,22 @@
     \__wisper_load_features_group:n { types }
     \__wisper_load_features_group:n { main }
 
-    \seq_use:Nn \g__wisper_preamble_seq { ~~~ }
-
-    \iow_new:N \__wisper_preamble_iow
-    \iow_open:Nn \__wisper_preamble_iow {preamble.tex}
-    \iow_now:Nn \__wisper_preamble_iow { \ExplSyntaxOn }
-    \seq_map_inline:Nn \g__wisper_preamble_seq
-      {
-        \tl_if_empty:nF {##1}
-          {
-            \iow_now:Nx \__wisper_preamble_iow
-            {
-              \exp_not:n {##1} % \iow_newline:
-            }
-          }
-      }
-    \iow_now:Nn \__wisper_preamble_iow { \ExplSyntaxOff }
-    \iow_close:N \__wisper_preamble_iow
+    %\__wisper_shipout:n { \ExplSyntaxOff }
   }
+
+
+
+% User interface [[[1
+\cs_new_eq:NN \DocumentStyle \__wisper_keys_set_doc:n
+\NewDocumentCommand \Preamble { m }
+  {
+    \__wisper_build_preamble:n { #1 }
+    \__wisper_write_preamble:n {preamble.tex}
+    %\seq_use:Nn \g__wisper_preamble_seq { ~~~ }
+    \input{preamble.tex}
+  }
+
+
 
 \ExplSyntaxOff
 
