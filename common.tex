@@ -331,16 +331,16 @@
     % #1 - name
     % #2 - keyvals
     % #3 - code
-    \cs_if_exist:cT {g__wisper_feature_ #1 _enabled_bool}
-      { \msg_error:nnn { wisper } { feature-multiply-declared } {#1} }
-    \bool_gset_false:c {g__wisper_feature_ #1 _enabled_bool}
-    \bool_gset_false:c {g__wisper_feature_ #1 _activated_bool}
-    \bool_gset_false:c {g__wisper_feature_ #1 _loaded_bool}
-    \clist_new:c {g__wisper_feature_ #1 _dependencies_clist}
-    \tl_gset:cn {g__wisper_feature_ #1 _code_tl} {#3}
-    \bool_gset_false:c {g__wisper_feature_ #1 _expl3_bool}
-    \clist_new:c {g__wisper_feature_ #1 _conflicting_features_clist}
-    \seq_put_right:Nn \g__wisper_all_features_all_seq {#1}
+    \cs_if_exist:cT { g__wisper_feature_ #1 _enabled_bool }
+      { \msg_error:nnn { wisper } { feature-multiply-declared } { #1 } }
+    \bool_gset_false:c { g__wisper_feature_ #1 _enabled_bool }
+    \bool_gset_false:c { g__wisper_feature_ #1 _activated_bool }
+    \bool_gset_false:c { g__wisper_feature_ #1 _loaded_bool }
+    \clist_new:c { g__wisper_feature_ #1 _dependencies_clist }
+    \tl_gset:cn { g__wisper_feature_ #1 _code_tl } { #3 }
+    \bool_gset_false:c { g__wisper_feature_ #1 _expl3_bool }
+    \clist_new:c { g__wisper_feature_ #1 _conflicting_features_clist }
+    \seq_put_right:Nn \g__wisper_all_features_all_seq { #1 }
 
     \__wisper_keys_define_doc:n
       {
@@ -353,15 +353,15 @@
 
         features/#1/groups .code:n =
           {
-            \clist_map_inline:nn {##1}
+            \clist_map_inline:nn { ##1 }
               {
-                \seq_if_exist:cF {g__wisper_all_features_ ####1 _seq}
-                  { \seq_new:c {g__wisper_all_features_ ####1 _seq} }
-                \seq_gput_right:cn {g__wisper_all_features_ ####1 _seq} {#1}
+                \seq_if_exist:cF { g__wisper_all_features_ ####1 _seq }
+                  { \seq_new:c { g__wisper_all_features_ ####1 _seq } }
+                \seq_gput_right:cn { g__wisper_all_features_ ####1 _seq } { #1 }
               }
           },
 
-        features/#1/requires .clist_gset:c = {g__wisper_feature_ #1 _dependencies_clist},
+        features/#1/requires .clist_gset:c = { g__wisper_feature_ #1 _dependencies_clist },
         % FIXME: Cannot work since the conditional must be parsed when at least
         % the document class has been loaded. Maybe restrict the conditonals
         % that are allowed here to document classes.
@@ -378,134 +378,136 @@
         %  },
 
         features/#1/options / unknown .code:n =
-          { \msg_error:nnnx { wisper } { no-such-feature-option } {#1} {\l_keys_key_tl=##1} },
+          { \msg_error:nnnx { wisper } { no-such-feature-option } { #1 } { \l_keys_key_tl=##1 } },
         features/#1/declare~options .code:n =
           {
             \__wisper_keys_define_doc:nn { features/#1/options } { ##1 }
           },
-        features/#1/classoptions .clist_gset:c = {g__wisper_feature_ #1 _classopts_clist},
+        features/#1/classoptions .clist_gset:c = { g__wisper_feature_ #1 _classopts_clist },
 
-        features/#1/conflicts / classes .tl_gset:c = {g__wisper_feature_ #1 _conflicting_classes_tl},
+        features/#1/conflicts / classes .tl_gset:c = { g__wisper_feature_ #1 _conflicting_classes_tl },
         %features/#1/conflicts / features .clist_gset:c = {g__wisper_feature_ #1 _conflicting_features_clist},
-        features/#1/conflicts / classes .initial:n = {},
-        %features/#1/conflicts / features .initial:n = {},
+        features/#1/conflicts / classes .initial:n = { },
+        %features/#1/conflicts / features .initial:n = { },
 
         % e.g. document classes can prevent loading a feature, should raise an
         % error if enabled explicitly in some place.
         features/#1/deactivate .bool_gset:c = {g__wisper_feature_ #1 _deactivated_bool},
-        features/#1/deactivate_for_engines .tl_gset:c = {g__wisper_feature_ #1 _deactivated_for_engines_strlist},
-        features/#1/deactivate_for_engines .initial:n = {},
-        features/#1/deactivate_for_classes .tl_gset:c = {g__wisper_feature_ #1 _deactivated_for_classes_strlist},
-        features/#1/deactivate_for_classes .initial:n = {},
+        features/#1/deactivate_for_engines .tl_gset:c =
+          { g__wisper_feature_ #1 _deactivated_for_engines_strlist },
+        features/#1/deactivate_for_engines .initial:n = { },
+        features/#1/deactivate_for_classes .tl_gset:c =
+          { g__wisper_feature_ #1 _deactivated_for_classes_strlist },
+        features/#1/deactivate_for_classes .initial:n = { },
       }
 
-      \__wisper_set_feature_config:nn {#1} {#2}
+      \__wisper_set_feature_config:nn { #1 } { #2 }
   }
 
 \cs_new:Npn \__wisper_set_feature_config:nn #1#2
-  { \__wisper_keys_set_doc:nn { features/#1 } {#2} }
+  { \__wisper_keys_set_doc:nn { features/#1 } { #2 } }
 \cs_new:Npn \__wisper_set_feature_config:nnn #1#2#3
-  { \__wisper_keys_set_doc:nn { features/#1/#2 } {#3} }
+  { \__wisper_keys_set_doc:nn { features/#1/#2 } { #3 } }
 
 \cs_new:Npn \__wisper_disable_feature:n #1
   {
     \__wisper_if_debug:nT { features }
-      { \msg_warning:nnn { wisper } { disabling-feature } {#1} }
-    \bool_gset_false:c {g__wisper_feature_ #1 _enabled_bool}
+      { \msg_warning:nnn { wisper } { disabling-feature } { #1 } }
+    \bool_gset_false:c { g__wisper_feature_ #1 _enabled_bool }
   }
 \cs_new:Npn \__wisper_enable_feature:n #1
   {
-    \bool_if:cF {g__wisper_feature_ #1 _enabled_bool}
+    \bool_if:cF { g__wisper_feature_ #1 _enabled_bool }
       {
         %\clist_show:c {g__wisper_feature_ #1 _conflicting_features_clist}
-        \clist_map_inline:cn {g__wisper_feature_ #1 _conflicting_features_clist}
+        \clist_map_inline:cn { g__wisper_feature_ #1 _conflicting_features_clist }
           {
             % TODO: error out if activated already
-            \__wisper_disable_feature:n {##1}
+            \__wisper_disable_feature:n { ##1 }
           }
         \__wisper_if_debug:nT { features }
-          { \msg_warning:nnn { wisper } { enabling-feature } {#1} }
-        \bool_gset_true:c {g__wisper_feature_ #1 _enabled_bool}
+          { \msg_warning:nnn { wisper } { enabling-feature } { #1 } }
+        \bool_gset_true:c { g__wisper_feature_ #1 _enabled_bool }
       }
   }
 \prg_new_conditional:Npnn \__wisper_if_feature_enabled:n #1 { T, F, TF }
   {
-    \bool_if:cTF {g__wisper_feature_ #1 _enabled_bool}
+    \bool_if:cTF { g__wisper_feature_ #1 _enabled_bool }
       { \prg_return_true: } { \prg_return_false: }
   }
 \cs_new:Npn \__wisper_enable_feature_set_options:nn #1#2
   {
-    \__wisper_enable_feature:n {#1}
-    \__wisper_set_feature_config:nn {#1}  {options={#2}}
+    \__wisper_enable_feature:n { #1 }
+    \__wisper_set_feature_config:nn { #1 }  { options={#2} }
   }
 \cs_new:Npn \__wisper_disable_features_group_except_group:nn #1#2
   {
-    \__wisper_loop_features_groups:nn {#1}
+    \__wisper_loop_features_groups:nn { #1 }
       {
-        \seq_if_in:cnF {g__wisper_all_features_ #2 _seq} {##1}
-          { \__wisper_disable_feature:n {##1} }
+        \seq_if_in:cnF { g__wisper_all_features_ #2 _seq } { ##1 }
+          { \__wisper_disable_feature:n { ##1 } }
       }
     }
 \cs_new:Npn \__wisper_activate_feature_dep_set_options:nn #1#2
   {
-    %\msg_warning:nnn { wisper } { enabling-feature } {Dep:~#1}
-    \__wisper_enable_feature:n {#1}
-    \__wisper_set_feature_config:nn {#1}  {options={#2}}
+    %\msg_warning:nnn { wisper } { enabling-feature } { Dep:~#1 }
+    \__wisper_enable_feature:n { #1 }
+    \__wisper_set_feature_config:nn { #1 }  { options={#2} }
     % Recursively activate dependencies.
-    \__wisper_activate_feature:n {#1}
+    \__wisper_activate_feature:n { #1 }
   }
 \cs_new:Npn \__wisper_activate_feature_dep:n #1
   {
-    %\msg_warning:nnn { wisper } { enabling-feature } {Dep:~#1}
-    \__wisper_enable_feature:n {#1}
+    %\msg_warning:nnn { wisper } { enabling-feature } { Dep:~#1 }
+    \__wisper_enable_feature:n { #1 }
     % Recursively activate dependencies.
-    \__wisper_activate_feature:n {#1}
+    \__wisper_activate_feature:n { #1 }
   }
 \cs_new:Npn \__wisper_activate_feature:n #1
   {
     \__wisper_if_debug:nT { features }
-      { \msg_warning:nnn { wisper } { check-activating-feature } {#1} }
-    \__wisper_should_load_feature:nT {#1}
+      { \msg_warning:nnn { wisper } { check-activating-feature } { #1 } }
+    \__wisper_should_load_feature:nT { #1 }
       {
-        \bool_if:cF {g__wisper_feature_ #1 _activated_bool}
+        \bool_if:cF { g__wisper_feature_ #1 _activated_bool }
           {
             \__wisper_if_debug:nT { features }
               {
                 \msg_warning:nnxx { wisper } { activating-feature }
-                  {#1} { \clist_use:cn { g__wisper_feature_ #1 _dependencies_clist } { ,~ } }
+                  { #1 } { \clist_use:cn { g__wisper_feature_ #1 _dependencies_clist } { ,~ } }
               }
             \keyval_parse:NNv
               \__wisper_activate_feature_dep:n
               \__wisper_activate_feature_dep_set_options:nn
-              {g__wisper_feature_ #1 _dependencies_clist}
-            \__wisper_store_classopts_from_clist:v {g__wisper_feature_ #1 _classopts_clist}
-            \bool_gset_true:c {g__wisper_feature_ #1 _activated_bool}
+              { g__wisper_feature_ #1 _dependencies_clist }
+            \__wisper_store_classopts_from_clist:v { g__wisper_feature_ #1 _classopts_clist }
+            \bool_gset_true:c { g__wisper_feature_ #1 _activated_bool }
           }
       }
   }
 \cs_new:Npn \__wisper_enable_features:n #1
   {
-    \clist_map_function:nN {#1} \__wisper_enable_feature:n
+    \clist_map_function:nN { #1 } \__wisper_enable_feature:n
   }
 \cs_new:Npn \__wisper_activate_features:n #1
   {
-    \clist_map_function:nN {#1} \__wisper_activate_feature:n
+    \clist_map_function:nN { #1 } \__wisper_activate_feature:n
   }
 \cs_new:Npn \__wisper_loop_features_groups:nN #1#2
   {
-    \clist_map_inline:nn {#1}
+    \clist_map_inline:nn { #1 }
       {
-        \seq_map_inline:cn {g__wisper_all_features_ ##1 _seq}
-          { #2 {####1} }
+        \seq_map_inline:cn { g__wisper_all_features_ ##1 _seq }
+          { #2 { ####1 } }
       }
   }
 \cs_new:Npn \__wisper_loop_features_groups:nn #1#2
   {
     \cs_set:Npn \l_tmpa_cs:n ##1 { #2 }
-    \__wisper_loop_features_groups:nN {#1} \l_tmpa_cs:n
+    \__wisper_loop_features_groups:nN { #1 } \l_tmpa_cs:n
   }
 \cs_new:Npn \__wisper_activate_features_group:n #1
-  { \__wisper_loop_features_groups:nN {#1} \__wisper_activate_feature:n }
+  { \__wisper_loop_features_groups:nN { #1 } \__wisper_activate_feature:n }
 \msg_new:nnn { wisper } { feature-executing } { Executing~feature-code~'#1'. }
 \cs_new:Nn \__wisper_load_features: 
   {
@@ -513,18 +515,18 @@
       {
         \__wisper_if_debug:nT { features }
           { \msg_warning:nnn { wisper } { feature-executing } {##1} }
-        \use:n {##2}
+        \use:n { ##2 }
       }
   }
 
 \cs_new:Npn \__wisper_declare_mutually_exclusive_features:n #1
   {
     % When enabling one such feature, disable all of the others
-    \clist_map_inline:nn {#1}
+    \clist_map_inline:nn { #1 }
       {
-        \clist_put_right:cn {g__wisper_feature_ ##1 _conflicting_features_clist}
-          {#1}
-        \clist_gremove_duplicates:c {g__wisper_feature_ ##1 _conflicting_features_clist}
+        \clist_put_right:cn { g__wisper_feature_ ##1 _conflicting_features_clist }
+          { #1 }
+        \clist_gremove_duplicates:c { g__wisper_feature_ ##1 _conflicting_features_clist }
       }
   }
 
@@ -532,17 +534,17 @@
 \seq_new:N \g__wisper_all_features_main_seq
 \cs_new:Npn \__wisper_declare_feature:nnn #1#2#3
   {
-    \seq_put_right:Nn \g__wisper_all_features_main_seq {#1}
-    \__wisper_declare_feature_aux:nnn {#1} {#2} {#3}
+    \seq_put_right:Nn \g__wisper_all_features_main_seq { #1 }
+    \__wisper_declare_feature_aux:nnn { #1 } { #2 } { #3 }
   }
 \cs_generate_variant:Nn \__wisper_declare_feature:nnn { nnx }
 \cs_generate_variant:Nn \bool_show:n { x }
 \cs_new:Npn \__wisper_declare_feature_expand_conditional:nnn #1#2#3
   {
     % Regex magic adapted from @egreg's code, https://tex.stackexchange.com/a/283944/111880
-    \tl_set:Nn \l_tmpa_tl {#3}
+    \tl_set:Nn \l_tmpa_tl { #3 }
     % prefix any cs in the tl with \noexpand
-    \regex_replace_all:nnN { (\cC.) } { \c{exp_not:N}\1 } \l_tmpa_tl
+    \regex_replace_all:nnN { (\cC.) } { \c{ exp_not:N } \1 } \l_tmpa_tl
     % remove the \noexpand from selected cs'
     \clist_map_inline:nn
       {
@@ -561,9 +563,9 @@
         IfDocClassT,
       }
       {
-        \regex_replace_all:nnN { \c{exp_not:N}(\c{##1}) } { \1 } \l_tmpa_tl
+        \regex_replace_all:nnN { \c{ exp_not:N }(\c{ ##1 }) } { \1 } \l_tmpa_tl
       }
-    \__wisper_declare_feature:nnx {#1} {#2}
+    \__wisper_declare_feature:nnx { #1 } { #2 }
       {
         % Actually expand the conditonals only when the feature is activated.
         % This ensures that documentclass and the like are actually set.
@@ -582,22 +584,22 @@
     % number errors here...
     \bool_if:nTF
       {
-        { \bool_not_p:v {g__wisper_feature_ #1 _enabled_bool} } ||
-        { \bool_if_p:v {g__wisper_feature_ #1 _loaded_bool} } ||
-        { \__wisper_if_engine_p:v {g__wisper_feature_ #1 _deactivated_for_engines_strlist} }
-        %{ \__wisper_if_document_class_p:v {g__wisper_feature_ #1 _deactivated_for_classes_strlist} }
+        { \bool_not_p:v { g__wisper_feature_ #1 _enabled_bool } } ||
+        { \bool_if_p:v { g__wisper_feature_ #1 _loaded_bool } } ||
+        { \__wisper_if_engine_p:v { g__wisper_feature_ #1 _deactivated_for_engines_strlist } }
+        %{ \__wisper_if_document_class_p:v { g__wisper_feature_ #1 _deactivated_for_classes_strlist } }
       }
       { \prg_return_false: } { \prg_return_true: }
   }
 \cs_new:Npn \__wisper_load_feature:n #1
   {
     \__wisper_if_debug:nT { features }
-      { \msg_warning:nnn { wisper } { check-loading-feature } {#1} }
-    \__wisper_should_load_feature:nT {#1}
+      { \msg_warning:nnn { wisper } { check-loading-feature } { #1 } }
+    \__wisper_should_load_feature:nT { #1 }
       {
         \__wisper_if_debug:nT { features }
-          { \msg_warning:nnn { wisper } { loading-feature } {#1} }
-        \bool_gset_true:c {g__wisper_feature_ #1 _loaded_bool}
+          { \msg_warning:nnn { wisper } { loading-feature } { #1 } }
+        \bool_gset_true:c { g__wisper_feature_ #1 _loaded_bool }
         \bool_if:cT { g__wisper_feature_ #1 _expl3_bool }
           { \__wisper_shipout:n { \ExplSyntaxOn } }
         \use:c {g__wisper_feature_ #1 _code_tl}
@@ -614,8 +616,8 @@
 \cs_new:Npn \__wisper_declare_font:nnn #1#2#3
   {
     %\seq_put_right:Nn \g__wisper_all_features_font_seq {#1}
-    \seq_put_right:Nn \g__wisper_all_features_font_seq {#1}
-    \__wisper_declare_feature_aux:nnn {#1} { #2, groups=font_only } {#3}
+    \seq_put_right:Nn \g__wisper_all_features_font_seq { #1 }
+    \__wisper_declare_feature_aux:nnn { #1 } { #2, groups=font_only } { #3 }
   }
 % Special case features: packages [[[2
 \cs_new:Npn \__wisper_declare_ordinary_feature:nnn #1#2#3
@@ -626,59 +628,59 @@
 \seq_new:N \g__wisper_all_features_packages_seq
 \cs_new:Npn \__wisper_declare_package:nnn #1#2#3
   {
-    \seq_put_right:Nn \g__wisper_all_features_packages_seq {#1}
+    \seq_put_right:Nn \g__wisper_all_features_packages_seq { #1 }
     \__wisper_keys_define_doc:n
       {
         features/#1/options .code:n =
-          { \__wisper_shipout:n { \PassOptionsToPackage {##1} {#1} } },
+          { \__wisper_shipout:n { \PassOptionsToPackage { ##1 } { #1 } } },
       }
-    \__wisper_declare_feature_aux:nnn {#1} {#2}
+    \__wisper_declare_feature_aux:nnn { #1 } { #2 }
       {
         \__wisper_shipout:n
           {
-            \usepackage{#1}
+            \usepackage { #1 }
             #3
           }
       }
   }
 \cs_new:Npn \__wisper_declare_package:nn #1#2
-  { \__wisper_declare_package:nnn {#1} {#2} {} }
+  { \__wisper_declare_package:nnn { #1 } { #2 } { } }
 \cs_new:Npn \__wisper_declare_package:n #1
-  { \__wisper_declare_package:nnn {#1} {} {} }
+  { \__wisper_declare_package:nnn { #1 } { } { } }
 \cs_new:Npn \__wisper_declare_packages:n #1
   {
     \keyval_parse:NNn
       \__wisper_declare_package:n
       \__wisper_declare_package:nn
-      {#1}
+      { #1 }
   }
 
 % Special case features: document classes [[[2
 \seq_new:N \g__wisper_all_features_documentclass_seq
 \cs_new:Npn \__wisper_store_classopt:nn #1#2
-  { \prop_put:Nnn \g__wisper_classopts_prop {#1} {#2} }
+  { \prop_put:Nnn \g__wisper_classopts_prop { #1 } { #2 } }
 \cs_generate_variant:Nn \__wisper_store_classopt:nn { nV }
 \cs_new:Npn \__wisper_store_classopt:n #1
   % Need to expand this once in order for \tl_if_novalue:nTF to work.
-  { \prop_put:Nno \g__wisper_classopts_prop {#1} {\c_novalue_tl} }
+  { \prop_put:Nno \g__wisper_classopts_prop { #1 } { \c_novalue_tl } }
 \cs_new:Npn \__wisper_store_classopts_from_clist:n #1
   {
     \keyval_parse:NNn
       \__wisper_store_classopt:n
       \__wisper_store_classopt:nn
-      {#1}
+      { #1 }
   }
 \cs_generate_variant:Nn \__wisper_store_classopts_from_clist:n { v }
 \cs_new:Npn \__wisper_declare_documentclass:nn #1#2
   {
-    \seq_put_right:Nn \g__wisper_all_features_documentclass_seq {class-#1}
+    \seq_put_right:Nn \g__wisper_all_features_documentclass_seq { class-#1 }
     \__wisper_keys_define_doc:n
       {
         % TODO: maybe store this as features/documentclass/options ?
         features/class-#1/options .meta:n =
-          { features/class-#1/classoptions = {##1} }
+          { features/class-#1/classoptions = { ##1 } }
       }
-    \__wisper_declare_feature_aux:nnn {class-#1} {#2}
+    \__wisper_declare_feature_aux:nnn { class-#1 } { #2 }
       {
         \__wisper_load_with_optional_arg:NNn
           \documentclass
@@ -687,22 +689,22 @@
       }
   }
 \cs_new:Npn \__wisper_declare_documentclass:n #1
-  { \__wisper_declare_documentclass:nn {#1} {} }
+  { \__wisper_declare_documentclass:nn { #1 } { } }
 
 % Special case features: document types [[[2
 % TODO: maybe rename 'document type' -> 'preset'?
 \seq_new:N \g__wisper_all_features_types_seq
 \cs_new:Npn \__wisper_declare_document_type:nnn #1#2#3
   {
-    \seq_put_right:Nn \g__wisper_all_features_types_seq {#1}
-    \__wisper_declare_feature_aux:nnn {#1} {#2}
+    \seq_put_right:Nn \g__wisper_all_features_types_seq { #1 }
+    \__wisper_declare_feature_aux:nnn { #1 } { #2 }
       {
-        \str_set:Nn \g__wisper_document_type_str {#1}
+        \str_set:Nn \g__wisper_document_type_str { #1 }
         \__wisper_shipout:n { #3 }
       }
   }
 \cs_new:Npn \__wisper_declare_document_type:nn #1#2
-  { \__wisper_declare_document_type:nnn {#1} {#2} { } }
+  { \__wisper_declare_document_type:nnn { #1 } { #2 } { } }
 
 % Feature declarations [[[1
 
