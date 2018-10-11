@@ -158,6 +158,10 @@
   { Checking~whether~to~activate~feature~'#1'. }
 \msg_new:nnn { wisper } { activating-feature }
   { Activating~feature~'#1'~and~dependencies~'#2'. }
+\msg_new:nnn { wisper } { check-activating-dependency }
+  { Checking~whether~to~activate~dependency~'#1'. }
+\msg_new:nnn { wisper } { activating-dependency }
+  { Activating~dependency~'#1'. }
 \msg_new:nnn { wisper } { check-loading-feature }
   { Checking~whether~to~load~feature~'#1'. }
 \msg_new:nnn { wisper } { loading-feature }
@@ -450,6 +454,8 @@
     }
 \cs_new:Npn \__wisper_activate_feature_dep_set_options:nn #1#2
   {
+    \__wisper_if_debug:nT { features }
+      { \msg_warning:nnx { wisper } { activating-dependency } { #1 } }
     %\msg_warning:nnn { wisper } { enabling-feature } { Dep:~#1 }
     \__wisper_enable_feature:n { #1 }
     \__wisper_set_feature_config:nn { #1 }  { options={#2} }
@@ -458,6 +464,8 @@
   }
 \cs_new:Npn \__wisper_activate_feature_dep:n #1
   {
+    \__wisper_if_debug:nT { features }
+      { \msg_warning:nnx { wisper } { activating-dependency } { #1 } }
     %\msg_warning:nnn { wisper } { enabling-feature } { Dep:~#1 }
     \__wisper_enable_feature:n { #1 }
     % Recursively activate dependencies.
