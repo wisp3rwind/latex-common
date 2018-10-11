@@ -466,10 +466,6 @@
   {
     \__wisper_if_debug:nT { features }
       { \msg_warning:nnn { wisper } { check-activating-feature } {#1} }
-    %\bool_show:c {g__wisper_feature_ #1 _enabled_bool}
-    %\bool_show:c {g__wisper_feature_ #1 _loaded_bool}
-    %\bool_show:x { \__wisper_if_engine_p:v {g__wisper_feature_ #1 _deactivated_for_engines_strlist} }
-    %\bool_show:x { \__wisper_if_document_class_p:v {g__wisper_feature_ #1 _deactivated_for_classes_strlist} }
     \__wisper_should_load_feature:nT {#1}
       {
         \bool_if:cF {g__wisper_feature_ #1 _activated_bool}
@@ -479,9 +475,6 @@
                 \msg_warning:nnxx { wisper } { activating-feature }
                   {#1} { \clist_use:cn { g__wisper_feature_ #1 _features_clist } }
               }
-            %\tl_show:c {g__wisper_feature_ #1 _features_clist}
-            % TODO: only enable dependencies immediately before loading the first
-            % features. Otherwise, later disabling will not unload the dependencies.
             \keyval_parse:NNv
               \__wisper_activate_feature_dep:n
               \__wisper_activate_feature_dep_set_options:nn
