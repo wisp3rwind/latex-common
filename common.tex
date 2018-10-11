@@ -336,7 +336,7 @@
     \bool_gset_false:c {g__wisper_feature_ #1 _enabled_bool}
     \bool_gset_false:c {g__wisper_feature_ #1 _activated_bool}
     \bool_gset_false:c {g__wisper_feature_ #1 _loaded_bool}
-    \clist_new:c {g__wisper_feature_ #1 _features_clist}
+    \clist_new:c {g__wisper_feature_ #1 _dependencies_clist}
     \tl_gset:cn {g__wisper_feature_ #1 _code_tl} {#3}
     \bool_gset_false:c {g__wisper_feature_ #1 _expl3_bool}
     \clist_new:c {g__wisper_feature_ #1 _conflicting_features_clist}
@@ -361,8 +361,7 @@
               }
           },
 
-        features/#1/requires .clist_gset:c = {g__wisper_feature_ #1 _features_clist},
-          %{ \clist_gput_right:cn = {g__wisper_feature_ #1 _features_clist} {##1} },
+        features/#1/requires .clist_gset:c = {g__wisper_feature_ #1 _dependencies_clist},
         % FIXME: Cannot work since the conditional must be parsed when at least
         % the document class has been loaded. Maybe restrict the conditonals
         % that are allowed here to document classes.
@@ -372,7 +371,7 @@
         %      {
         %        \bool_if:xT { \use_i:nn ####1 }
         %          {
-        %            \clist_gput_right:cx {g__wisper_feature_ #1 _features_clist}
+        %            \clist_gput_right:cx {g__wisper_feature_ #1 _dependencies_clist}
         %              { \use_ii:nn ####1 }
         %          }
         %      }
@@ -473,12 +472,12 @@
             \__wisper_if_debug:nT { features }
               {
                 \msg_warning:nnxx { wisper } { activating-feature }
-                  {#1} { \clist_use:cn { g__wisper_feature_ #1 _features_clist } }
+                  {#1} { \clist_use:cn { g__wisper_feature_ #1 _dependencies_clist } { ,~ } }
               }
             \keyval_parse:NNv
               \__wisper_activate_feature_dep:n
               \__wisper_activate_feature_dep_set_options:nn
-              {g__wisper_feature_ #1 _features_clist}
+              {g__wisper_feature_ #1 _dependencies_clist}
             \__wisper_store_classopts_from_clist:v {g__wisper_feature_ #1 _classopts_clist}
             \bool_gset_true:c {g__wisper_feature_ #1 _activated_bool}
           }
