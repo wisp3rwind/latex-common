@@ -52,6 +52,7 @@
 
 % Additions to l3kernel [[[1
 % \__wisper_strlist_if_in:nn, code is very similar to \__prop_if_in [[[2
+% in contrast to \clist_if_in:nn, this is expandable
 \prg_new_conditional:Npnn \__wisper_strlist_if_in:nn #1#2 { p, T, F, TF }
   {
     \__wisper_strlist_if_in:nww { #2 } #1 , #2 , \q_recursion_tail
