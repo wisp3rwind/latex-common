@@ -224,9 +224,6 @@
 \cs_new_eq:NN \union \cup
 \cs_new_eq:NN \intersection \cap
 
-\cs_new_eq:NN \Union \bigcup
-\cs_new_eq:NN \Intersection \bigcap
-
 \ExplSyntaxOff
 
 
@@ -453,29 +450,70 @@
   }
 \cs_gset_eq:NN \Int \Integrate
 
-\ExplSyntaxOff
 
-% TODO: port \Sum and \Prod, too, and write starred versions that use \limits
 % TODO: \Int{f}{x,1,3;y,0,10}
 % TODO: \Iint, \Iiint, \Iiiint, \Idotsint{f(x_1,\ldots,x_n)}{x_1,0,\infty;...;x_j,\R;...;x_n,0,\infty}
-% TODO: \Union, \Intersection, \Infimum, \Supremum, \Limes
+% TODO: \Infimum, \Supremum, \Limes
 
-% COOL prints the '=' also if the second argument is empty...
-\NewDocumentCommand\SumInternal{m m m m}{%
-    \sum%
-    \IfValueT{#2}{_%
-        {#2\IfValueT{#3}{%
-            \if\relax\detokenize{#3}\relax%
-            \else%
-                = #3%
-            \fi}}%
-        }%
-    \IfValueT{#4}{^{#4}}%
-    #1%
-}
-\DeclareDocumentCommand\Sum{ >{\SplitArgument{2}{,}} m m }{%
-    \SumInternal{#2}#1
-}
+% Other 'Big' operators [[[1
+
+\prg_new_conditional:Npnn \__wisper_tl_if_novalue_or_blank:n #1 { p, T, F, TF }
+  {
+    \bool_if:nTF { \tl_if_novalue_p:n {#1} || \tl_if_blank_p:n {#1} }
+      { \prg_return_true: } { \prg_return_false: }
+  }
+\cs_new:Npn \__wisper_operator_with_limits:Nnnnnn #1#2#3#4#5#6
+  {
+    #1
+    \bool_if:nT {#2 && (!\tl_if_blank_p:n {#4} || !\tl_if_blank_p:n {#6}) }
+      {
+        % only add this if there's a sub- or superscript to show
+        \limits
+      }
+    \tl_if_blank:nF {#4}
+      {
+        \c_math_subscript_token
+          {
+            #4
+            \tl_if_blank:nF {#5}
+              { = #5 }
+          }
+      }
+    \tl_if_blank:nF {#6}
+      {
+        \c_math_superscript_token {#6}
+      }
+    #3
+  }
+\cs_new:Npn \__wisper_big_operator_with_limits_aux:Nnnw #1#2#3 #4,#5,#6, #7 \q_stop
+  {
+    \__wisper_operator_with_limits:Nnnnnn #1 {#2} {#3} {#4} {#5} {#6}
+  }
+\cs_new:Npn \__wisper_declare_big_operator_with_limits:NN #1#2
+  {
+    %\DeclareDocumentCommand #1 { s >{\SplitArgument{2}{,}} o m }
+    \DeclareDocumentCommand #1 { s o m }
+      {
+        % Starred version uses \limits
+        \tl_if_novalue:nTF {##2}
+          { \__wisper_operator_with_limits:Nnnnnn #2 {##1} {##3} { } { } { } }
+          { \__wisper_big_operator_with_limits_aux:Nnnw #2 {##1} {##3} ##2 , , , \q_stop }
+      }
+  }
+\__wisper_declare_big_operator_with_limits:NN \Prod \prod
+\__wisper_declare_big_operator_with_limits:NN \Sum \sum
+\__wisper_declare_big_operator_with_limits:NN \Coprod \coprod
+\__wisper_declare_big_operator_with_limits:NN \DirectSum \bigoplus
+\__wisper_declare_big_operator_with_limits:NN \TensorProd \bigotimes
+%\__wisper_declare_big_operator_with_limits:NN \Bigodot \bigodot
+\__wisper_declare_big_operator_with_limits:NN \Union \bigcup
+\__wisper_declare_big_operator_with_limits:NN \Intersection \bigcap
+%\__wisper_declare_big_operator_with_limits:NN \Biguplus \biguplus
+%\__wisper_declare_big_operator_with_limits:NN \Bigsqcup \bigsqcup
+%\__wisper_declare_big_operator_with_limits:NN \Bigvee \bigvee
+%\__wisper_declare_big_operator_with_limits:NN \Bigwedge \bigwedge
+
+\ExplSyntaxOff
 
 % combinatorics [[[1
 % \bincoef{N \\ k}

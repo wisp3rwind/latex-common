@@ -2,6 +2,17 @@
 \DocumentStyle{main_language=english}
 \Preamble{scrbook, font-TexGyre, math, phys, minted-default, koma-misc}
 
+\ExplSyntaxOn
+\NewDocumentCommand \Example { O{displaymath} v }
+  {
+    \texttt{#2}
+    \quad
+    \begin{#1}
+      \tl_rescan:nn {}{#2}
+    \end{#1}
+  }
+\ExplSyntaxOff
+
 \usepackage{blindtext}
 \usepackage{lipsum}
 
@@ -141,6 +152,21 @@ no spacing will applied.
 
 
 \subsection{Symbols}
+
+\subsection{Big operators}
+These all support the same syntax
+\begin{itemize}
+  \item \Example|\Prod{a_i}|
+  \item \Example|\Prod{a_i}|
+  \item \Example|\Prod[i, 1, N]{a_i}|
+  \item \Example|\Sum[i, 1, N]{a_i}|
+  \item \Example|\Sum[i \in I]{a_i}|
+  \item \Example|{(ABC)}_{ij} = \Prod[{k,l}, 1, N]{a_{ik} b_{kl} c_{lj}}|
+  \item \Example|X = \Coprod[j \in J]{X_j}|
+  \item \Example|X = \TensorProd[j \in J]{X_j}|
+  \item \Example|X = \Union[j \in J]{X_j}|
+  \item \Example|X = \Intersection[j \in J]{X_j}|
+\end{itemize}
 
 \subsubsection{Sets}
 
