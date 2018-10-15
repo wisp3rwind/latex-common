@@ -123,6 +123,14 @@
     \image (#1)
   }
 
+% TODO: maybe automize definition of the following very similar commands
+\DeclarePairedDelimiter \__wisper_bracketize_aux:w \lbrack \rbrack
+\cs_new:Npn \__wisper_bracketize:nn #1
+  {
+    \IfBooleanTF {#1}
+      { \__wisper_bracketize_aux:w* }
+      { \__wisper_bracketize_aux:w }
+  }
 \DeclarePairedDelimiter \__wisper_embrace_aux:w \lbrace \rbrace
 \cs_new:Npn \__wisper_embrace:nn #1
   {
@@ -137,7 +145,7 @@
       { \__wisper_parenthesize_aux:w* }
       { \__wisper_parenthesize_aux:w }
   }
-  \cs_new:Npn \__wisper_surround_none:n #1 { #1 }
+\cs_new:Npn \__wisper_surround_none:n #1 { #1 }
 \cs_new:Npn \__wisper_surround_none:w
   {
     \peek_charcode_remove_ignore_spaces:NTF *
@@ -145,6 +153,7 @@
       { \__wisper_surround_none:n }
       { \__wisper_surround_none:n }
   }
+
 % TODO style variants: \MathStyle{trace-symbol = tr|Tr}
 \DeclareMathOperator { \__wisper_operator_trace: } {tr}
 % TODO style variants: \MathStyle{trace-parens = parenthesis|curly|square|none}
@@ -245,12 +254,12 @@
 { \__wisper_argument_or_empty:n {#1} , \__wisper_argument_or_empty:n {#2} }
 \cs_gset_eq:NN \IProd \InnerProduct
 
-\ExplSyntaxOff
-
 
 % Equivalence relations, quotient spaces, ... [[[1
-\DeclarePairedDelimiter\EquivalenceClass{\lbrack}{\rbrack}
-\let\EqClass\EquivalenceClass
+\cs_gset_eq:NN \EquivalenceClass \__wisper_bracketize_aux:w
+\cs_gset_eq:NN \EqClass \EquivalenceClass
+
+\ExplSyntaxOff
 
 
 % ranges [[[1
@@ -798,7 +807,7 @@
     \__wisper_declare_document_command:cnn { p #1 deriv } { m o m }
       { \__wisper_derivative:NNnnn \__wisper_parenthesize_aux:w #2 {##1} {##2} {##3} }
     \__wisper_declare_document_command:cnn { b #1 deriv } { m o m }
-      { \__wisper_derivative:NNnnn \__wisper_embrace_aux:w     #2 {##1} {##2} {##3} }
+      { \__wisper_derivative:NNnnn \__wisper_bracketize_aux:w   #2 {##1} {##2} {##3} }
   }
 
 \__wisper_define_derivative_command:nN { t } \dif
