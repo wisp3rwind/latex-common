@@ -50,7 +50,6 @@
 \cs_generate_variant:Nn \msg_error:nnnn { nnnx }
 
 
-
 % Additions to l3kernel [[[1
 % \__wisper_strlist_if_in:nn, code is very similar to \__prop_if_in [[[2
 % in contrast to \clist_if_in:nn, this is expandable
@@ -177,7 +176,10 @@
 \seq_new:N \g__wisper_preamble_seq
 \cs_new:Npn \__wisper_shipout:n #1
   {
-    \seq_gput_right:Nn \g__wisper_preamble_seq {#1}
+    % Reading the code as an argument will have doubled hashes, undo this
+    \tl_set:Nn \l_tmpa_tl { #1 }
+    \regex_replace_all:nnN { \cP\# } { \cO\# } \l_tmpa_tl
+    \seq_gput_right:NV \g__wisper_preamble_seq \l_tmpa_tl
     \__wisper_if_debug:nT { shipout }
       { \seq_show:N \g__wisper_preamble_seq }
   }
@@ -1124,6 +1126,7 @@
       biblatex-default-verbosity,
       footnotecite,
     },
+    expl3 = true,
   }
   {
     \newlength { \spc }

@@ -1,6 +1,9 @@
 % TODO: add ensuremath everywhere where appropriate
 % TODO: Remove macros already provided by the cool package
 % TODO: re-implement physics.sty and braket.sty
+% TODO: ensure that starred versions of commands only ever mean resizing version
+% and nothing else
+% TODO: support \Op[\big] syntax to override size for as many commands as possible
 
 \usepackage{xparse}
 \usepackage{amsmath,amssymb,amsthm}
@@ -75,8 +78,6 @@
       { \prg_return_false: }
   }
 \cs_generate_variant:Nn \__wisper_if_integer:nTF { xTF }
-
-\ExplSyntaxOff
 
 % helpers [[[1
 % TODO: use DeclarePairedDelimiter, also see
