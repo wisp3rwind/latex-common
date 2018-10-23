@@ -48,6 +48,7 @@
 \cs_generate_variant:Nn \bool_if:nT { xT }
 \cs_generate_variant:Nn \keyval_parse:NNn { NNv, NNo }
 \cs_generate_variant:Nn \msg_error:nnnn { nnnx }
+\exp_args_generate:n { nxx } % -> \exp_args:Nnxx
 
 
 % Additions to l3kernel [[[1
@@ -1514,6 +1515,87 @@
       }
   }
 
+% Boxes [[[2
+\__wisper_declare_packages:n
+  {
+    mdframed,
+    xtemplate,
+  }
+\__wisper_declare_ordinary_feature:nnn { boxes }
+  {
+    requires = 
+      {
+        mdframed,
+        xtemplate,
+        xcolor,
+      },
+    expl3=true,
+  }
+  {
+    \dim_new:N \l__wisper_left_margin_dim
+    \DeclareObjectType { fancy-box } { 1 }
+    \DeclareTemplateInterface { fancy-box } { wisper } { 1 }
+      {
+        title-format: tokenlist = { \bfseries { \Title } },
+        bar-location: choice {margin, flush} = flush,
+        bar-width: length = 0.15cm,
+        bar-colour: tokenlist = {black},
+        bg-colour: tokenlist = {white},
+      }
+    \DeclareTemplateCode { fancy-box } { wisper } { 1 }
+      {
+        title-format = \l__wisper_title_format_tl,
+        bar-location =
+          {
+            margin = { \bool_gset_true:N \l__wisper_bar_in_margin_bool },
+            flush = { \bool_gset_false:N \l__wisper_bar_in_margin_bool },
+          },
+        bar-width = \l__wisper_bar_width_dim,
+        bar-colour = \l__wisper_bar_colour_tl,
+        bg-colour = \l__wisper_bg_colour_tl,
+      }
+      {
+        \AssignTemplateKeys
+        \bool_if:NTF \l__wisper_bar_in_margin_bool
+          { \dim_set:Nn \l__wisper_left_margin_dim { -1cm} }
+          { \dim_set:Nn \l__wisper_left_margin_dim { 0pt } }
+        \tl_show:n {#1}
+        \use:x
+          {
+            \exp_not:N \newmdenv
+              [
+                skipabove=0.3 \exp_not:N \baselineskip,
+                skipbelow=0.3 \exp_not:N \baselineskip,
+                rightline=false,
+                leftline=true,
+                topline=false,
+                bottomline=false,
+                linecolor=\l__wisper_bar_colour_tl,
+                backgroundcolor=\l__wisper_bg_colour_tl,
+                innerleftmargin=5pt,
+                innerrightmargin=5pt,
+                innertopmargin=3pt,
+                innerbottommargin=3pt
+                leftmargin=\l__wisper_left_margin_dim,
+                rightmargin=0cm,
+                linewidth=\l__wisper_bar_width_dim,
+              ]
+              { #1 }
+          }
+      }
+    \cs_new:Npn \NewFancyBox #1#2
+      {
+        \exp_args:Nnx
+          \DeclareInstance { fancy-box } { \tl_trim_spaces:n { #1 } } { wisper } { #2 }
+        \exp_args:Nnxx
+          \UseInstance { fancy-box } { \tl_trim_spaces:n { #1 } } { \tl_trim_spaces:n { #1 } }
+      }
+    \cs_new:Npn \NewFancyTheoremBox #1#2#3
+      {
+        % TODO: implement using \newmdtheoremenv
+      }
+  }
+
 % Loading orders [[[1
 
 % TODO: automatically set these clists from \__wisper_declare_feature:
@@ -1546,9 +1628,7 @@
     fancyhdr,
     ragged2e,
     url,
-
-    % colors
-    xcolor,
+    mdframed,
 
     % tables
     rotating,
