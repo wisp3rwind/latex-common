@@ -313,43 +313,60 @@
 % From https://tex.stackexchange.com/questions/44017/dot-notation-for-derivative-of-a-vector/44071#44071
 % --- Macro \xvec
 \ExplSyntaxOff
+\expandafter \def \csname __wisper_xvec_tikzpicture:nn\endcsname #1#2%
+  {%
+    % #1 is width
+    % #2 are the dot locations
+    \begin{tikzpicture}[scale=1]%
+        \pgfsetroundcap%
+        %\draw[-{Stealth[width=0.1em, length=0.075em, slant=.3]}] (.05em,0)--(\xvec@width-.05em,0);
+        %\draw[-{Straight Barb[left,width=0.1em, length=0.075em, slant=.3]}] (.05em,0)--(\xvec@width-.05em,0);
+        \draw[-{Classical TikZ Rightarrow[width=0.2em, length=0.15em, slant=.3]}] (.05em,0)--(#1-.05em,0);%
+        %\draw[-{Classical TikZ Rightarrow[left, width=0.2em, length=0.1em, slant=.3]}] (.05em,0)--(\xvec@width-.05em,0);
+        %\draw (\xvec@width-.05em,0)--(\xvec@width-.15em, .075em);
+        %\draw (\xvec@width-.05em,0)--(\xvec@width-.15em,-.075em);
+        \foreach \x in {#2}%
+          \fill(#1*\x,.5ex) circle (.6pt);%
+    \end{tikzpicture}%%
+  }%
+\ExplSyntaxOn
+%\cs_gset:Npn \__wisper_xvec_tikzpicture:nn #1#2
+%  {
+%    \tl_show:n {#1} 
+%    \tl_show:n {#2} 
+%  }
+\cs_generate_variant:Nn \__wisper_xvec_tikzpicture:nn { nf }
 \makeatletter
-\newlength\xvec@height%
-\newlength\xvec@depth%
-\newlength\xvec@width%
-\newcommand{\xvec}[2][]{%
-    \ifmmode%
-        \settoheight{\xvec@height}{$#2$}%
-        \settodepth{\xvec@depth}{$#2$}%
-        \settowidth{\xvec@width}{$#2$}%
-    \else%
-        \settoheight{\xvec@height}{#2}%
-        \settodepth{\xvec@depth}{#2}%
-        \settowidth{\xvec@width}{#2}%
-    \fi%
-    \def\xvec@arg{#1}%
-    \def\xvec@dd{:}%
-    \def\xvec@d{.}%
-    \raisebox{.1ex}{\raisebox{\xvec@height}{\rlap{%
-        \kern.05em%  (Because left edge of drawing is at .05em)
-        \begin{tikzpicture}[scale=1]
-            \pgfsetroundcap
-            %\draw[-{Stealth[width=0.1em, length=0.075em, slant=.3]}] (.05em,0)--(\xvec@width-.05em,0);
-            %\draw[-{Straight Barb[left,width=0.1em, length=0.075em, slant=.3]}] (.05em,0)--(\xvec@width-.05em,0);
-            \draw[-{Classical TikZ Rightarrow[width=0.2em, length=0.15em, slant=.3]}] (.05em,0)--(\xvec@width-.05em,0);
-            %\draw[-{Classical TikZ Rightarrow[left, width=0.2em, length=0.1em, slant=.3]}] (.05em,0)--(\xvec@width-.05em,0);
-            %\draw (\xvec@width-.05em,0)--(\xvec@width-.15em, .075em);
-            %\draw (\xvec@width-.05em,0)--(\xvec@width-.15em,-.075em);
-            \ifx\xvec@arg\xvec@d%
-                \fill(\xvec@width*.45,.5ex) circle (.6pt);%
-            \else\ifx\xvec@arg\xvec@dd%
-                \fill(\xvec@width*.30,.5ex) circle (.6pt);%
-                \fill(\xvec@width*.65,.5ex) circle (.6pt);%
-            \fi\fi%
-        \end{tikzpicture}%
-    }}}%
-    #2%
-}
+\dim_new:N \xvec@height
+\dim_new:N \xvec@depth
+\dim_new:N \xvec@width
+\cs_new:Npn \xvec #1#2
+  {
+    \mode_if_math:TF
+      %{ \hbox_set:Nn \l_tmpa_box {#2} }
+      { \hbox_set:Nn \l_tmpa_box {$#2$} }
+      { \hbox_set:Nn \l_tmpa_box {$#2$} }
+    \dim_set:Nn \xvec@height { \box_ht:N \l_tmpa_box }
+    \dim_set:Nn \xvec@depth { \box_dp:N \l_tmpa_box }
+    \dim_set:Nn \xvec@width { \box_wd:N \l_tmpa_box }
+
+    \box_move_up:nn { \xvec@height + .1ex }
+      {
+        \hbox_overlap_right:n
+          {
+            \kern.05em%  (Because left edge of drawing is at .05em)
+            \__wisper_xvec_tikzpicture:nf
+              {
+                \xvec@width
+              }
+              {
+                \str_if_eq:nnT {#1} {.} {.45}
+                \str_if_eq:nnT {#1} {:} {.30, .65}
+              }
+          }
+      }
+    #2
+  }
 \makeatother
 \ExplSyntaxOn
 
@@ -370,10 +387,10 @@
       },
     vecdisplay / xvec .code:n =
       {
-        \cs_gset_eq:NN \vec \xvec
-        \cs_gset:Npn \uvec ##1 { \hat{\xvec{##1}} }
-        \cs_gset:Npn \dvec ##1 { \xvec[.]{##1} }
-        \cs_gset:Npn \ddvec ##1 { \xvec[:]{##1} }
+        \cs_gset:Npn \vec ##1 { \xvec{}{##1} }
+        \cs_gset:Npn \uvec ##1 { \hat{\xvec{}{##1}} }
+        \cs_gset:Npn \dvec ##1 { \xvec{.}{##1} }
+        \cs_gset:Npn \ddvec ##1 { \xvec{:}{##1} }
       },
     vecdisplay / bold .meta:n =
       {
