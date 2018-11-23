@@ -805,6 +805,31 @@
     }
     \numberwithin{equation}{section}
   }
+\__wisper_declare_document_type:nnn { simple-notes }  % [[[3
+  {
+    % TODO: remove english after implementing languages properly
+    classoptions = { english, DIV=10, fontsize=10pt },
+    requires =
+      {
+        scrartcl,
+        font-TexGyre,
+        math,
+        phys,
+        biblatex-numeric-supercite,
+        caption,
+      },
+  }
+  {
+    \captionsetup{
+      format=plain,
+      %font=small,
+      font={sf,footnotesize},
+      labelfont=sc,
+      calcwidth=0.9\linewidth,
+      justification=RaggedRight
+    }
+    \numberwithin{equation}{section}
+  }
 \__wisper_declare_document_type:nnn { presentation }  % [[[3
   {
     requires = { beamer, font-fira, math, phys, biblatex-numeric-supercite, },
