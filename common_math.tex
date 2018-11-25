@@ -317,35 +317,27 @@
     \end{tikzpicture}%%
   }%
 \ExplSyntaxOn
-%\cs_gset:Npn \__wisper_xvec_tikzpicture:nn #1#2
-%  {
-%    \tl_show:n {#1} 
-%    \tl_show:n {#2} 
-%  }
 \cs_generate_variant:Nn \__wisper_xvec_tikzpicture:nn { nf }
-\makeatletter
-\dim_new:N \xvec@height
-\dim_new:N \xvec@depth
-\dim_new:N \xvec@width
+\dim_new:N \l__wisper_xvec_ht_dim
+\dim_new:N \l__wisper_xvec_dp_dim
+\dim_new:N \l__wisper_xvec_wd_dim
 \cs_new:Npn \xvec #1#2
   {
     \mode_if_math:TF
       %{ \hbox_set:Nn \l_tmpa_box {#2} }
       { \hbox_set:Nn \l_tmpa_box {$#2$} }
       { \hbox_set:Nn \l_tmpa_box {$#2$} }
-    \dim_set:Nn \xvec@height { \box_ht:N \l_tmpa_box }
-    \dim_set:Nn \xvec@depth { \box_dp:N \l_tmpa_box }
-    \dim_set:Nn \xvec@width { \box_wd:N \l_tmpa_box }
+    \dim_set:Nn \l__wisper_xvec_ht_dim { \box_ht:N \l_tmpa_box }
+    %\dim_set:Nn \l__wisper_xvec_dp_dim { \box_dp:N \l_tmpa_box }
+    \dim_set:Nn \l__wisper_xvec_wd_dim { \box_wd:N \l_tmpa_box }
 
-    \box_move_up:nn { \xvec@height + .1ex }
+    \box_move_up:nn { \l__wisper_xvec_ht_dim + .1ex }
       {
         \hbox_overlap_right:n
           {
             \kern.05em%  (Because left edge of drawing is at .05em)
             \__wisper_xvec_tikzpicture:nf
-              {
-                \xvec@width
-              }
+              { \l__wisper_xvec_wd_dim }
               {
                 \str_if_eq:nnT {#1} {.} {.45}
                 \str_if_eq:nnT {#1} {:} {.30, .65}
@@ -354,8 +346,6 @@
       }
     #2
   }
-\makeatother
-\ExplSyntaxOn
 
 % Override \vec with an either invocation of \xvec or \bm
 
