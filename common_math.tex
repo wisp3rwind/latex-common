@@ -548,15 +548,32 @@
 
 
 % vector calculus [[[1
-\NewDocumentCommand \Gradient { m } { \nabla {#1} }  % not a vector! -> non-bold
+\__wisper_keys_define_math:n
+  {
+    calculus/laplacian/symbol .choice:,
+    calculus/laplacian/symbol / nabla .code:n =
+      { \tl_gset:Nn \__wisper_laplacian_symbol_tl { \nabla^2 } },
+    calculus/laplacian/symbol / delta .code:n =
+      { \tl_gset:Nn \__wisper_laplacian_symbol_tl { \Delta } },
+    calculus/laplacian/symbol .initial:n = delta,
+
+    % shorthands
+    laplacian-nabla .meta:n = { calculus/laplacian/symbol = nabla },
+    laplacian-delta .meta:n = { calculus/laplacian/symbol = delta },
+  }
+\NewDocumentCommand \Gradient
+  { m } { \nabla {#1} }  % not a vector!
 \cs_gset_eq:NN \Grad \Gradient
 
-\NewDocumentCommand \Divergence { m } { \vec{\nabla} \cdot {#1} }
+\NewDocumentCommand \Divergence { m }
+  { \vec{\nabla} \cdot {#1} }
 \cs_gset_eq:NN \Div \Divergence
 
-\RenewDocumentCommand \Curl { m } { \vec{\nabla} \times {#1} }
+\RenewDocumentCommand \Curl { m }
+  { \vec{\nabla} \times {#1} }
 
-\RenewDocumentCommand \Laplacian { m } { \nabla^2 {#1} }  % not a vector! -> non-bold
+\RenewDocumentCommand \Laplacian { m }
+  { \__wisper_laplacian_symbol_tl {#1} }  % not a vector!
 %\newcommand{\laplacian}{\Delta}
 
 
