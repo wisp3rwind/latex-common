@@ -293,6 +293,18 @@ From the \verb|braket| package.
 \begin{magentabox} Magenta box \end{magentabox}
 \begin{greybox} Grey box \end{greybox}
 
+\begin{shortpycode*}{highlightlines={5}}
+  from gpaw.mpi import world
+  
+  # do something
+
+  world.barrier()
+
+  # do something that must not happen before all processes
+  # complete the previous thing
+  # TODO: ...
+\end{shortpycode*}
+
 \section{Code}
 
 \begin{itemize}
