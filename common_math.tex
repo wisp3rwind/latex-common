@@ -840,40 +840,19 @@
 
 
 % Quick quad text (math-mode text with \quad spacing). [[[1
-% Stolen from the physics package.
-\DeclareDocumentCommand\qqmathinternal{m m}{\IfBooleanTF{#1}{}{\quad}{#2}\quad}
-\DeclareDocumentCommand\qqtextinternal{m m}{\qqmathinternal{#1}{\textnormal{#2}}}
-\DeclareDocumentCommand\qqtext{s m}{\qqtextinternal{#1}{#2}}
-\DeclareDocumentCommand\qqmath{s m}{\qqmathinternal{#1}{#2}}
+% Idea stolen from the physics package.
+\cs_new:Npn \__wisper_q:Nnn #1#2#3
+  {
+    \IfBooleanF { #2 }
+      { \quad }
+      #1 {#3}
+    \quad
+  }
 
-\DeclareDocumentCommand\qq{}{\qqtext}
-
-\DeclareDocumentCommand\qcomma{}{,\quad}
-\DeclareDocumentCommand\qc{}{\qcomma}
-
-\DeclareDocumentCommand\qimplies{s}{\qqmathinternal{#1}{\implies}}
-\DeclareDocumentCommand\qiff{s}{\qqmathinternal{#1}{\iff}}
-
-\DeclareDocumentCommand\qif{s}{\qqtextinternal{#1}{if}}
-\DeclareDocumentCommand\qthen{s}{\qqtextinternal{#1}{then}}
-\DeclareDocumentCommand\qelse{s}{\qqtextinternal{#1}{else}}
-\DeclareDocumentCommand\qotherwise{s}{\qqtextinternal{#1}{otherwise}}
-\DeclareDocumentCommand\qunless{s}{\qqtextinternal{#1}{unless}}
-\DeclareDocumentCommand\qgiven{s}{\qqtextinternal{#1}{given}}
-\DeclareDocumentCommand\qusing{s}{\qqtextinternal{#1}{using}}
-\DeclareDocumentCommand\qassume{s}{\qqtextinternal{#1}{assume}}
-\DeclareDocumentCommand\qsince{s}{\qqtextinternal{#1}{since}}
-\DeclareDocumentCommand\qlet{s}{\qqtextinternal{#1}{let}}
-\DeclareDocumentCommand\qfor{s}{\qqtextinternal{#1}{for}}
-\DeclareDocumentCommand\qall{s}{\qqtextinternal{#1}{all}}
-\DeclareDocumentCommand\qeven{s}{\qqtextinternal{#1}{even}}
-\DeclareDocumentCommand\qodd{s}{\qqtextinternal{#1}{odd}}
-\DeclareDocumentCommand\qinteger{s}{\qqtextinternal{#1}{integer}}
-\DeclareDocumentCommand\qand{s}{\qqtextinternal{#1}{and}}
-\DeclareDocumentCommand\qor{s}{\qqtextinternal{#1}{or}}
-\DeclareDocumentCommand\qas{s}{\qqtextinternal{#1}{as}}
-\DeclareDocumentCommand\qin{s}{\qqtextinternal{#1}{in}}
-\DeclareDocumentCommand\qcc{s}{\qqtextinternal{#1}{c.c.}}
-\DeclareDocumentCommand\qwith{s}{\qqtextinternal{#1}{with}}
+% TODO: only define in math mode (is this possible?)
+\NewDocumentCommand \q { s m }
+  { \__wisper_q:Nnn \textnormal { #1 } { #2 } }
+\NewDocumentCommand \qm { s m }
+  { \__wisper_q:Nnn \use:n { #1 } { #2 } }
 
 % vim: ts=2 sw=2 et fdm=marker fmr=[[[,]]]:
