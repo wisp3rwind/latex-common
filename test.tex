@@ -94,9 +94,11 @@ Bold vectors usually look better, \verb|\vc| is a shorthand:
 \end{itemize}
 
 \subsection{Integrals and differential forms}
-\verb|\dif|, \verb|Dif| \verb|\del| and \verb|var| automatically provide correct spacing.
-In case they don't, use the starred version to disable the spacing. Also, if no argument is given,
-no spacing will applied.
+\verb|\dif|, \verb|Dif| \verb|\del| and \verb|var| automatically provide
+correct spacing (or more precisely, wrap the argument in \verb|\mathinner| and let
+\TeX do the job).
+In case they don't, use the starred version to disable the spacing. Also, if the
+argument is empty, no spacing will be applied.
 \begin{itemize}
   \item \verb|\dif{x} \dif^3 x \dif{x^3} \dif{{x^3}} \dif^3(\cos x) \dif({\cos x}^3) \dif({\cos x^3})|
     \begin{displaymath}
@@ -119,33 +121,16 @@ no spacing will applied.
       \MathStyle{integrate/displayfunc=outset} \Int{x^2}{x} \qquad
       \MathStyle{integrate/displayfunc=inset} \Int{x^2}{x}
     \end{displaymath}
-  \item
-    \verb|\Int[outset]{x^2}{x} \qquad| \\
-    \verb|\Int[inset]{x^2}{x}|
-    \begin{displaymath}
-      \Int[outset]{x^2}{x} \qquad
-      \Int[inset]{x^2}{x}
-    \end{displaymath}
-  \item \verb|\MathStyle{integrate/displayfunc=outset}| \\ \verb|\var S = \Int{t}{\Int{\vc r^3}{\vc{r}} \lagr(t, \vc{r}, \dvc{r})} |
-  \begin{displaymath} 
-    \MathStyle{integrate/displayfunc=outset}
-    \var S = \Int{t}{\Int{\vc r^3}{\vc{r}} \lagr(t, \vc{r}, \dot{\vc{r}})}
-  \end{displaymath}
-  \item \verb|\int \dif(\cos\theta) x^2 \int x^2 \dif(\cos\theta)| \begin{displaymath} \int \dif(\cos\theta) x^2 \qquad \int f(\theta) \dif(\cos\theta) \end{displaymath}
-  \item \verb|\dif{f} = \pderiv{f}{x} \dif{x} + \pderiv{f}{y} \dif y| (note the incorrect spacing of $\dif y$) \begin{displaymath} \dif{f} = \pderiv{f}{x} \dif{x} + \pderiv{f}{y} \dif y \end{displaymath}
+  \item \Example|\Int[outset]{x^2}{x} \qquad \Int[inset]{x^2}{x}|
+  \item Let's reset the style for the rest of this document:
+    \Example|\MathStyle{integrate/displayfunc=outset}|
+  \item \Example|\var S = \Int{t}{\Int{\vc r^3}{\vc{r}} \lagr(t, \vc{r}, \dvc{r})}|
+  \item Limits can easily be specified: \\
+    \Example|\Int[inset]{x^3,\R^3}{f(x)} \qquad \Int[outset]{x^3,\R^3}{f(x)}|
+  \item and the long form of the differential is also supported: \\
+    \Example|\Int[outset](\cos t,-\infty,\infty){f(t)} \\ \qquad \Int[inset](\cos t,-\infty,\infty){f(t)}|
+  \item \verb|\dif{f} = \pderiv{f}{x} \dif{x} + \pderiv{f}{y} \dif y| (note the incorrect spacing of $\dif y$ (Why is that so? Currently, I don't understand this spacing issue myself\ldots)) \begin{displaymath} \dif{f} = \pderiv{f}{x} \dif{x} + \pderiv{f}{y} \dif y \end{displaymath}
 \end{itemize}
-
-\begin{gather*}
-  \MathStyle{integrate/displayfunc=inset}
-  \Int{x^3,-\infty,\infty}{f(x)}
-  \qquad
-  \Int(\cos t,-\infty,\infty){f(t)} \\
-  \MathStyle{integrate/displayfunc=outset}
-  \Int{x^3,-\infty,\infty}{f(x)}
-  \qquad
-  \Int(\cos t,-\infty,\infty){f(t)} \\
-\end{gather*}
-
 
 \subsection{Symbols}
 
