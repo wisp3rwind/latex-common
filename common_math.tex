@@ -87,20 +87,6 @@
 %\newcommand{\parenthesize}[1]{{\left(#1\right)}}
 %\newcommand{\bracketize}[1]{{\left[#1\right]}}
 
-% stolen from the physics package. Starred versions resize the delimiters
-\DeclareDocumentCommand \argopen { s }
-  {
-    \mathopen{} \mathclose \bgroup
-    \IfBooleanTF { #1 }
-      { \left }
-  }
-\DeclareDocumentCommand \argclose { s }
-{
-    \IfBooleanTF { #1 }
-        { \egroup }
-        { \aftergroup\egroup\right }
-}
-
 % symbols [[[1
 % TODO: switch according to language, i.e. Spanish is cte.
 \cs_new:Npn \diffd { \mathrm{ d } }
