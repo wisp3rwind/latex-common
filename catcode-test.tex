@@ -1,0 +1,38 @@
+\RequirePackage{xparse}
+
+\ExplSyntaxOn
+
+\cs_generate_variant:Nn \tl_show:n { x }
+
+
+\cs_new:Npn \__wisper_read_i_with_newlines_aux:n #1
+  {
+    \tl_show:n {tl=#1}
+    \group_end:
+  }
+
+\cs_new:Npn \__wisper_wrapped_iow_newline: { \exp_not:n { \iow_newline: } }
+
+\cs_new:Npn \__wisper_read_i_with_newlines:w
+  {
+    \group_begin:
+    \endlinechar`\^^M
+    \char_set_active_eq:nN { `\^^M } \__wisper_wrapped_iow_newline:
+    \char_set_catcode_active:n { `\^^M }
+    \exp_after:wN
+      \__wisper_read_i_with_newlines_aux:n
+      \peek_catcode_collect_inline:Nn \^^M {}
+  }
+
+\__wisper_read_i_with_newlines:w {
+    \adfj 
+    \jkajfdk
+    \daf
+  }
+
+\ExplSyntaxOff
+
+\documentclass{article}
+
+\begin{document}
+\end{document}
