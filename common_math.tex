@@ -403,8 +403,12 @@
 \cs_gset_eq:NN \ddvc \ddvec
 \cs_gset_eq:NN \uvc \uvec
 
-\cs_new:Npn \colvec #1
-  { \begin{pmatrix} #1 \end{pmatrix} }
+\NewDocumentCommand \colvec { o m }
+  {
+    \IfNoValueTF{#1}
+      { \begin{pmatrix} #2 \end{pmatrix} } 
+      { \begin{pmatrix*}[#1] #2 \end{pmatrix*} } 
+  }
 
 
 %\DeclareMathOperator { \__wisper_operator_dim: } { dim }
