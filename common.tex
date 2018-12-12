@@ -137,7 +137,7 @@
 \clist_new:N \g__wisper_debug_modules_clist
 \clist_gset:Nn \g__wisper_debug_modules_clist {}
 \clist_gset:Nn \g__wisper_debug_modules_clist { loader, declaration, shipout, features }
-\clist_gset:Nn \g__wisper_debug_modules_clist { features }
+\clist_gset:Nn \g__wisper_debug_modules_clist {}
 \prg_new_conditional:Nnn \__wisper_if_debug:n { T, F, TF }
   { 
     \clist_if_in:NnTF \g__wisper_debug_modules_clist {#1}
