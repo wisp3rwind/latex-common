@@ -291,7 +291,10 @@
   }
 
 % complex numbers [[[1
-\cs_new:Npn \conj #1 { { #1 \c_math_superscript_token { \ast } } }
+\cs_gset:Npn \Conj #1
+  { #1 \c_math_superscript_token { \ast } }
+\cs_new:Npn \HC
+  { \mathrm{h.c.} }
 
 
 % vectors etc. [[[1
@@ -530,7 +533,7 @@
   { \colvec {#1} }
 
 % operators [[[1
-\NewDocumentCommand \Adjoint { m } { {#1}^\dagger }
+\NewDocumentCommand \Adjoint { m } { #1^\dagger }
 \cs_new_eq:NN \Adj \Adjoint
 \NewDocumentCommand \Operator { m } { \hat{#1} }
 \cs_new_eq:NN \Op \Operator
