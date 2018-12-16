@@ -126,9 +126,9 @@ argument is empty, no spacing will be applied.
     \Example|\MathStyle{integrate/displayfunc=outset}|
   \item \Example|\var S = \Int{t}{\Int{\vc r^3}{\vc{r}} \lagr(t, \vc{r}, \dvc{r})}|
   \item Limits can easily be specified: \\
-    \Example|\Int[inset]{x^3,\R^3}{f(x)} \qquad \Int[outset]{x^3,\R^3}{f(x)}|
+    \Example|\Int[inset]{x^3;\R^3}{f(x)} \qquad \Int[outset]{x^3;\R^3}{f(x)}|
   \item and the long form of the differential is also supported: \\
-    \Example|\Int[outset](\cos t,-\infty,\infty){f(t)} \\ \qquad \Int[inset](\cos t,-\infty,\infty){f(t)}|
+    \Example|\Int[outset](\cos t;-\infty;\infty){f(t)} \\ \qquad \Int[inset](\cos t;-\infty;\infty){f(t)}|
   \item \verb|\dif{f} = \pderiv{f}{x} \dif{x} + \pderiv{f}{y} \dif y| (note the incorrect spacing of $\dif y$ (Why is that so? Currently, I don't understand this spacing issue myself\ldots)) \begin{displaymath} \dif{f} = \pderiv{f}{x} \dif{x} + \pderiv{f}{y} \dif y \end{displaymath}
 \end{itemize}
 
@@ -145,10 +145,13 @@ These all support the same syntax
 \begin{itemize}
   \item \Example|\Prod{a_i}|
   \item \Example|\Prod{a_i}|
-  \item \Example|\Prod[i, 1, N]{a_i}|
-  \item \Example|\Sum[i, 1, N]{a_i}|
+  \item \Example|\Prod[i; 1; N]{a_i}|
+  \item \Example|\Sum[i; 1; N]{a_i}|
+  \item \Example|\Sum[i,j; 1; N]{a_i b_j}|
+  \item \Example|\Sum[{i;j}; 1; N]{a_i b_j}|
+  \item \Example|\Sum[{i;j}]{a_i b_j}|
   \item \Example|\Sum[i \in I]{a_i}|
-  \item \Example|{(ABC)}_{ij} = \Prod[{k,l}, 1, N]{a_{ik} b_{kl} c_{lj}}|
+  \item \Example|{(ABC)}_{ij} = \Prod[k,l; 1; N]{a_{ik} b_{kl} c_{lj}}|
   \item \Example|X = \Coprod[j \in J]{X_j}|
   \item \Example|X = \TensorProd[j \in J]{X_j}|
   \item \Example|X = \Union[j \in J]{X_j}|
