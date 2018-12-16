@@ -30,6 +30,19 @@
 \cs_new:Npn \__wisper_keys_set_math:nn #1#2 { \keys_set:nn { wisper/math/#1 } {#2} }
 \cs_new_eq:NN \MathStyle \__wisper_keys_set_math:n
 
+\__wisper_key_define_surrounding:nNn #1#2#3
+  {
+    \__wisper_keys_define_math:n
+      {
+        #1 .choice:,
+        #1 / parenthesis .code:n = { \cs_set_eq:NN #2 \__wisper_parenthesize:nnn },
+        #1 / braces .code:n = { \cs_set_eq:NN #2 \__wisper_embrace:nnn },
+        #1 / brackets .code:n = { \cs_set_eq:NN #2 \__wisper_bracketize:nnn },
+        #1 / none .code:n = { \cs_set_eq:NN #2 \__wisper_surround_none:nnn },
+        #1 .initial:n = #3,
+      }
+  }
+
 % Variants, Additions to l3kernel and non math-specific helpers [[[1
 
 %\cs_new:Npn \exp_last_unbraced:NcNo
@@ -167,11 +180,35 @@
 \cs_new:Npn \__wisper_surround_none:nn #1#2
   { #2 }
 
-% TODO style variants: \MathStyle{trace-symbol = tr|Tr}
-\DeclareMathOperator { \__wisper_operator_trace: } {tr}
-% TODO style variants: \MathStyle{trace-parens = parenthesis|curly|square|none}
-\NewDocumentCommand \Trace { s }
-  { \__wisper_operator_trace: \__wisper_embrace:nn { #1 } }
+\tl_new:N \g__wisper_symbol_trace_tl
+\prop_new:N \g__wisper_symbol_trace_prop
+\DeclareMathOperator \__wisper_operator_trace_tr: { tr }
+\DeclareMathOperator \__wisper_operator_trace_Tr: { Tr }
+\prop_put:Nnn \g__wisper_symbol_trace_prop { tr } { \__wisper_operator_trace_tr: }
+\prop_put:Nnn \g__wisper_symbol_trace_prop { Tr } { \__wisper_operator_trace_Tr: }
+\__wisper_keys_define_math:n
+  {
+    trace / symbol .code:n =
+      {
+        \prop_if_in:NnTF \g__wisper_symbol_trace_prop {#1}
+          {
+            \prop_get:NnN \g__wisper_symbol_trace_prop {#1} \__wisper_operator_trace:
+          }
+          {
+            \msg_error:
+          }
+      },
+    trace / symbol .value_required:n = true,
+    trace / symbol .initial:n = Tr,
+  }
+\__wisper_key_define_surrounding:nNn { trace / surrounding }
+  \__wisper_operator_trace_surrounding:nnn
+  { braces }
+\NewDocumentCommand \Trace { s o }
+  {
+    \__wisper_operator_trace:
+    \__wisper_operator_trace_surrounding:nnn { #1 } { #2 }
+  }
 \cs_gset_eq:NN \Tr \Trace
 
 \tl_new:N \g__wisper_symbol_identity_tl
