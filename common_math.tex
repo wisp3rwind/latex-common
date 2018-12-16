@@ -124,36 +124,48 @@
     \__wisper_operator_image: \__wisper_parenthesize:nn {#1}
   }
 
-% TODO: maybe automize definition of the following very similar commands
-\DeclarePairedDelimiter \__wisper_bracketize_aux:w \lbrack \rbrack
-\cs_new:Npn \__wisper_bracketize:nn #1
+\cs_new:Npn \__wisper_declare_paired_delimiter:nNN #1#2#3
   {
-    \IfBooleanTF {#1}
-      { \__wisper_bracketize_aux:w* }
-      { \__wisper_bracketize_aux:w }
+    \tl_show:n {#1}
+    \exp_args:Nc \DeclarePairedDelimiter { #1 _aux:w } #2 #3
+    \cs_new:cpx { #1 :nnn } ##1##2
+      {
+        \exp_not:N \IfBooleanTF {##1}
+          { \exp_not:c { #1 _aux:w } * }
+          {
+            \exp_not:N \tl_if_novalue:nTF {##2}
+              { \exp_not:c { #1 _aux:w } }
+              { \exp_not:c { #1 _aux:w } [##2] }
+          }
+      }
+    \cs_new:cpx { #1 :nn } ##1
+      {
+        \exp_not:N \IfBooleanTF {##1}
+          { \exp_not:c { #1 _aux:w } * }
+          { \exp_not:c { #1 _aux:w } }
+      }
+    \cs_new:cpx { #1 _resize:n }
+      {
+        \exp_not:c { #1 _aux:w } * 
+      }
+    \cs_show:c { #1 :nnn }
+    \cs_show:c { #1 :nn }
   }
-\DeclarePairedDelimiter \__wisper_embrace_aux:w \lbrace \rbrace
-\cs_new:Npn \__wisper_embrace:nn #1
-  {
-    \IfBooleanTF {#1}
-      { \__wisper_embrace_aux:w* }
-      { \__wisper_embrace_aux:w }
-  }
-\DeclarePairedDelimiter \__wisper_parenthesize_aux:w \lparen \rparen
-\cs_new:Npn \__wisper_parenthesize:nn #1
-  {
-    \IfBooleanTF {#1}
-      { \__wisper_parenthesize_aux:w* }
-      { \__wisper_parenthesize_aux:w }
-  }
-\cs_new:Npn \__wisper_surround_none:n #1 { #1 }
+
+\__wisper_declare_paired_delimiter:nNN { __wisper_bracketize } \lbrack \rbrack
+\__wisper_declare_paired_delimiter:nNN { __wisper_embrace } \lbrace \rbrace
+\__wisper_declare_paired_delimiter:nNN { __wisper_parenthesize } \lparen \rparen
 \cs_new:Npn \__wisper_surround_none:w
   {
     \peek_charcode_remove_ignore_spaces:NTF *
     % TODO: There should probably be some grouping here
-      { \__wisper_surround_none:n }
-      { \__wisper_surround_none:n }
+      { \use:n }
+      { \use:n }
   }
+\cs_new:Npn \__wisper_surround_none:nnn #1#2#3
+  { #3 }
+\cs_new:Npn \__wisper_surround_none:nn #1#2
+  { #2 }
 
 % TODO style variants: \MathStyle{trace-symbol = tr|Tr}
 \DeclareMathOperator { \__wisper_operator_trace: } {tr}
