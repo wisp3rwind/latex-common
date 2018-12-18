@@ -30,7 +30,7 @@
 \cs_new:Npn \__wisper_keys_set_math:nn #1#2 { \keys_set:nn { wisper/math/#1 } {#2} }
 \cs_new_eq:NN \MathStyle \__wisper_keys_set_math:n
 
-\__wisper_key_define_surrounding:nNn #1#2#3
+\cs_new:Npn \__wisper_key_define_surrounding:nNn #1#2#3
   {
     \__wisper_keys_define_math:n
       {
@@ -139,7 +139,6 @@
 
 \cs_new:Npn \__wisper_declare_paired_delimiter:nNN #1#2#3
   {
-    \tl_show:n {#1}
     \exp_args:Nc \DeclarePairedDelimiter { #1 _aux:w } #2 #3
     \cs_new:cpx { #1 :nnn } ##1##2
       {
@@ -161,8 +160,6 @@
       {
         \exp_not:c { #1 _aux:w } * 
       }
-    \cs_show:c { #1 :nnn }
-    \cs_show:c { #1 :nn }
   }
 
 \__wisper_declare_paired_delimiter:nNN { __wisper_bracketize } \lbrack \rbrack
