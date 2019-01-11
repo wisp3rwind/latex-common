@@ -805,6 +805,33 @@
     }
     \numberwithin{equation}{section}
   }
+\__wisper_declare_document_type:nnn { handout }  % [[[3
+  {
+    % TODO: remove english after implementing languages properly
+    classoptions = { twocolumn, english, DIV=14, fontsize=10pt },
+    requires =
+      {
+        scrartcl,
+        font-TexGyre,
+        math,
+        phys,
+        % biblatex-numeric-supercite,
+        % biblatex-alphabetic,
+        biblatex-authoryear-comp,
+        caption,
+      },
+  }
+  {
+    \captionsetup{
+      format=plain,
+      %font=small,
+      font={sf,footnotesize},
+      labelfont=sc,
+      margin=0.1\linewidth,
+      justification=RaggedRight
+    }
+    % \numberwithin{equation}{section}
+  }
 \__wisper_declare_document_type:nnn { simple-notes }  % [[[3
   {
     % TODO: remove english after implementing languages properly
