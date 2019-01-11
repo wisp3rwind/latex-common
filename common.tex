@@ -1133,6 +1133,20 @@
   }
   { }
 
+\__wisper_declare_ordinary_feature:nnn { biblatex-authoryear-comp }
+  {
+    disabled,
+    requires = {
+      biblatex = {
+        % many of these options can only be given in \usepackage and not later, unfortunately..
+        style=authoryear-comp,
+      },
+      biblatex-backref,
+      biblatex-default-verbosity,
+    },
+  }
+  { }
+
 % TODO: separate the concepts of superscript and footnote citations
 % TODO: be bold enough to \renewcommand\cite
 \__wisper_declare_ordinary_feature:nnn { biblatex-numeric-supercite }
