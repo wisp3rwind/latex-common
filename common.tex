@@ -1033,6 +1033,7 @@
     %babel = { enabled, options = { main=english } },
     babel = { enabled },  %, groups=font_only },
     fontenc = { enabled, options = { T1 }, groups=font_only },
+    standalone,
     csquotes = { enabled },  %, groups=font_only },
     microtype = { enabled, groups=font_only },
     inputenc = {
@@ -1670,6 +1671,7 @@
     inputenc,
     babel,
     fontenc,
+    standalone
   }
 \seq_gset_from_clist:Nn \g__wisper_all_features_main_packages_seq
   {
