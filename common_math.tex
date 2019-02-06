@@ -322,6 +322,14 @@
 { \__wisper_argument_or_empty:n {#1} , \__wisper_argument_or_empty:n {#2} }
 \cs_gset_eq:NN \IProd \InnerProduct
 
+\cs_undefine:N \Floor
+\DeclarePairedDelimiterX \Floor[2] \lfloor \rfloor
+{ \__wisper_argument_or_empty:n {#1} , \__wisper_argument_or_empty:n {#2} }
+
+\cs_undefine:N \Ceil
+\DeclarePairedDelimiterX \Ceil[2] \lceil \rceil
+{ \__wisper_argument_or_empty:n {#1} , \__wisper_argument_or_empty:n {#2} }
+
 
 % Equivalence relations, quotient spaces, ... [[[1
 \cs_gset_eq:NN \EquivalenceClass \__wisper_bracketize_aux:w
