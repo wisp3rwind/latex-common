@@ -631,7 +631,6 @@
         \bool_gset_true:c { g__wisper_feature_ #1 _loaded_bool }
         \bool_if:cT { g__wisper_feature_ #1 _expl3_bool }
           { \__wisper_shipout:n { \ExplSyntaxOn } }
-        \tl_show:c {g__wisper_feature_ #1 _code_tl}
         \use:c {g__wisper_feature_ #1 _code_tl}
         \bool_if:cT { g__wisper_feature_ #1 _expl3_bool }
           { \__wisper_shipout:n { \ExplSyntaxOff } }
@@ -1637,7 +1636,7 @@
         \bool_if:NTF \l__wisper_bar_in_margin_bool
           { \dim_set:Nn \l__wisper_left_margin_dim { -1cm} }
           { \dim_set:Nn \l__wisper_left_margin_dim { 0pt } }
-        \tl_show:n {#1}
+        %\tl_show:n {#1}
         \use:x
           {
             \exp_not:N \newmdenv
