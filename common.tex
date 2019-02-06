@@ -49,6 +49,7 @@
 \cs_generate_variant:Nn \keyval_parse:NNn { NNv, NNo }
 \cs_generate_variant:Nn \msg_error:nnnn { nnnx }
 \exp_args_generate:n { nxx } % -> \exp_args:Nnxx
+\cs_generate_variant:Nn \regex_replace_all:nnN { nnc }
 
 
 % Additions to l3kernel [[[1
@@ -179,7 +180,8 @@
   {
     % Reading the code as an argument will have doubled hashes, undo this
     \tl_set:Nn \l_tmpa_tl { #1 }
-    \regex_replace_all:nnN { \cP\# } { \cO\# } \l_tmpa_tl
+    %\regex_replace_all:nnN { \cP\# } { \cO\# } \l_tmpa_tl
+    \regex_replace_all:nnN { \c{ __wisper_parameter_token: } } { \cO\# } \l_tmpa_tl
     \seq_gput_right:NV \g__wisper_preamble_seq \l_tmpa_tl
     \__wisper_if_debug:nT { shipout }
       { \seq_show:N \g__wisper_preamble_seq }
@@ -349,7 +351,9 @@
     \bool_gset_false:c { g__wisper_feature_ #1 _loaded_bool }
     \clist_new:c { g__wisper_feature_ #1 _dependencies_clist }
     \clist_new:c { g__wisper_feature_ #1 _conditional_dependencies_clist }
-    \tl_gset:cn { g__wisper_feature_ #1 _code_tl } { #3 }
+    \tl_set:Nn \l_tmpa_tl { #3 }
+    \regex_replace_all:nnN { \cP\# } { \c{ __wisper_parameter_token: } } \l_tmpa_tl
+    \tl_gset_eq:cN { g__wisper_feature_ #1 _code_tl } \l_tmpa_tl
     \bool_gset_false:c { g__wisper_feature_ #1 _expl3_bool }
     \clist_new:c { g__wisper_feature_ #1 _conflicting_features_clist }
     \seq_put_right:Nn \g__wisper_all_features_all_seq { #1 }
@@ -568,6 +572,8 @@
     \tl_set:Nn \l_tmpa_tl { #3 }
     % prefix any cs in the tl with \noexpand
     \regex_replace_all:nnN { (\cC.) } { \c{ exp_not:N } \1 } \l_tmpa_tl
+    % protect #
+    \regex_replace_all:nnN { \cP\# } { \c{ exp_not:N } \c{ __wisper_parameter_token: } } \l_tmpa_tl
     % remove the \noexpand from selected cs'
     \clist_map_inline:nn
       {
@@ -625,6 +631,7 @@
         \bool_gset_true:c { g__wisper_feature_ #1 _loaded_bool }
         \bool_if:cT { g__wisper_feature_ #1 _expl3_bool }
           { \__wisper_shipout:n { \ExplSyntaxOn } }
+        \tl_show:c {g__wisper_feature_ #1 _code_tl}
         \use:c {g__wisper_feature_ #1 _code_tl}
         \bool_if:cT { g__wisper_feature_ #1 _expl3_bool }
           { \__wisper_shipout:n { \ExplSyntaxOff } }
@@ -736,6 +743,7 @@
 \__wisper_declare_documentclass:n { article }
 \__wisper_declare_documentclass:n { beamer }
 \__wisper_declare_documentclass:n { scrbook }
+\__wisper_declare_documentclass:n { scrreprt }
 \__wisper_declare_documentclass:n { scrartcl }
 \__wisper_declare_documentclass:n { scrlttr2 }
 \exp_args:Nx \__wisper_declare_mutually_exclusive_features:n
@@ -859,7 +867,8 @@
   }
 \__wisper_declare_document_type:nnn { presentation }  % [[[3
   {
-    requires = { beamer, font-fira, math, phys, biblatex-numeric-supercite, },
+    classoptions = { english },
+    requires = { class-beamer, font-fira, math, phys, biblatex-numeric-supercite, },
   }
   {
     % TODO: devise a way to properly cite image references, cf.
@@ -1477,7 +1486,9 @@
   }
 
 \__wisper_declare_ordinary_feature:nnn { plots }
-  { }
+  {
+    expl3=true,
+  }
   {
     \input{common_plots.tex}
     \tl_if_exist:NF \PlotFont { \tl_gclear:N \PlotFont }
