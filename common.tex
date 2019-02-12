@@ -867,7 +867,14 @@
 \__wisper_declare_document_type:nnn { presentation }  % [[[3
   {
     classoptions = { english },
-    requires = { class-beamer, font-fira, math, phys, biblatex-numeric-supercite, },
+    requires = {
+      class-beamer,
+      font-fira,
+      math,
+      phys,
+      %biblatex-numeric-supercite,
+      biblatex-alphabetic,
+    },
   }
   {
     % TODO: devise a way to properly cite image references, cf.
