@@ -888,6 +888,14 @@
         block=fill,  % transparent, fill {for theorem and example environments}
       }
     \setbeamertemplate{footline}[page number]{}
+    % compat with enumitem package
+    % TODO: make this conditional on enumitem being loaded
+    \setlist[itemize,1]
+      { label=\protect\usebeamertemplate*{itemize~item} }
+    \setlist[itemize,2]
+      { label=\protect\usebeamertemplate*{itemize~subitem} }
+    \setlist[itemize,3]
+      { label=\protect\usebeamertemplate*{itemize~subsubitem} }
   }
 \__wisper_declare_document_type:nn {tufte-book}  % [[[3
   {
