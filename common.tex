@@ -355,6 +355,7 @@
     \regex_replace_all:nnN { \cP\# } { \c{ __wisper_parameter_token: } } \l_tmpa_tl
     \tl_gset_eq:cN { g__wisper_feature_ #1 _code_tl } \l_tmpa_tl
     \bool_gset_false:c { g__wisper_feature_ #1 _expl3_bool }
+    \bool_gset_false:c { g__wisper_feature_ #1 _makeatletter_bool }
     \clist_new:c { g__wisper_feature_ #1 _conflicting_features_clist }
     \seq_put_right:Nn \g__wisper_all_features_all_seq { #1 }
 
@@ -366,6 +367,7 @@
         features/#1/disabled .value_forbidden:n = true,
 
         features/#1/expl3 .bool_gset:c = { g__wisper_feature_ #1 _expl3_bool },
+        features/#1/makeatletter .bool_gset:c = { g__wisper_feature_ #1 _makeatletter_bool },
 
         features/#1/groups .code:n =
           {
@@ -631,7 +633,11 @@
         \bool_gset_true:c { g__wisper_feature_ #1 _loaded_bool }
         \bool_if:cT { g__wisper_feature_ #1 _expl3_bool }
           { \__wisper_shipout:n { \ExplSyntaxOn } }
+        \bool_if:cT { g__wisper_feature_ #1 _makeatletter_bool }
+          { \__wisper_shipout:n { \makeatletter } }
         \use:c {g__wisper_feature_ #1 _code_tl}
+        \bool_if:cT { g__wisper_feature_ #1 _makeatletter_bool }
+          { \__wisper_shipout:n { \makeatother } }
         \bool_if:cT { g__wisper_feature_ #1 _expl3_bool }
           { \__wisper_shipout:n { \ExplSyntaxOff } }
       }
@@ -866,6 +872,8 @@
   }
 \__wisper_declare_document_type:nnn { presentation }  % [[[3
   {
+    expl3=true,
+    makeatletter=true,
     classoptions = { english },
     requires = {
       class-beamer,
@@ -873,6 +881,7 @@
       math,
       phys,
       %biblatex-numeric-supercite,
+      biblatex={doi=false},
       biblatex-alphabetic,
     },
   }
@@ -895,6 +904,7 @@
         block=fill,  % transparent, fill {for theorem and example environments}
       }
     \setbeamertemplate{footline}[page number]{}
+    \setbeamerfont{caption}{size=\footnotesize}
     % compat with enumitem package
     % TODO: make this conditional on enumitem being loaded
     \setlist[itemize,1]
@@ -903,6 +913,28 @@
       { label=\protect\usebeamertemplate*{itemize~subitem} }
     \setlist[itemize,3]
       { label=\protect\usebeamertemplate*{itemize~subsubitem} }
+    % https://tex.stackexchange.com/questions/31616/how-to-use-shortjournal-with-biblatex-and-biblatex-chem
+    \renewbibmacro*{journal}{%
+      \iffieldundef{shortjournal}
+        {%
+          \iffieldundef{journaltitle}
+            {}
+            {%
+              \printtext[journaltitle]
+                {%
+                  \printfield[titlecase]{journaltitle}%
+                  \setunit{\subtitlepunct}%
+                  \printfield[titlecase]{journalsubtitle}%
+                 }%
+             }%
+        }
+        {\printtext[journaltitle]{\printfield[titlecase]{shortjournal}}}%
+    }
+    % https://tex.stackexchange.com/questions/368757/add-square-brackets-to-footfullcite-in-beamer
+  \renewcommand \@makefnmark
+    { \,[\@thefnmark] }
+  \renewcommand \@makefntext[1]
+    { \usebeamerfont*{footnote} [\@thefnmark]\enspace #1 }
   }
 \__wisper_declare_document_type:nn {tufte-book}  % [[[3
   {
@@ -1169,6 +1201,20 @@
   }
   {
   }
+
+\__wisper_declare_ordinary_feature:nnn { biblatex-verbose-note }
+  {
+    disabled,
+    requires = {
+      biblatex = {
+        % many of these options can only be given in \usepackage and not later, unfortunately..
+        style=verbose-note,
+      },
+      biblatex-backref,
+      biblatex-default-verbosity,
+    },
+  }
+  { }
 
 \__wisper_declare_ordinary_feature:nnn { biblatex-alphabetic }
   {
