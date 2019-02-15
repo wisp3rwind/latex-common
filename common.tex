@@ -883,6 +883,7 @@
       %biblatex-numeric-supercite,
       biblatex={doi=false},
       biblatex-alphabetic,
+      pgfpages,  % for notes on second screen
     },
   }
   {
@@ -1100,6 +1101,7 @@
     },
     fancyhdr,
     amsthm = { groups = font_only },
+    pgfpages,
   }
 
 \__wisper_declare_ordinary_feature:nnn { nonnum-section-commands }
@@ -1742,7 +1744,8 @@
     inputenc,
     babel,
     fontenc,
-    standalone
+    standalone,
+    pgfpages,
   }
 \seq_gset_from_clist:Nn \g__wisper_all_features_main_packages_seq
   {
