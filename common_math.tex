@@ -309,12 +309,12 @@
     \mathopen{}
   }
 
-\cs_undefine:N \Set
-\DeclarePairedDelimiterX \Set[1] \lbrace \rbrace
+\DeclarePairedDelimiterX \__wisper_set:wn [1] \lbrace \rbrace
   {
     \cs_set:Npn \given { \__wisper_mid_vert:n { \delimsize } }
     \nonscript\, #1 \nonscript\,
   }
+\cs_gset_eq:NN \Set \__wisper_set:wn
 
 \cs_new_eq:NN \union \cup
 \cs_new_eq:NN \intersection \cap

@@ -30,7 +30,17 @@
 \providecommand\isomer[1]{\cesplit{{\/}{\c{isomerslash}}}{#1}}
 
 % dirac notation
+\ExplSyntaxOn
+% save the Set macro from common_math and restore after braket has overwritten it
+% TODO: rewrite to get rid of these hacks
+\cs_gset_eq:NN \__wisper_set_save \Set
+\cs_gset_eq:Nc \__wisper_set_save_aux { Set~ }
 \usepackage{braket}
+\cs_gset_eq:NN \Set \__wisper_set_save
+\cs_gset_eq:cN { Set~ } \__wisper_set_save_aux
+\cs_undefine:N \set
+\cs_undefine:c { set~ }
+\ExplSyntaxOff
 
 
 % Electrodynamics [[[1
