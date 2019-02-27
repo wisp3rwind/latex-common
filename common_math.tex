@@ -823,18 +823,18 @@
     \IfValueT {#2}
       { e^{#2} }
   }
-\NewDocumentCommand \__wisper_operator_exp_parens:ww { m r() }
-  { \__wisper_operator_exp: \__wisper_parenthesize:nn {#1} {#2} }
-\NewDocumentCommand \__wisper_operator_exp_parens:wn { m m }
-  { \__wisper_operator_exp: \__wisper_parenthesize:nn {#1} {#2} }
-\NewDocumentCommand \__wisper_operator_exp:ww { s }
+\NewDocumentCommand \__wisper_operator_exp_parens:nnw { m m r() }
+  { \__wisper_operator_exp: \__wisper_parenthesize:nnn {#1} {#2} {#3} }
+\NewDocumentCommand \__wisper_operator_exp_parens:nnn { m m m }
+  { \__wisper_operator_exp: \__wisper_parenthesize:nnn {#1} {#2} {#3} }
+\NewDocumentCommand \__wisper_operator_exp:ww { s o }
   {
     \peek_charcode_ignore_spaces:NTF ^
       { \__wisper_operator_exp_power:w }
       {
         \peek_charcode_ignore_spaces:NTF ( %)
-          { \__wisper_operator_exp_parens:ww {#1} }
-          { \__wisper_operator_exp_parens:wn {#1} }
+          { \__wisper_operator_exp_parens:nnw {#1} {#2} }
+          { \__wisper_operator_exp_parens:nnn {#1} {#2} }
       }
   }
 \cs_gset_eq:NN \Exp \__wisper_operator_exp:ww
