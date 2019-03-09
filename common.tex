@@ -8,6 +8,8 @@
 % -> fonts are nothing but features!
 % TODO: append code to package setup (independent of enabling)
 % TODO: engine-specific features, engine={luatex,xetex}
+% TODO: for unknown features, just assume that they are a package and automically define
+% them instead of failing with an unintlligible error
 
 % New packages to investigate
 % subfigure
@@ -1813,6 +1815,7 @@
     url,
     mdframed,
     setspace,
+    soul,
 
     % tables
     rotating,
@@ -1901,6 +1904,7 @@
     \__wisper_load_features_group:n { main_packages }
     \__wisper_load_features_group:n { types }
     \__wisper_load_features_group:n { main }
+    % TODO: load all features that are not explicitly given in the loading orders
 
     %\__wisper_shipout:n { \ExplSyntaxOff }
   }
