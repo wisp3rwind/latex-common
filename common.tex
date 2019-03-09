@@ -153,6 +153,8 @@
 % Common messages [[[1
 \msg_new:nnn { wisper } { unknown-choice }
   { Unknown~#1~'#2'.~Valid~choices~are~\clist_use:Nn #3 { ,~ }. }
+\msg_new:nnn { wisper } { declaring-feature }
+  { Declaring~feature~'#1'. }
 \msg_new:nnn { wisper } { feature-multiply-declared }
   { Feature~'#1'~already~declared. }
 \msg_new:nnn { wisper } { enabling-feature }
@@ -346,6 +348,8 @@
     % #1 - name
     % #2 - keyvals
     % #3 - code
+    \__wisper_if_debug:nT { declaration }
+      { \msg_warning:nnn { wisper } { declaring-feature } { #1 } }
     \cs_if_exist:cT { g__wisper_feature_ #1 _enabled_bool }
       { \msg_error:nnn { wisper } { feature-multiply-declared } { #1 } }
     \bool_gset_false:c { g__wisper_feature_ #1 _enabled_bool }
