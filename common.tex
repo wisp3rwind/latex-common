@@ -874,7 +874,7 @@
   {
     expl3=true,
     makeatletter=true,
-    classoptions = { english },
+    classoptions = { english, smaller },
     requires = {
       class-beamer,
       font-fira,
@@ -884,6 +884,7 @@
       biblatex={doi=false, arxiv=false},
       biblatex-alphabetic,
       pgfpages,  % for notes on second screen
+      setspace,  % control line stretch
     },
   }
   {
@@ -904,7 +905,8 @@
         progressbar=frametitle,  % head, foot, frametitle, none
         block=fill,  % transparent, fill {for theorem and example environments}
       }
-    \setbeamertemplate{footline}[page number]{}
+    %\setbeamertemplate{footline}[page number]{}
+    \setbeamertemplate{footline}[frame number]{}
     \setbeamerfont{caption}{size=\footnotesize}
     % compat with enumitem package
     % TODO: make this conditional on enumitem being loaded
@@ -931,11 +933,48 @@
         }
         {\printtext[journaltitle]{\printfield[titlecase]{shortjournal}}}%
     }
-    % https://tex.stackexchange.com/questions/368757/add-square-brackets-to-footfullcite-in-beamer
-  \renewcommand \@makefnmark
-    { \,[\@thefnmark] }
-  \renewcommand \@makefntext[1]
-    { \usebeamerfont*{footnote} [\@thefnmark]\enspace #1 }
+    % https://tex.stackexchange.com/questions/368757/add-square-brackets-to-footfullcite-in-beamer, but
+    % fixed to be less intrusive
+    \def \@makefnmark
+      {
+        \hbox
+          {
+            \bgroup
+              \,[
+              \usebeamercolor[fg]{footnote mark}
+              \usebeamerfont*{footnote mark}
+              \@thefnmark
+              ]
+            \egroup
+          }
+      }
+    \AtBeginDocument
+      {
+        \bgroup
+          %\showthe\baselineskip
+          \footnotesize
+          %\showthe\baselineskip
+          % Some expandafter trickery needed because 
+          % \setlength\skip@{\baselineskip}
+          % for some reason ends up as
+          % \setlength\skip @{\baselineskip}
+          % in the preamble (note the space) which obviously fails
+          \setlength { \csname skip@\endcsname } { .5\baselineskip }
+          %\showthe \footnotesep
+          \expandafter \global \expandafter \footnotesep
+            \expandafter = \csname skip@\endcsname 
+          %\showthe \footnotesep
+        \egroup
+      }
+
+    %\AtBeginDocument{\setstretch{1.5}}
+    % This is copied from beamerinnerthememetropolis.sty (and also made less intrusive) 
+    % with reduced linespacing (\setstretch)
+    \setbeamertemplate{footnote}{
+      \parindent 0em\noindent
+      \raggedright\setstretch{1.0}
+      \hbox to 1.8em{\hfil\insertfootnotemark}\insertfootnotetext\par
+    }
   }
 \__wisper_declare_document_type:nn {tufte-book}  % [[[3
   {
@@ -1103,6 +1142,7 @@
     amsthm = { groups = font_only },
     pgfpages,
     soul,
+    setspace,
   }
 
 \__wisper_declare_ordinary_feature:nnn { nonnum-section-commands }
@@ -1772,6 +1812,7 @@
     ragged2e,
     url,
     mdframed,
+    setspace,
 
     % tables
     rotating,
