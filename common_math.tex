@@ -310,7 +310,8 @@
 \DeclarePairedDelimiterX \__wisper_set:wn [1] \lbrace \rbrace
   {
     \cs_set:Npn \given { \__wisper_mid_vert:n { \delimsize } }
-    \nonscript\, #1 \nonscript\,
+    %\nonscript\, #1 \nonscript\,
+    \nonscript #1 \nonscript
   }
 \cs_gset_eq:NN \Set \__wisper_set:wn
 
