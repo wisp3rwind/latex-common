@@ -136,6 +136,13 @@
   }
 \cs_generate_variant:Nn \__wisper_if_integer:nTF { xTF }
 
+\prg_new_conditional:Npnn \__wisper_tl_if_novalue_or_blank:n #1 { p, T, F, TF }
+  {
+    \bool_if:nTF { \tl_if_novalue_p:n {#1} || \tl_if_blank_p:n {#1} }
+      { \prg_return_true: } { \prg_return_false: }
+  }
+\prg_generate_conditional_variant:Nnn \__wisper_tl_if_novalue_or_blank:n { V } { p, T, F, TF }
+
 % helpers [[[1
 % TODO: use DeclarePairedDelimiter, also see
 % http://tex.stackexchange.com/questions/23178/swap-definition-of-starred-and-non-starred-command/23214#23214
@@ -243,7 +250,8 @@
     \IfNoValueF { #2 }
       {
         \__wisper_keys_set_known_math:nnN { trace / options } { #2 } \l_tmpa_tl
-        \c_math_subscript_token { \l__wisper_trace_space_tl }
+        \__wisper_tl_if_novalue_or_blank:VF \l__wisper_trace_space_tl
+          { \c_math_subscript_token { \l__wisper_trace_space_tl } }
       }
     \__wisper_operator_trace_surrounding:nVn { #1 } \l_tmpa_tl { #3 }
   }
@@ -593,12 +601,6 @@
 % TODO: \Infimum, \Supremum, \Limes
 
 % Other 'Big' operators [[[1
-
-\prg_new_conditional:Npnn \__wisper_tl_if_novalue_or_blank:n #1 { p, T, F, TF }
-  {
-    \bool_if:nTF { \tl_if_novalue_p:n {#1} || \tl_if_blank_p:n {#1} }
-      { \prg_return_true: } { \prg_return_false: }
-  }
 \cs_new:Npn \__wisper_operator_with_limits:Nnnnnn #1#2#3#4#5#6
   {
     #1
