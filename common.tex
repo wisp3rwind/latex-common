@@ -1704,15 +1704,18 @@
     \NewDocumentCommand \margintodo {s o m} 
       {
         \stepcounter{todonotecounter}
-        \IfBooleanTF{#1}{}{%
-          \marginpar{%
-            \IfValueT{#2}{\vspace{#2}}%
-            \raggedoutside
-            \footnotesize%
-            \fcolorbox{red}{white}{\color{red} \thetodonotecounter}%
-            #3%
+        \IfBooleanTF{#1}{}
+          {
+            \marginpar
+              {
+                \IfValueT{#2}{\vspace{#2}}
+                \raggedoutside
+                \footnotesize
+                \fcolorbox{red}{white}{\color{red} \thetodonotecounter}
+                \hspace{1ex}
+                #3
+              }
           }
-        }
       }
   }
 
