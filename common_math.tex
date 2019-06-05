@@ -956,13 +956,21 @@
 \__wisper_define_derivative_command:nN { f } \var
 
 
-\DeclarePairedDelimiter \EvaluateNoStar {} {\rvert}
-\DeclarePairedDelimiter \EvaluateStar {.} {\rvert}
-\DeclareDocumentCommand \Evaluate { s }
+\DeclarePairedDelimiter \EvaluateNoSizing {} {\rvert}
+\DeclarePairedDelimiter \EvaluateSizing {.} {\rvert}
+\DeclareDocumentCommand \Evaluate { s o }
   {
     \IfBooleanTF {#1}
-      { \EvaluateStar* }
-      { \EvaluateNoStar }
+      {
+        \IfNoValueTF {#2}
+          { \EvaluateSizing* }
+          { \EvaluateSizing*[#2] }
+      }
+      {
+        \IfNoValueTF {#2}
+          { \EvaluateNoSizing }
+          { \EvaluateSizing[#2] }
+      }
   }
 \cs_new_eq:NN \Eval \Evaluate
 
