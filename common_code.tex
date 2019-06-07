@@ -48,4 +48,8 @@
                                 %fontseries=light,
                                 }
 
+%stub: TODO: support language argument (lang=... or direct) and delegate to mintinline
+\NewDocumentCommand \InlineCode { o m }
+  { \texttt{#2} }
+
 % vim: ts=4 sw=4 et fdm=marker fmr=[[[,]]]:
