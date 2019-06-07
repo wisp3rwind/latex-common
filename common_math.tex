@@ -26,6 +26,8 @@
 % Use l3keys to configure style (cf. \Style from the cool package) [[[1
 \ExplSyntaxOn
 
+\exp_args_generate:n { cxx } % -> \exp_args:Ncxx
+
 \cs_new:Npn \__wisper_keys_define_math:n #1 { \keys_define:nn { wisper/math } {#1} }
 \cs_new:Npn \__wisper_keys_set_math:n #1 { \keys_set:nn { wisper/math } {#1} }
 \cs_new:Npn \__wisper_keys_set_math:nn #1#2 { \keys_set:nn { wisper/math/#1 } {#2} }
@@ -41,30 +43,42 @@
         #1 / parenthesis .code:n =
           {
             \cs_set_eq:cN { #2:nnn } \__wisper_parenthesize:nnn
+            \cs_set_eq:cN { #2:nVn } \__wisper_parenthesize:nVn
             \cs_set_eq:cN { #2:nn } \__wisper_parenthesize:nn
             \cs_set_eq:cN { #2_resize:n } \__wisper_parenthesize_resize:n
           },
         #1 / parenthesis-alt .code:n =
           {
             \cs_set_eq:cN { #2:nnn } \__wisper_parenthesize_alt:nnn
+            \cs_set_eq:cN { #2:nVn } \__wisper_parenthesize_alt:nVn
             \cs_set_eq:cN { #2:nn } \__wisper_parenthesize_alt:nn
             \cs_set_eq:cN { #2_resize:n } \__wisper_parenthesize_alt_resize:n
           },
         #1 / braces .code:n =
           {
             \cs_set_eq:cN { #2:nnn } \__wisper_embrace:nnn
+            \cs_set_eq:cN { #2:nVn } \__wisper_embrace:nVn
             \cs_set_eq:cN { #2:nn } \__wisper_embrace:nn
             \cs_set_eq:cN { #2_resize:n } \__wisper_embrace_resize:n
           },
         #1 / brackets .code:n =
           {
             \cs_set_eq:cN { #2:nnn } \__wisper_bracketize:nnn
+            \cs_set_eq:cN { #2:nVn } \__wisper_bracketize:nVn
             \cs_set_eq:cN { #2:nn } \__wisper_bracketize:nn
             \cs_set_eq:cN { #2_resize:n } \__wisper_bracketize_resize:n
+          },
+        #1 / rvert .code:n =
+          {
+            \cs_set_eq:cN { #2:nnn } \__wisper_rvert:nnn
+            \cs_set_eq:cN { #2:nVn } \__wisper_rvert:nVn
+            \cs_set_eq:cN { #2:nn } \__wisper_rvert:nn
+            \cs_set_eq:cN { #2_resize:n } \__wisper_rvert_resize:n
           },
         #1 / none .code:n =
           {
             \cs_set_eq:cN { #2:nnn } \__wisper_surround_none:nnn
+            \cs_set_eq:cN { #2:nVn } \__wisper_surround_none:nVn
             \cs_set_eq:cN { #2:nn } \__wisper_surround_none:nn
             \cs_set_eq:cN { #2_resize:n } \__wisper_surround_none_resize:n
           },
@@ -173,24 +187,37 @@
     \__wisper_operator_image: \__wisper_parenthesize:nn {#1}
   }
 
-\cs_new:Npn \__wisper_declare_paired_delimiter:nNN #1#2#3
+\cs_new:Npn \__wisper_declare_paired_delimiter:nnn #1#2#3
   {
     \exp_args:Nc \DeclarePairedDelimiter { #1 _aux:w } #2 #3
+    % If no \left, \big, ... is prepended to the ., there will be errors (why
+    % doesn't mathtools handle this?)
+    \tl_if_eq:nnTF { #2 } { . }
+      { \tl_set:Nn \l_tmpa_tl {} }
+      { \tl_set:Nn \l_tmpa_tl {#2} }
+    \tl_if_eq:nnTF { #3 } { . }
+      { \tl_set:Nn \l_tmpb_tl {} }
+      { \tl_set:Nn \l_tmpb_tl {#3} }
+    \exp_args:NcVV \DeclarePairedDelimiter { #1 _aux_nonsizing:w } \l_tmpa_tl \l_tmpb_tl
     \cs_new:cpx { #1 :nnn } ##1##2
       {
+        \exp_not:N \tl_show:n {##1}
+        \exp_not:N \tl_show:n {##2}
+        \exp_not:N \tl_show:n { \exp_not:c { #1 _aux:w } }
         \exp_not:N \IfBooleanTF {##1}
           { \exp_not:c { #1 _aux:w } * }
           {
             \exp_not:N \__wisper_tl_if_novalue_or_blank:nTF {##2}
-              { \exp_not:c { #1 _aux:w } }
+              { \exp_not:c { #1 _aux_nonsizing:w } }
               { \exp_not:c { #1 _aux:w } [##2] }
           }
       }
+    \cs_generate_variant:cn { #1:nnn } { nVn }
     \cs_new:cpx { #1 :nn } ##1
       {
         \exp_not:N \IfBooleanTF {##1}
           { \exp_not:c { #1 _aux:w } * }
-          { \exp_not:c { #1 _aux:w } }
+          { \exp_not:c { #1 _aux_nonsizing:w } }
       }
     \cs_new:cpx { #1 _resize:n }
       {
@@ -198,10 +225,11 @@
       }
   }
 
-\__wisper_declare_paired_delimiter:nNN { __wisper_bracketize } \lbrack \rbrack
-\__wisper_declare_paired_delimiter:nNN { __wisper_embrace } \lbrace \rbrace
-\__wisper_declare_paired_delimiter:nNN { __wisper_parenthesize } \lparen \rparen
-\__wisper_declare_paired_delimiter:nNN { __wisper_parenthesize_alt } \lgroup \rgroup
+\__wisper_declare_paired_delimiter:nnn { __wisper_bracketize } \lbrack \rbrack
+\__wisper_declare_paired_delimiter:nnn { __wisper_embrace } \lbrace \rbrace
+\__wisper_declare_paired_delimiter:nnn { __wisper_parenthesize } \lparen \rparen
+\__wisper_declare_paired_delimiter:nnn { __wisper_parenthesize_alt } \lgroup \rgroup
+\__wisper_declare_paired_delimiter:nnn { __wisper_rvert } {.} \rvert
 \cs_new:Npn \__wisper_surround_none:w
   {
     \peek_charcode_remove_ignore_spaces:NTF *
@@ -209,10 +237,10 @@
       { \use:n }
       { \use:n }
   }
-\cs_new:Npn \__wisper_surround_none:nnn #1#2#3
-  { #3 }
-\cs_new:Npn \__wisper_surround_none:nn #1#2
-  { #2 }
+\cs_new:Npn \__wisper_surround_none:nnn #1#2#3 { #3 }
+\cs_generate_variant:Nn \__wisper_surround_none:nnn { nVn }
+\cs_new:Npn \__wisper_surround_none:nn #1#2 { #2 }
+\cs_new:Npn \__wisper_surround_none_resize:n #1 { #1 }
 
 \tl_new:N \g__wisper_symbol_trace_tl
 \prop_new:N \g__wisper_symbol_trace_prop
@@ -240,7 +268,6 @@
 \__wisper_key_define_surrounding:nnn { trace / surrounding }
   { __wisper_operator_trace_surrounding }
   { braces }
-\cs_generate_variant:Nn \__wisper_operator_trace_surrounding:nnn { nVn }
 \NewDocumentCommand \Trace { s o m }
   {
     \__wisper_operator_trace:
@@ -956,21 +983,18 @@
 \__wisper_define_derivative_command:nN { f } \var
 
 
-\DeclarePairedDelimiter \EvaluateNoSizing {} {\rvert}
-\DeclarePairedDelimiter \EvaluateSizing {.} {\rvert}
-\DeclareDocumentCommand \Evaluate { s o }
+\__wisper_key_define_surrounding:nnn { evaluate / surrounding }
+  { __wisper_evaluate_surrounding }
+  { rvert }
+\DeclareDocumentCommand \Evaluate { s o m }
   {
-    \IfBooleanTF {#1}
+    \tl_clear:N \l_tmpa_tl
+    \IfNoValueF { #2 }
       {
-        \IfNoValueTF {#2}
-          { \EvaluateSizing* }
-          { \EvaluateSizing*[#2] }
+        \__wisper_keys_set_known_math:nnN { evaluate / surrounding } { #2 } \l_tmpa_tl
       }
-      {
-        \IfNoValueTF {#2}
-          { \EvaluateNoSizing }
-          { \EvaluateSizing[#2] }
-      }
+    \tl_show:N \l_tmpa_tl
+    \__wisper_evaluate_surrounding:nVn { #1 } \l_tmpa_tl { #3 }
   }
 \cs_new_eq:NN \Eval \Evaluate
 
