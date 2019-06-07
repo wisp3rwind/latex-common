@@ -201,9 +201,9 @@
     \exp_args:NcVV \DeclarePairedDelimiter { #1 _aux_nonsizing:w } \l_tmpa_tl \l_tmpb_tl
     \cs_new:cpx { #1 :nnn } ##1##2
       {
-        \exp_not:N \tl_show:n {##1}
-        \exp_not:N \tl_show:n {##2}
-        \exp_not:N \tl_show:n { \exp_not:c { #1 _aux:w } }
+        %\exp_not:N \tl_show:n {##1}
+        %\exp_not:N \tl_show:n {##2}
+        %\exp_not:N \tl_show:n { \exp_not:c { #1 _aux:w } }
         \exp_not:N \IfBooleanTF {##1}
           { \exp_not:c { #1 _aux:w } * }
           {
@@ -993,7 +993,7 @@
       {
         \__wisper_keys_set_known_math:nnN { evaluate / surrounding } { #2 } \l_tmpa_tl
       }
-    \tl_show:N \l_tmpa_tl
+    %\tl_show:N \l_tmpa_tl
     \__wisper_evaluate_surrounding:nVn { #1 } \l_tmpa_tl { #3 }
   }
 \cs_new_eq:NN \Eval \Evaluate
