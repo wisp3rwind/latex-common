@@ -8,7 +8,9 @@
 % TODO: make as many commands as possible expandable, properly protect everything else
 
 \usepackage{xparse}
-\usepackage{amsmath,amssymb,amsthm}
+\PassOptionsToPackage{fleqn}{amsmath}
+\usepackage{amsmath}
+\usepackage{amssymb,amsthm}
 \usepackage{mathtools}
 \usepackage{cancel}
 \usepackage{bm}
@@ -39,6 +41,7 @@
     \__wisper_keys_define_math:n
       {
         % TODO: shortcuts
+        % TODO: automate these definitions
         #1 .choice:,
         #1 / parenthesis .code:n =
           {

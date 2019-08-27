@@ -884,6 +884,35 @@
     }
     \numberwithin{equation}{section}
   }
+\__wisper_declare_document_type:nnn { thesis }  % [[[3
+  {
+    % TODO: remove english after implementing languages properly
+    classoptions = { english, a4paper, DIV=calc, BCOR=0mm, fontsize=10pt, pagesize, fleqn },
+    requires =
+      {
+        class-scrbook,
+        koma-misc,
+        scrbook,
+        font-TexGyre,
+        math,
+        phys,
+        footnotecite,
+        nonnum-section-commands,
+        biblatex-numeric-supercite,
+        caption,
+      },
+  }
+  {
+    \captionsetup{
+      format=plain,
+      %font=small,
+      font={sf,footnotesize},
+      labelfont=sc,
+      calcwidth=0.9\linewidth,
+      justification=RaggedRight
+    }
+    \numberwithin{equation}{section}
+  }
 \__wisper_declare_document_type:nnn { presentation }  % [[[3
   {
     expl3=true,
@@ -1162,6 +1191,7 @@
     pgfpages,
     soul,
     setspace,
+    titletoc,
   }
 
 \__wisper_declare_ordinary_feature:nnn { nonnum-section-commands }
@@ -1834,6 +1864,7 @@
     xtemplate,
 
     sidenotes,
+    titletoc,
 
     enumitem,
     float,
