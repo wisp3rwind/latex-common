@@ -287,6 +287,27 @@
   }
 \cs_gset_eq:NN \Tr \Trace
 
+\__wisper_key_define_surrounding:nnn { DiracDelta / surrounding }
+  { __wisper_operator_dirac_delta_surrounding }
+  { parenthesis }
+% Already defined by COOL
+\RenewDocumentCommand \DiracDelta { s o m }
+  {
+    \delta
+    \__wisper_operator_dirac_delta_surrounding:nnn { #1 } { #2 } { #3 }
+  }
+
+\__wisper_key_define_surrounding:nnn { HeavisideTheta / surrounding }
+  { __wisper_operator_heaviside_theta_surrounding }
+  { parenthesis }
+\NewDocumentCommand \HeavisideTheta { s o m }
+  {
+    \Theta
+    \__wisper_operator_heaviside_theta_surrounding:nnn { #1 } { #2 } { #3 }
+  }
+% Discourage use of the macro defined by COOL
+\cs_undefine:N \HeavisideStep
+
 \tl_new:N \g__wisper_symbol_identity_tl
 \prop_new:N \g__wisper_symbol_identity_prop
 \prop_put:Nnn \g__wisper_symbol_identity_prop { id } {\mathrm{id}}
