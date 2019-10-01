@@ -112,7 +112,7 @@
 % cf. https://tex.stackexchange.com/questions/214347/how-to-implement-a-macro-for-normal-ordering-of-operators
 \NewDocumentCommand \NormalOrdering { m }
   {
-    \vcentcolon \, \mathrel{#1} \, \vcentcolon
+    \mathopen{\vcentcolon} \, \mathinner{#1} \, \mathclose{\vcentcolon}
   }
 
 \ExplSyntaxOff
