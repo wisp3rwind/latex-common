@@ -803,8 +803,6 @@
       {
         scrartcl,
         font-TexGyre,
-        math,
-        phys,
       },
   }
 \__wisper_declare_document_type:nnn { paper }  % [[[3
@@ -815,8 +813,6 @@
       {
         scrartcl,
         font-TexGyre,
-        math,
-        phys,
         biblatex-numeric-supercite,
         caption,
       },
@@ -840,8 +836,6 @@
       {
         scrartcl,
         font-TexGyre,
-        math,
-        phys,
         % biblatex-numeric-supercite,
         biblatex-alphabetic,
         biblatex={maxcitenames=1},
@@ -867,8 +861,6 @@
       {
         scrartcl,
         font-TexGyre,
-        math,
-        phys,
         biblatex-numeric-supercite,
         caption,
       },
@@ -894,8 +886,6 @@
         koma-misc,
         scrbook,
         font-TexGyre,
-        math,
-        phys,
         footnotecite,
         nonnum-section-commands,
         biblatex = {giveninits=true, date=year},
@@ -939,8 +929,6 @@
     requires = {
       class-beamer,
       font-fira,
-      math,
-      phys,
       %biblatex-numeric-supercite,
       biblatex={doi=false, arxiv=false, giveninits=true, date=year},
       biblatex-alphabetic,
@@ -1636,48 +1624,6 @@
 \__wisper_declare_mutually_exclusive_features:n
   { hyperref-black, hyperref-pale-colors }
 
-% Code display [[[2
-\__wisper_declare_packages:n
-  { minted }
-
-\__wisper_declare_ordinary_feature:nnn { minted-default }
-  {
-    requires = { minted },
-  }
-  {
-    %\input{common_code.tex}
-    \usepackage{wispercode}
-  }
-
-\__wisper_declare_ordinary_feature:nnn { listings }
-  { requires = minted }
-  {
-  }
-
-% Math, physics [[[2
-\__wisper_declare_ordinary_feature:nnn { math }
-  { groups=font_only }
-  {
-    %\input{common_math.tex}
-    \usepackage{wispermath}
-  }
-
-\__wisper_declare_ordinary_feature:nnn { phys }
-  { requires = math, groups=font_only }
-  {
-    %\input{common_phys.tex}
-    \usepackage{wisperphys}
-  }
-
-\__wisper_declare_ordinary_feature:nnn { plots }
-  {
-    expl3=true,
-  }
-  {
-    %\input{common_plots.tex}
-    \usepackage{wisperplots}
-    \tl_if_exist:NF \PlotFont { \tl_gclear:N \PlotFont }
-  }
 
 % Tables, figures [[[2
 \__wisper_declare_packages:n
@@ -1891,7 +1837,6 @@
 
     % load minted before csquotes to suppress a warning due to a common package
     % they load
-    minted,
     csquotes,  % context-sensitive quotes
     microtype,
     xtemplate,
@@ -1922,10 +1867,6 @@
     subcaption,
 
     biblatex,
-
-    math,
-    phys,
-
 
     % Packages that need to be loaded last [[[2
     bigfoot,

@@ -9,6 +9,7 @@
 %\RequirePackage{tikzexternal}
 %\tikzexternalize[prefix=./build/externalized/]
 
+\tl_if_exist:NF \PlotFont { \tl_gclear:N \PlotFont }
 \tl_new:N \__plot_width_tl
 \tl_new:N \__plot_preamble_tl
 \keys_define:nn { plots }

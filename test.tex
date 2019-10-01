@@ -1,6 +1,10 @@
 \input{common.tex}
 \DocumentStyle{main_language=english}
-\Preamble{scrbook, font-TexGyre, math, phys, minted-default, koma-misc, alphabetic-default-footnote, footnotecite, boxes, paul-tol-colors}
+\Preamble{scrbook, font-TexGyre, koma-misc, alphabetic-default-footnote, footnotecite, boxes, paul-tol-colors}
+\usepackage{wispermath}
+\usepackage{wisperphys}
+\usepackage{wispercode}
+%\usepackage{wisperplots}
 
 \ExplSyntaxOn
 \NewDocumentCommand \Example { O{displaymath} v }
