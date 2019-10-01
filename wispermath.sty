@@ -7,26 +7,29 @@
 % TODO: documentation
 % TODO: make as many commands as possible expandable, properly protect everything else
 
-\usepackage{xparse}
+\ProvidesExplPackage {wispermath} {2019-10-01} {0.1} {Empty description.}
+
+\RequirePackage{xparse}
 \PassOptionsToPackage{fleqn}{amsmath}
-\usepackage{amsmath}
-\usepackage{amssymb,amsthm}
-\usepackage{mathtools}
-\usepackage{cancel}
-\usepackage{bm}
-\usepackage{cool}
-\usepackage{tikz}
+\RequirePackage{amsmath}
+\RequirePackage{amssymb,amsthm}
+\RequirePackage{mathtools}
+\RequirePackage{cancel}
+\RequirePackage{bm}
+\RequirePackage{cool}
+\RequirePackage{tikz}
+\ExplSyntaxOff
 \usetikzlibrary{arrows.meta}
 \usetikzlibrary{calc,arrows.meta,bending}  % current texlive version of witharrows fails to load if not preloading these...
-\usepackage{witharrows}
-\WithArrowsOptions{displaystyle}
-\usepackage{xcolor}
-\usepackage{empheq}
-\usepackage{tensor}
+\ExplSyntaxOn
+\RequirePackage{witharrows}
+%\WithArrowsOptions{displaystyle}
+\RequirePackage{xcolor}
+\RequirePackage{empheq}
+\RequirePackage{tensor}
 
 
 % Use l3keys to configure style (cf. \Style from the cool package) [[[1
-\ExplSyntaxOn
 
 \exp_args_generate:n { cxx } % -> \exp_args:Ncxx
 
@@ -1052,6 +1055,5 @@
 \NewDocumentCommand \qm { s m }
   { \__wisper_q:Nnn \use:n { #1 } { #2 } }
 
-\ExplSyntaxOff
 
 % vim: ts=2 sw=2 et fdm=marker fmr=[[[,]]]:

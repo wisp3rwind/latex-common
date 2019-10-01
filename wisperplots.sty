@@ -1,13 +1,14 @@
-\usepackage{filemod}
-\usepackage{shellesc}
+\ProvidesExplPackage {wisperplots} {2019-10-01} {0.1} {Empty description.}
 
-\usepackage{pgfplots}
+\RequirePackage{filemod}
+\RequirePackage{shellesc}
+
+\RequirePackage{pgfplots}
 \pgfplotsset{compat=1.15}
-\usepackage[subpreambles,sort]{standalone}
-%\usepackage{tikzexternal}
+\RequirePackage[subpreambles,sort]{standalone}
+%\RequirePackage{tikzexternal}
 %\tikzexternalize[prefix=./build/externalized/]
 
-\ExplSyntaxOn
 \tl_new:N \__plot_width_tl
 \tl_new:N \__plot_preamble_tl
 \keys_define:nn { plots }
@@ -60,5 +61,4 @@
         \includegraphics{{\__plot_filename_tl}.pdf}
     \endgroup
   }
-\ExplSyntaxOff
 

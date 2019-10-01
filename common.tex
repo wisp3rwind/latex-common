@@ -1645,7 +1645,8 @@
     requires = { minted },
   }
   {
-    \input{common_code.tex}
+    %\input{common_code.tex}
+    \usepackage{wispercode}
   }
 
 \__wisper_declare_ordinary_feature:nnn { listings }
@@ -1657,13 +1658,15 @@
 \__wisper_declare_ordinary_feature:nnn { math }
   { groups=font_only }
   {
-    \input{common_math.tex}
+    %\input{common_math.tex}
+    \usepackage{wispermath}
   }
 
 \__wisper_declare_ordinary_feature:nnn { phys }
   { requires = math, groups=font_only }
   {
-    \input{common_phys.tex}
+    %\input{common_phys.tex}
+    \usepackage{wisperphys}
   }
 
 \__wisper_declare_ordinary_feature:nnn { plots }
@@ -1671,7 +1674,8 @@
     expl3=true,
   }
   {
-    \input{common_plots.tex}
+    %\input{common_plots.tex}
+    \usepackage{wisperplots}
     \tl_if_exist:NF \PlotFont { \tl_gclear:N \PlotFont }
   }
 
