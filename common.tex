@@ -904,6 +904,14 @@
       },
   }
   {
+    \AtBeginDocument{
+      \AtEveryBibitem
+        {
+          \clearlist{location}
+          \clearfield{note}
+          \clearfield{pagetotal}
+        }
+      }
     \captionsetup{
       format=plain,
       %font=small,
@@ -913,6 +921,15 @@
       justification=RaggedRight
     }
     \numberwithin{equation}{section}
+    \KOMAoption{toc}{bibliography}%, flat}
+    \KOMAoptions{overfullrule=true}
+    \setcounter{tocdepth}{\sectiontocdepth}
+    \DeclareTOCStyleEntries[
+        linefill={\ {\color{mark-pale-grey}\footnotesize\textbullet}\ },
+        raggedpagenumber=true,
+        raggedentrytext=true,
+        pagenumberbox=\mbox
+      ]{tocline}{chapter,section}
   }
 \__wisper_declare_document_type:nnn { presentation }  % [[[3
   {
@@ -1107,6 +1124,7 @@
       fontspec = no-math,
       %cabin = type1,
       %beramono = {scaled=.85},
+      FiraSans
     },
   }
   {
@@ -1146,6 +1164,7 @@
         \__wisper_shipout:n
           { \useosf }
       }
+      \__wisper_load_feature:n {FiraSans}
 
       \__wisper_shipout:n
         { \linespread{1.05} }
@@ -1271,7 +1290,12 @@
       },
     },
   }
-  { }
+  {
+    \AtEveryBibitem
+      {
+        \clearfield{location}
+      }
+  }
 
 \__wisper_declare_ordinary_feature:nnn { biblatex-wip-interface }
   % TODO: actually implement this.
@@ -1497,11 +1521,15 @@
         % https://tex.stackexchange.com/questions/108894/typesetting-formulas-in-section-titles-title-bold-toc-entry-isnt#comment238645_108894
         % https://tex.stackexchange.com/questions/41379/automatically-typeset-math-in-section-headings-in-bold-face#124311
         % Fix chapter/section titles defaulting to sans (i.e. CM) fonts
-        \setkomafont{disposition}{\sffamily\bfseries\boldmath}
+        %\setkomafont{disposition}{\sffamily\bfseries\boldmath}
+        %\setkomafont{disposition}{\scshape\large}
+        \setkomafont{disposition}{\firalight\large}
         \KOMAoptions{headings=normal}
         % Fix fonts in the toc
         \IfDocClassT {scrbook}
-          { \setkomafont{chapterentry}{\sffamily\bfseries\boldmath} }
+          %{ \setkomafont{chapterentry}{\sffamily\bfseries\boldmath} }
+          %{ \setkomafont{chapterentry}{\scshape\large} }
+          { \setkomafont{chapterentry}{\firalight\large} }
         % fix item font in descriptions and enumerates
         \setkomafont{descriptionlabel}{\normalfont\bfseries\boldmath}
         \setkomafont{labelinglabel}{\normalfont\bfseries\boldmath}
