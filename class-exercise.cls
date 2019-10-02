@@ -1,0 +1,3 @@
+\documentclass[]{scrartcl}
+
+\usepackage{wisperFontsTexGyre}
