@@ -2,28 +2,43 @@
 
 \RequirePackage{wisperProgrammingTools}
 
+\__wisper_if_document_class:nTF {koma}
+  {
+    \prg_new_protected_conditional:Npnn \__wisper_if_odd_page: { p, T, F, TF }
+      {
+        \ifthispageodd { \prg_return_true: } { \prg_return_false: }
+      }
+  }
+  {
+    \PassOptionsToPackage{strict}{changepage}
+    \RequirePackage{changepage}
+
+    \prg_new_protected_conditional:Npnn \__wisper_if_odd_page: { p, T, F, TF }
+      {
+        \checkoddpage
+        \ifoddpage \prg_return_true: \else \prg_return_false: \fi
+      }
+  }
+
+\NewDocumentCommand \IfOddPageTF { m m }
+  { \__wisper_if_odd_page:TF {#1} {#2} }
+\NewDocumentCommand \IfOddPageT { m }
+  { \__wisper_if_odd_page:T {#1} }
+\NewDocumentCommand \IfOddPageF { m }
+  { \__wisper_if_odd_page:F {#1} }
 
 \__wisper_if_twoside:TF
   {
     % onesided
-    \cs_new_eq:NN \raggedoutside \raggedright
+    \cs_new_eq:NN \RaggedOutside \raggedright
     \NewDocumentEnvironment {FlushInside} { }
       { \begin{FlushLeft} }
       { \end{FlushLeft} }
   }
   {
-    \PassOptionsToPackage{strict}{changepage}
-    \RequirePackage{changepage}
     %twosided
-    \NewDocumentCommand \raggedoutside { }
-      {
-        \checkoddpage
-        \ifoddpage
-          \RaggedRight
-        \else
-          \RaggedLeft
-        \fi
-      }
+    \NewDocumentCommand \RaggedOutside { }
+      { \__wisper_if_odd_page:TF { \RaggedRight } { \RaggedLeft } }
 
     \NewDocumentEnvironment {FlushInside} { }
       {
@@ -31,12 +46,7 @@
         % in turn mimic LaTeX' flushleft/flushrigh. According to source2e, the
         % trivlist is used to handle vertical spacing.
         \trivlist
-        \checkoddpage
-        \ifoddpage
-          \RaggedRight\item\relax
-        \else
-          \RaggedLeft\item\relax
-        \fi
+        \RaggedOutside \item\relax
       }
       {
         \endtrivlist

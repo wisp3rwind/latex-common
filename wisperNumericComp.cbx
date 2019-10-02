@@ -1,0 +1,64 @@
+% TODO: add \xfootnotecite that mimics \superfullcite 
+% TODO: experiment with alphabetic citations in superscripts
+\ProvidesFile{wisperNumericComp.cbx}
+
+% The script originally taken from
+% http://www.texdev.net/2010/03/08/biblatex-numbered-citations-as-footnotes/
+% Modified by S. Khirevich
+% Modified by ...
+  % Inspired and partially copied from
+  %   http://www.khirevich.com/latex/footnote_citation/
+
+\RequireCitationStyle{numeric-comp}
+
+\ExecuteBibliographyOptions{citetracker,sorting=none}
+
+%==========================================================%
+% 
+%==========================================================%
+\ExplSyntaxOn
+\RequirePackage{wisperProgrammingTools}
+
+\cs_new:Npn \__wisper_smartbibsuperscript:n #1
+  { \mkbibsuperscript{#1} }
+\cs_new:Npn \__wisper_smartbibsuperscript:nN #1#2
+  {
+    \settowidth \l_tempa_dim {#2}
+    \dim_add:Nn \l_tempa_dim { -1.8\l_tempa_dim }
+
+    #2 \hspace* { \l_tempa_dim }
+    % TODO: ensure that spacing after the superscript is correct
+    \__wisper_smartbibsuperscript:n {#1}
+  }
+\cs_new:Npn \__wisper_smartbibsuperscript:nw #1
+  {
+    \__wisper_peek_charcode_any_ignore_spaces:nTF {.,:;}
+      { \__wisper_smartbibsuperscript:nN {#1} }
+      { \__wisper_smartbibsuperscript:n {#1} }
+  }
+
+
+%==========================================================%
+% \DeclareCiteCommand below creates a citation with the citation
+% index in a superscript and smart handling of trailing punctuation characters.
+% The command is identical to \supercite from numeric-comp.cbx
+% except for the superscript wrapper
+%==========================================================%
+\DeclareCiteCommand{\xcite}[\__wisper_smartbibsuperscript:nw]
+  {\usebibmacro{cite:init}%
+   \let\multicitedelim=\supercitedelim
+   \iffieldundef{prenote}
+     {}
+     {\BibliographyWarning{Ignoring prenote argument}}%
+   \iffieldundef{postnote}
+     {}
+     {\BibliographyWarning{Ignoring postnote argument}}}
+  {\usebibmacro{citeindex}%
+   \usebibmacro{cite:comp}}
+  {}
+  {\usebibmacro{cite:dump}}
+
+\ExplSyntaxOff
+
+\endinput
+

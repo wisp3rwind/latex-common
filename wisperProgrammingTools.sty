@@ -124,6 +124,21 @@
 \makeatother
 
 
+% Peeking ahead [[[1
+\prg_new_conditional:Npnn \__wisper_peek_charcode_any_ignore_spaces:n #1 { T, F, TF }
+  {
+    \exp_args:No \peek_charcode_ignore_spaces:NTF \tl_head:w #1 \q_stop 
+      { \prg_return_true: }
+      {
+        \tl_if_single:nTF  {#1}
+          { \prg_return_false: }
+          {
+            \__wisper_peek_charcode_any_ignore_spaces:nTF \tl_tail:n {#1}
+              { \prg_return_true: } { \prg_return_false: }
+          }
+      }
+  }
+
 % Old, unused code [[[1
 \cs_new:Npn \__wisper_prop_keys_to_clist:NN #1#2
   {

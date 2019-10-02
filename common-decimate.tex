@@ -1,0 +1,141 @@
+\__wisper_declare_ordinary_feature:nnn { biblatex-picture-sources }
+  % Usage:
+  %\usepackage{filecont ents}
+  %\begin{filecontent s}{pictures.bib}
+  %@online {pic:source:foo,
+  %  title = {Figure~\ref{pic:foo}},
+  %  url = {https://example.com/pic.jpg},
+  %  urldate = {2018-01-05},
+  %}
+  %\end{filecont ents}
+  %\addbibresource{pictures.bib}
+  % ...
+  %\begin{document}
+  % ...
+  % \caption{...\cite{pic:source:foo}}
+  { requires = biblatex }
+  {
+    \DeclareBibliographyDriver{cite:online}
+    {
+      \usebibmacro{author+title}
+      %\usebibmacro{note+pages}
+      \setunit{\addperiod\addspace}
+      %\usebibmacro{url+urldate}
+      \usebibmacro{url}
+      \usebibmacro{finentry}
+    }
+  }
+
+% biblatex styles to look at:
+style=verbose-note,
+style=alphabetic,
+style=authoryear-comp,
+
+\__wisper_declare_feature_expand_conditional:nnn { footnotecite }
+  {
+    expl3=true,
+    requires-conditional = {
+      { { ! \__wisper_if_document_class_p:n { beamer } } { multiple-footnotes } },
+    },
+  }
+  {
+    \IfDocClassTF { beamer }
+      {
+        % bigfoot+beamer crashes (incomplete iffalse ...)
+        %\DeclareDocumentCommand \footnotetextCite { r[] } { \footnotetext[#1][frame] }
+        \DeclareDocumentCommand \footnotetextCite { r[] } { \footnotetext[#1] }
+        \cs_gset_eq:NN \footnotemarkCite \footnotemark
+        %\cs_gset_eq:NN \footnotetextCite \footnotetext
+        \cs_gset_eq:NN \footnoteCite \footnote
+      }
+      {
+        \DeclareNewFootnote{Cite} 
+      }
+  }
+
+
+% Footnotes [[[2
+\__wisper_declare_package:n { bigfoot }
+
+\__wisper_declare_ordinary_feature:nnn { multiple-footnotes }
+  {
+    requires = bigfoot,
+  }
+  {
+  }
+
+\__wisper_declare_feature_expand_conditional:nnn { alphabetic-default-footnote }
+  {
+    expl3=true,
+  }
+  {
+    \__wisper_if_feature_enabled:nTF { bigfoot }
+      {
+        \DeclareNewFootnote{default}[alph]
+        \cs_gset_eq:NN \footnote \footnotedefault
+        \cs_gset_eq:NN \footnotemark \footnotemarkdefault
+        \cs_gset_eq:NN \footnotetext \footnotetextdefault
+      }
+      {
+        \cs_gset:Npn \thefootnote { \alph{footnote} }
+      }
+  }
+
+% Loading orders [[[1
+
+% TODO: automatically set these clists from \__wisper_declare_feature:
+\seq_gset_from_clist:Nn \g__wisper_all_features_early_packages_seq
+  {
+    inputenc,
+    babel,
+    fontenc,
+    standalone,
+    pgfpages,
+  }
+\seq_gset_from_clist:Nn \g__wisper_all_features_main_packages_seq
+  {
+    koma-misc,  % must be after fonts to adjust dimensions
+
+    % colors
+    xcolor,
+    paul-tol-colors,
+
+    % load minted before csquotes to suppress a warning due to a common package
+    % they load
+    csquotes,  % context-sensitive quotes
+    microtype,
+
+    sidenotes,
+    titletoc,
+
+    enumitem,
+    float,
+    calc,
+    fancyhdr,
+    ragged2e,
+    url,
+    setspace,
+    soul,
+
+    % tables
+    rotating,
+    booktabs,
+    array,
+    multirow,
+    tabu,
+
+    % Graphics
+    graphicx,  % advanced key=value arguments for \includegraphics
+    caption,
+    subcaption,
+
+    biblatex,
+
+    % Packages that need to be loaded last [[[2
+    bigfoot,
+    hyperref,
+    showlabels,
+  }
+
+
+% vim: ft=tex ts=2 sw=2 et fdm=marker fmr=[[[,]]]:

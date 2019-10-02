@@ -1,0 +1,52 @@
+% TODO: caption-font option to specify font/labelfont/...; only set the alignment here
+
+\ProvidesExplPackage {wisperSidenotes} {2019-10-01} {0.1} {Empty description.}
+
+\RequirePackage{wisperProgrammingTools}
+
+\RequirePackage{caption}
+
+
+\DeclareCaptionStyle{myfigure}{
+  font=footnotesize,
+  labelfont=sc,
+}
+
+\captionsetup{style=myfigure}  % default
+
+
+\dim_new:N \realmarginparwidth
+\dim_gset:Nn \realmarginparwidth
+  { \marginparwidth + \marginparsep }
+
+
+\__wisper_if_twoside:T
+  {
+    \DeclareCaptionJustification{RaggedOutside}{\RaggedOutside}
+
+    \DeclareCaptionStyle{marginfigure}{
+      justification=RaggedOutside,
+      font={sf,footnotesize},
+      labelfont=sc,
+    }
+
+    \DeclareCaptionStyle{margintable}{
+      justification=RaggedOutside,
+      font={sf,footnotesize},
+      labelfont=sc,
+    }
+
+    \DeclareCaptionStyle{sidecaption}{
+      justification=RaggedOutside,
+      font={sf,footnotesize},
+      labelfont=sc,
+    }
+
+    \DeclareCaptionStyle{widetable}{
+      %justification=RaggedOutside,
+      font={sf,footnotesize},
+      labelfont=sc,
+      margin={0pt, \realmarginparwidth}
+    }
+  }
+

@@ -25,6 +25,10 @@
     \renewcommand\labelitemi{{\fontfamily{cmr}\selectfont\textbullet}}
     \renewcommand\labelitemiii{{\fontfamily{cmr}\selectfont\textasteriskcentered}}
     \renewcommand\labelitemiv{{\fontfamily{cmr}\selectfont\textperiodcentered}}
+
+    % use ragged2e in headings
+    \renewcommand* { \raggedchapter } { \RaggedRight }
+    \renewcommand* { \raggedsection } { \RaggedRight }
     
     % Titlepage
     \IfDocClassT { scrbook }  % TODO: better conditional
