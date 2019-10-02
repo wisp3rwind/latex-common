@@ -1,0 +1,11 @@
+\ProvidesExplPackage {wisperArrayParColumns} {2019-10-01} {0.1} {Empty description.}
+
+\RequirePackage{array}
+\RequirePackage{ragged2e}
+
+% https://tex.stackexchange.com/a/2442/111880
+% https://tex.stackexchange.com/a/12712/111880
+\newcolumntype {L}[1] { >{ \RaggedRight \let\newline\\ \arraybackslash \hspace{0pt} } m {#1} }
+\newcolumntype {C}[1] { >{ \Centering   \let\newline\\ \arraybackslash \hspace{0pt} } m {#1} }
+\newcolumntype {R}[1] { >{ \RaggedLeft  \let\newline\\ \arraybackslash \hspace{0pt} } m {#1} }
+

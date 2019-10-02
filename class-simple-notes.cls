@@ -1,4 +1,4 @@
-\documentclass[ english, DIV=10, fontsize=10pt ]{scrartcl}
+\documentclass[ a4paper, english, BCOR=0mm, DIV=10, fontsize=10pt, pagesize ]{scrartcl}
 
 \usepackage{wisperFontsTexGyre}
 %\usepackage{wisperNumericSupercite}

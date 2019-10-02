@@ -1,7 +1,8 @@
 \documentclass[ english, a4paper, DIV=calc, BCOR=0mm, fontsize=10pt, pagesize, fleqn ]{scrbook}
 
+\usepackage{wisperFontSetupTexGyreAndFira}
 \usepackage{wisperKOMAMisc}
-\usepackage{wisperFontsTexGyre}
+\KOMAoptions{DIV=last}
 \usepackage{wisperFootnotecite}
 \usepackage[giveninits=true, date=year]{biblatex}
 \usepackage{wisperNumericSupercite}
@@ -23,7 +24,8 @@
 	calcwidth=0.9\linewidth,
 	justification=RaggedRight
 }
-\numberwithin{equation}{section}
+%\numberwithin{equation}{section}
+\numberwithin{equation}{chapter}
 \KOMAoption{toc}{bibliography}%, flat}
 \KOMAoptions{overfullrule=true}
 \setcounter{tocdepth}{\sectiontocdepth}

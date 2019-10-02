@@ -1,0 +1,49 @@
+\ProvidesExplPackage {wisperDefaultPackages} {2019-10-01} {0.1} {Empty description.}
+
+\RequirePackage{wisperProgrammingTools}
+
+
+\__wisper_if_document_class:nF {beamer}
+  { \RequirePackag{inline}{enumitem} }
+%\RequirePackage{calc}
+\RequirePackage{ragged2e}
+\RequirePackage{xcolor}
+
+\__wisper_if_document_class:nF {beamer}
+  % loaded early by hyperref which is loaded way to early by beamer...
+  % loading it again gives an option clash.
+  { \RequirePackage[hyphens]{url} }
+\RequirePackage{hyperref}
+
+%\RequirePackage{sidenotes}
+\RequirePackage{babel}
+%\RequirePackage{standalone}
+
+% TODO: the following are more closely related to fonts, and should probably
+% also be loaded for plots. -> move to another file
+\RequirePackage[T1]{fontenc}
+\RequirePackage{csquotes}
+\RequirePackage{microtype}
+\__wisper_if_engine:nF {luatex, xetex}
+  { \RequirePackage[utf8]{inputenc} }
+
+%\RequirePackage{fancyhdr}
+%\RequirePackage{amsthm}
+%\RequirePackage{pgfpages}
+%\RequirePackage{soul}
+%\RequirePackage{setspace}
+%\RequirePackage{titletoc}
+
+% Tables, figures [[[1
+\RequirePackage{float}
+\RequirePackage{rotating}
+\RequirePackage{booktabs}
+\RequirePackage{array}
+%\RequirePackage{multirow}
+%\RequirePackage{tabu}
+\RequirePackage{caption}
+\RequirePackage{subcaption}
+\RequirePackage{graphicx}
+
+
+% vim: ft=tex ts=2 sw=2 et fdm=marker fmr=[[[,]]]:

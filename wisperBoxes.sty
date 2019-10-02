@@ -1,0 +1,86 @@
+\ProvidesExplPackage {wisperBoxes} {2019-10-01} {0.1} {Empty description.}
+
+\RequirePackage{mdframed}
+\RequirePackage{xtemplate}
+\RequirePackage{xcolor}
+
+% Define expl3-style interfaces for xtemplate and mdframed
+\cs_new:Npn \__wisper_xtemplate_DeclareInstance:nnnn { \DeclareInstance }
+\cs_new:Npn \__wisper_xtemplate_UseInstance:nnnw { \UseInstance }  % -> w-type argument because this reads a variable number of arguments depending on the template
+\cs_generate_variant:Nn \__wisper_xtemplate_DeclareInstance:nnnn { nxnn }
+\cs_generate_variant:Nn \__wisper_xtemplate_UseInstance:nnnw { nxxw }
+
+\cs_new:Npn \__wisper_mdfdefinestyle:nn { \mdfdefinestyle }
+\cs_generate_variant:Nn \__wisper_mdfdefinestyle:nn { nx }
+
+
+\dim_new:N \l__wisper_left_margin_dim
+\DeclareObjectType { fancy-box } { 1 }
+\DeclareTemplateInterface { fancy-box } { wisper } { 1 }
+  {
+    title-format: tokenlist = { \bfseries { \Title } },
+    bar-location: choice {margin, flush} = flush,
+    bar-width: length = 0.15cm,
+    bar-colour: tokenlist = {black},
+    bg-colour: tokenlist = {white},
+  }
+\DeclareTemplateCode { fancy-box } { wisper } { 1 }
+  {
+    title-format = \l__wisper_title_format_tl,
+    bar-location =
+      {
+        margin = { \bool_gset_true:N \l__wisper_bar_in_margin_bool },
+        flush = { \bool_gset_false:N \l__wisper_bar_in_margin_bool },
+      },
+    bar-width = \l__wisper_bar_width_dim,
+    bar-colour = \l__wisper_bar_colour_tl,
+    bg-colour = \l__wisper_bg_colour_tl,
+  }
+  {
+    \AssignTemplateKeys
+    \bool_if:NTF \l__wisper_bar_in_margin_bool
+      { \dim_set:Nn \l__wisper_left_margin_dim { -1cm} }
+      { \dim_set:Nn \l__wisper_left_margin_dim { 0pt } }
+    \__wisper_mdfdefinestyle:nx { #1 }
+      {
+        skipabove=0.3 \exp_not:N \baselineskip,
+        skipbelow=0.3 \exp_not:N \baselineskip,
+        rightline=false,
+        leftline=true,
+        topline=false,
+        bottomline=false,
+        linecolor=\l__wisper_bar_colour_tl,
+        backgroundcolor=\l__wisper_bg_colour_tl,
+        innerleftmargin=5pt,
+        innerrightmargin=5pt,
+        innertopmargin=3pt,
+        innerbottommargin=3pt
+        leftmargin=\l__wisper_left_margin_dim,
+        rightmargin=0cm,
+        linewidth=\l__wisper_bar_width_dim,
+      }
+  }
+\cs_new_nopar:Npn \NewFancyBox #1#2
+  {
+    \__wisper_xtemplate_DeclareInstance:nxnn
+      { fancy-box }
+      { \tl_trim_spaces:n { #1 } }
+      { wisper }
+      { #2 }
+    \__wisper_xtemplate_UseInstance:nxxw
+      { fancy-box }
+      { \tl_trim_spaces:n { #1 } }
+      { \tl_trim_spaces:n { #1 } }
+    \use:x
+      {
+        \exp_not:N \newmdenv[style=\tl_trim_spaces:n { #1 }]{ \tl_trim_spaces:n { #1 } }
+      }
+  }
+\cs_new_nopar:Npn \WrapInFancyBox #1#2
+  {
+    % mdframed also provided \newmdtheoremenv, but that only supports
+    % ntheorem. Anyway, this kind of wrapper gives better separation
+    % between different packages.
+    \BeforeBeginEnvironment { #1 } { \begin { #2 } }
+    \AfterEndEnvironment { #1 } { \end { #2 } }
+  }

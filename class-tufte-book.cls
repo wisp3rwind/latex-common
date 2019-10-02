@@ -1,10 +1,11 @@
-\documentclass{scrbook}
+\documentclass[ english, a4paper, DIV=calc, BCOR=0mm, fontsize=10pt, pagesize, fleqn ]{scrbook}
 
+\usepackage{wisperFontSetupTexGyreAndFira}
 \usepackage{wisperKOMAMisc}
-\usepackage{wisperFontsTexGyre}
+\KOMAoptions{DIV=last}
 \usepackage{wisperFootnotecite}
 \usepackage{wisperNumericSupercite}
-\usepackage{wisperTwoside}
+\usepackage{wisperIfTwoside}
 \usepackage{wisperTwosideFloats}
 \usepackage{sidenotes}
 \usepackage{wisperBoxes}

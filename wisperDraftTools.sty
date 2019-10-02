@@ -1,0 +1,33 @@
+\ProvidesExplPackage {wisperDraftTools} {2019-10-01} {0.1} {Empty description.}
+
+\RequirePackage{wisperProgrammingTools}
+
+% Drafts [[[2
+
+\PassOptionsToPackage{inner}{showlabels}
+\RequirePackage{showlabels}
+
+\tl_gset:Nn \showlabelfont { \tiny\ttfamily }
+\showlabels{cite}
+\showlabels{ref}
+\showlabels{begin}
+
+\RequirePackage{wisperIfTwoside}
+
+\newcounter{todonotecounter}
+\NewDocumentCommand \margintodo {s o m} 
+  {
+    \stepcounter{todonotecounter}
+    \IfBooleanTF{#1}{}
+      {
+        \marginpar
+          {
+            \IfValueT{#2}{\vspace{#2}}
+            \raggedoutside
+            \footnotesize
+            \fcolorbox{red}{white}{\color{red} \thetodonotecounter}
+            \hspace{1ex}
+            #3
+          }
+      }
+  }

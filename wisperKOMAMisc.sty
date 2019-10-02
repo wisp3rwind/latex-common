@@ -1,0 +1,59 @@
+\ProvidesExplPackage {wisperKOMAMisc} {2019-10-01} {0.1} {Empty description.}
+
+\RequirePackage{wisperProgrammingTools}
+
+% TODO: most of this should probably go to the fontSetups and classes
+\IfDocClassTF{koma}
+  {
+    % TODO: make the use of boldmath configurable, cf. 
+    % https://tex.stackexchange.com/questions/108894/typesetting-formulas-in-section-titles-title-bold-toc-entry-isnt#comment238645_108894
+    % https://tex.stackexchange.com/questions/41379/automatically-typeset-math-in-section-headings-in-bold-face#124311
+    % Fix chapter/section titles defaulting to sans (i.e. CM) fonts
+    %\setkomafont{disposition}{\sffamily\bfseries\boldmath}
+    %\setkomafont{disposition}{\scshape\large}
+    \setkomafont{disposition}{\firalight\large}
+    \KOMAoptions{headings=normal}
+    % Fix fonts in the toc
+    \IfDocClassT {scrbook}
+      %{ \setkomafont{chapterentry}{\sffamily\bfseries\boldmath} }
+      %{ \setkomafont{chapterentry}{\scshape\large} }
+      { \setkomafont{chapterentry}{\firalight\large} }
+    % fix item font in descriptions and enumerates
+    \setkomafont{descriptionlabel}{\normalfont\bfseries\boldmath}
+    \setkomafont{labelinglabel}{\normalfont\bfseries\boldmath}
+    % Suppress warnings on font fallback
+    \renewcommand\labelitemi{{\fontfamily{cmr}\selectfont\textbullet}}
+    \renewcommand\labelitemiii{{\fontfamily{cmr}\selectfont\textasteriskcentered}}
+    \renewcommand\labelitemiv{{\fontfamily{cmr}\selectfont\textperiodcentered}}
+    
+    % Titlepage
+    \IfDocClassT { scrbook }  % TODO: better conditional
+      { \KOMAoptions{titlepage=firstiscover} }
+    
+    % Footnotes
+    \KOMAoptions{footnotes=multiple}  % comma-separate footnote superscripts
+    \renewcommand{\multfootsep}{,}
+    
+    % Header/Footer
+    \usepackage[draft=false]{scrlayer-scrpage}
+    \pagestyle{scrheadings}
+    \IfDocClassTF { scrbook }  % TODO: better conditional
+      {
+        \automark[chapter]{chapter}
+        \automark*[section]{}
+      }
+      {
+        \automark[section]{section}
+      }
+    \ihead{}
+    \chead{\headmark}
+    \ohead{\pagemark}
+    \ifoot{}
+    \cfoot{}
+    \ofoot{}
+    %\KOMAoptions{headsepline=true}
+    %\KOMAoptions{footsepline=:0.5\textwidth, olines}
+  }
+  {
+    \PackageError{wisperKOMAMisc~must~not~be~loaded~for~non-KOMAScript~classes.}
+  }

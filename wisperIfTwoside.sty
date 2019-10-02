@@ -1,0 +1,47 @@
+\ProvidesExplPackage {wisperIfTwoside} {2019-10-01} {0.1} {Empty description.}
+
+\RequirePackage{wisperProgrammingTools}
+
+
+\__wisper_if_twoside:TF
+  {
+    % onesided
+    \cs_new_eq:NN \raggedoutside \raggedright
+    \NewDocumentEnvironment {FlushInside} { }
+      { \begin{FlushLeft} }
+      { \end{FlushLeft} }
+  }
+  {
+    \PassOptionsToPackage{strict}{changepage}
+    \RequirePackage{changepage}
+    %twosided
+    \NewDocumentCommand \raggedoutside { }
+      {
+        \checkoddpage
+        \ifoddpage
+          \RaggedRight
+        \else
+          \RaggedLeft
+        \fi
+      }
+
+    \NewDocumentEnvironment {FlushInside} { }
+      {
+        % This is implemented just like FlushLeft/FlushRight in ragged2e, which
+        % in turn mimic LaTeX' flushleft/flushrigh. According to source2e, the
+        % trivlist is used to handle vertical spacing.
+        \trivlist
+        \checkoddpage
+        \ifoddpage
+          \RaggedRight\item\relax
+        \else
+          \RaggedLeft\item\relax
+        \fi
+      }
+      {
+        \endtrivlist
+      }
+  }
+
+
+% vim: ft=tex ts=2 sw=2 et fdm=marker fmr=[[[,]]]:

@@ -112,4 +112,37 @@
 \cs_new_eq:NN \IfDocClassTF \__wisper_if_document_class:nTF
 
 
+\makeatletter
+\prg_new_conditional:Npnn \__wisper_if_twoside: { p, T, F, TF }
+  {
+    \if@twoside
+      \prg_return_true:
+    \else
+      \prg_return_false:
+    \fi
+  }
+\makeatother
+
+
+% Old, unused code [[[1
+\cs_new:Npn \__wisper_prop_keys_to_clist:NN #1#2
+  {
+    \clist_clear:N #2
+    \prop_map_inline:Nn #1 { \clist_put_right:Nn #2 {##1} }
+  }
+\cs_generate_variant:Nn \__wisper_prop_keys_to_clist:NN { cN }
+
+\cs_new:Npn \__wisper_build_clist_from_prop:NN #1#2
+  {
+    \__wisper_if_debug:nT { loader }
+      { \prop_show:N #1 }
+
+    \prop_map_inline:Nn #1
+      {
+        \tl_if_novalue:nTF {##2}
+          { \clist_put_right:Nn #2 {##1} }
+          { \clist_put_right:Nn #2 {##1=##2} }
+      }
+  }
+
 % vim: ft=tex ts=2 sw=2 et fdm=marker fmr=[[[,]]]:
