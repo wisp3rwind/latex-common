@@ -1,0 +1,9 @@
+\ProvidesExplPackage {wisperFontSetupURWGaramond} {2019-10-01} {0.1} {Empty description.}
+
+% URW-Garamond: A free garamond font, supposedly good for books but to
+% fragile for presentations. Math fonts provided by the mathdesign project
+% FIXME: maybe drop this? PagellaX is better anyway. At least give a
+% warning.
+% TODO: matching sans font
+\PassOptionsToPackage{urw-garamond}{mathdesign}
+\RequirePackage{mathdesign}

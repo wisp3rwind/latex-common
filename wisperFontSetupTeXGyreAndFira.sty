@@ -1,0 +1,47 @@
+\ProvidesExplPackage {wisperFontSetupTeXGyre} {2019-10-01} {0.1} {Empty description.}
+
+\RequirePackage{wisperProgrammingTools}
+
+\renewcommand{\rmdefault}{zpltlf} 
+
+%\PassOptionsToPackage{scaled=0.85}{beramono}
+%\RequirePackage{beramono}  % used only by \mathtt
+%\PassOptionsToPackage{type1}{cabin}
+%\RequirePackage{cabin}  % used only by \mathsf
+
+% preload amsthm to suppress error due to newpxmath redfining \openbox
+\RequirePackage{amsthm}
+
+\PassOptionsToPackage{vvarbb}{newpxmath}
+\RequirePackage{newpxmath}
+
+\__wisper_switch_engine:nF
+  {
+    { luatex }
+      {
+        \PassOptionsToPackage{no-math}{fontspec}
+        \RequirePackage{fontspec}
+
+        % TODO: ensure correct small caps, \usepackage[largesc]{newpxtext}
+        % (but the package isn't loaded here...)
+        \setmainfont{TeXGyrePagellaX}[Numbers=OldStyle]
+        \setsansfont{TeXGyreHeros}
+        % TODO: where appropriate, check for \liningnumtext to be defined and
+        % use it.
+        \newfontfamily \liningnumtext {TeXGyrePagellaX}[Numbers=Lining]
+      }
+    { xetex }
+      {
+        \PackageError{---}{No~XeTeX~support~here.}
+      }
+  }
+  {
+    % Other TeX
+    \PassOptionsToPackage{largesc}{newpxtext}
+    \RequirePackage{newpxtext}
+    \useosf 
+  }
+\tl_gset:Nn \PlotFont { \sffamily }
+\linespread{1.05} 
+
+\RequirePackage{FiraSans}

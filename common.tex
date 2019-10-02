@@ -62,78 +62,8 @@
 \cs_generate_variant:Nn \__wisper_mdfdefinestyle:nn { nx }
 
 
-% Additions to l3kernel [[[1
-% \__wisper_strlist_if_in:nn, code is very similar to \__prop_if_in [[[2
-% in contrast to \clist_if_in:nn, this is expandable
-\prg_new_conditional:Npnn \__wisper_strlist_if_in:nn #1#2 { p, T, F, TF }
-  {
-    \__wisper_strlist_if_in:nww { #2 } #1 , #2 , \q_recursion_tail
-    \__prg_break_point:
-  }
-\cs_new:Npn \__wisper_strlist_if_in:nww #1 #2 ,
-  {
-    \str_if_eq:nnTF {#1} {#2}
-      { \__wisper_strlist_if_in:N }
-      { \__wisper_strlist_if_in:nww {#1} }
-  }
-\cs_new:Npn \__wisper_strlist_if_in:N #1
-  {
-    \if_meaning:w \q_recursion_tail #1
-      \prg_return_false:
-    \else:
-      \prg_return_true:
-    \fi:
-    \__prg_break:
-  }
-\cs_generate_variant:Nn \__wisper_strlist_if_in:nnTF { nVTF }
-\cs_generate_variant:Nn \__wisper_strlist_if_in_p:nn { nV }
+\RequirePackage{wisperProgrammingTools}
 
-% \__wisper_if_engine:n, allows checking if on any of the given engines [[[2
-\prg_new_conditional:Npnn \__wisper_if_engine:n #1 { p, T, F, TF }
-  {
-    \__wisper_strlist_if_in:nVTF {#1} \c_sys_engine_str
-    %\clist_if_in:nVTF {#1} \c_sys_engine_str
-      { \prg_return_true: }
-      { \prg_return_false: }
-  }
-\cs_generate_variant:Nn \__wisper_if_engine:nTF { vTF }
-\cs_generate_variant:Nn \__wisper_if_engine_p:n { v }
-
-% \__wisper_switch_engine:n switch statement, code mostly borrowed from \__str_case:nnTF [[[2
-\cs_new:Npn \__wisper_switch_engine:n #1
-  {
-    \exp:w
-    \__wisper_switch_engine_aux:nTF {#1} { } { }
-  }
-\cs_new:Npn \__wisper_switch_engine:nT #1#2
-  {
-    \exp:w
-    \__wisper_switch_engine_aux:nTF {#1} {#2} { }
-  }
-\cs_new:Npn \__wisper_switch_engine:nF #1
-  {
-    \exp:w
-    \__wisper_switch_engine_aux:nTF {#1} { }
-  }
-\cs_new:Npn \__wisper_switch_engine:nTF #1
-  {
-    \exp:w
-    \__wisper_switch_engine_aux:nTF {#1}
-  }
-
-\cs_new:Npn \__wisper_switch_engine_aux:nTF #1#2#3
-  { \__wisper_switch_engine_aux:VnTF \c_sys_engine_str {#1} {#2} {#3} }
-\cs_new:Npn \__wisper_switch_engine_aux:nnTF #1#2#3#4
-  { \__wisper_switch_engine:nw {#1} #2 {#1} { } \q_mark {#3} \q_mark {#4} \q_stop }
-\cs_generate_variant:Nn \__wisper_switch_engine_aux:nnTF { VnTF }
-\cs_new:Npn \__wisper_case_end:nw #1#2#3 \q_mark #4#5 \q_stop
-  { \exp_end: #1 #4 }
-\cs_new:Npn \__wisper_switch_engine:nw #1#2#3
-  {
-    \__wisper_strlist_if_in:nnTF {#2} {#1}
-      { \__wisper_case_end:nw {#3} }
-      { \__wisper_switch_engine:nw {#1} }
-  }
 % Old, unused code [[[2
 \cs_new:Npn \__wisper_prop_keys_to_clist:NN #1#2
   {
@@ -1042,8 +972,6 @@
       },
   }
 
-% CONVERSION DONE
-
 
 % Fonts [[[2
 % Packages [[[3
@@ -1160,6 +1088,8 @@
         { \linespread{1.05} }
     }
 
+
+% CONVERSION DONE
 
 % Generic [[[2
 \__wisper_declare_packages:n
