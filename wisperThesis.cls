@@ -4,14 +4,13 @@
 \LoadClass[ english, a4paper, DIV=calc, BCOR=0mm, fontsize=10pt, pagesize, fleqn ]{scrbook}
 
 % Packages that need to be loaded early
-\RequirePackage{inputenc}
-\RequirePackage[main=english]{babel}
-\RequirePackage{fontenc}
+\RequirePackage{wisperDefaultPackagesEarly}
 \RequirePackage{standalone}
 \RequirePackage{pgfpages}
+\RequirePackage[main=english]{babel}
 
 % Setup fonts and recalculate textarea dimensions
-\RequirePackage{wisperFontSetupTexGyreAndFira}
+\RequirePackage{wisperFontSetupTeXGyreAndFira}
 \RequirePackage{wisperKOMAMisc}
 \KOMAoptions{DIV=last}
 \KOMAoption{toc}{bibliography}%, flat}
@@ -29,8 +28,9 @@
 
 
 %\usepackage{wisperFootnotecite}
-\usepackage{wisperDefaultPackages}
-\usepackage[
+\RequirePackage{titletoc}
+\RequirePackage{wisperDefaultPackages}
+\RequirePackage[
     citestyle=wisperNumericComp,
     bibstyle=numeric,
     autocite=superscript,
@@ -51,7 +51,7 @@
 		}
 	}
 
-\usepackage{caption}
+\RequirePackage{caption}
 \captionsetup{
 	format=plain,
 	%font=small,
@@ -67,8 +67,13 @@
 \RequirePackage{paul-tol-colors}
 \RequirePackage{wisperBoxes}
 
+\usepackage{wispermath}
+\usepackage{wisperphys}
+\usepackage{wispercode}
+%\usepackage{wisperplots}
 
 % Packages that need to be loaded last
+\RequirePackage{csquotes}  % conflicts with minted if loaded in reverse order
 \RequirePackage{hyperref}
 \hypersetup{
   bookmarksopen=true,

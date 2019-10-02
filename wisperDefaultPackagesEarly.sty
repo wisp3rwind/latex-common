@@ -1,0 +1,15 @@
+\ProvidesExplPackage {wisperDefaultPackagesEarly} {2019-10-01} {0.1} {Empty description.}
+
+\RequirePackage{wisperProgrammingTools}
+
+
+% TODO: the following are more closely related to fonts, and should probably
+% also be loaded for plots.
+\__wisper_if_engine:nF {luatex, xetex}
+  { \RequirePackage[utf8]{inputenc} }
+\RequirePackage[T1]{fontenc}
+\RequirePackage{microtype}
+
+
+% vim: ft=tex ts=2 sw=2 et fdm=marker fmr=[[[,]]]:
+
