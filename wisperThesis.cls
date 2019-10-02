@@ -4,15 +4,15 @@
 \LoadClass[ english, a4paper, DIV=calc, BCOR=0mm, fontsize=10pt, pagesize, fleqn ]{scrbook}
 
 % Packages that need to be loaded early
-\usepackage{inputenc}
-\usepackage[main=english]{babel}
-\usepackage{fontenc}
-\usepackage{standalone}
-\usepackage{pgfpages}
+\RequirePackage{inputenc}
+\RequirePackage[main=english]{babel}
+\RequirePackage{fontenc}
+\RequirePackage{standalone}
+\RequirePackage{pgfpages}
 
 % Setup fonts and recalculate textarea dimensions
-\usepackage{wisperFontSetupTexGyreAndFira}
-\usepackage{wisperKOMAMisc}
+\RequirePackage{wisperFontSetupTexGyreAndFira}
+\RequirePackage{wisperKOMAMisc}
 \KOMAoptions{DIV=last}
 \KOMAoption{toc}{bibliography}%, flat}
 \KOMAoptions{
@@ -28,11 +28,12 @@
 	]{tocline}{chapter,section}
 
 
-\usepackage{wisperFootnotecite}
+%\usepackage{wisperFootnotecite}
 \usepackage{wisperDefaultPackages}
 \usepackage[
     citestyle=wisperNumericComp,
     bibstyle=numeric,
+    autocite=superscript,
     hyperref=true,
     url=false,
     isbn=false,  %  DOI only, FIXME: show ISBN if no DOI present
@@ -41,7 +42,6 @@
     citereset=section,
     giveninits=true, date=year
   ]{biblatex}
-\usepackage{wisperNumericSupercite}
 \AtBeginDocument{
 	\AtEveryBibitem
 		{
@@ -64,11 +64,12 @@
 %\numberwithin{equation}{section}
 \numberwithin{equation}{chapter}
 
-\usepackage{paul-tol-colors}
+\RequirePackage{paul-tol-colors}
+\RequirePackage{wisperBoxes}
 
 
 % Packages that need to be loaded last
-\usepackage{hyperref}
+\RequirePackage{hyperref}
 \hypersetup{
   bookmarksopen=true,
   bookmarksopenlevel=3,
@@ -80,6 +81,6 @@
   filecolor=mark-dark-green,
   urlcolor=mark-dark-blue,
 }
-\usepackage{wisperDraftTools}
+\RequirePackage{wisperDraftTools}
 
 % vim: ft=tex ts=2 sw=2 et fdm=marker fmr=[[[,]]]:

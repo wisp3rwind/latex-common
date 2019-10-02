@@ -3,6 +3,7 @@
 
 \ProvidesExplPackage {wisperDraftTools} {2019-10-01} {0.1} {Empty description.}
 
+\RequirePackage{xparse}
 \RequirePackage{wisperProgrammingTools}
 
 % Drafts [[[2
@@ -11,9 +12,9 @@
 \RequirePackage{showlabels}
 
 \tl_gset:Nn \showlabelfont { \tiny\ttfamily }
-\showlabels{cite}
+%\showlabels{cite}
 \showlabels{ref}
-\showlabels{begin}
+%\showlabels{begin}
 
 \RequirePackage{wisperIfTwoside}
 
@@ -26,7 +27,7 @@
         \marginpar
           {
             \IfValueT{#2}{\vspace{#2}}
-            \raggedoutside
+            \RaggedOutside
             \footnotesize
             \fcolorbox{red}{white}{\color{red} \thetodonotecounter}
             \hspace{1ex}

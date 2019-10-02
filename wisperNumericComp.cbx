@@ -20,12 +20,13 @@
 \RequirePackage{wisperProgrammingTools}
 
 \cs_new:Npn \__wisper_smartbibsuperscript:n #1
-  { \mkbibsuperscript{#1} }
+  { \mkbibsuperscript{#1} foo\blx@postpunct@saved}
 \cs_new:Npn \__wisper_smartbibsuperscript:nN #1#2
   {
     \settowidth \l_tempa_dim {#2}
     \dim_add:Nn \l_tempa_dim { -1.8\l_tempa_dim }
 
+    \printfield{postpunct}
     #2 \hspace* { \l_tempa_dim }
     % TODO: ensure that spacing after the superscript is correct
     \__wisper_smartbibsuperscript:n {#1}
@@ -57,6 +58,8 @@
    \usebibmacro{cite:comp}}
   {}
   {\usebibmacro{cite:dump}}
+  % Pass trailing punctuation to \xcite implementation, similar to \autocite
+\DeclareCitePunctuationPosition{\xcite}{d}
 
 \ExplSyntaxOff
 
