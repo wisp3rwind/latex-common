@@ -7,6 +7,7 @@
 \usepackage{caption}
 \usepackage{pgfpages}  % for notes on second screen
 \usepackage{setspace}  % control line stretch
+\PassOptionsToPackage {main=english} {babel} 
 
 % TODO: devise a way to properly cite image references, cf.
 % the cite:online hack.
@@ -96,3 +97,6 @@
 	\raggedright\setstretch{1.0}
 	\hbox to 1.8em{\hfil\insertfootnotemark}\insertfootnotetext\par
 }
+
+
+% vim: ft=tex ts=2 sw=2 et fdm=marker fmr=[[[,]]]:

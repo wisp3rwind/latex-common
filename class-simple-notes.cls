@@ -12,3 +12,7 @@
 	calcwidth=0.9\linewidth,
 	justification=RaggedRight
 \numberwithin{equation}{section}
+\PassOptionsToPackage {main=english} {babel} 
+
+
+% vim: ft=tex ts=2 sw=2 et fdm=marker fmr=[[[,]]]:

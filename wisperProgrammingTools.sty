@@ -73,3 +73,43 @@
       { \__wisper_case_end:nw {#3} }
       { \__wisper_switch_engine:nw {#1} }
   }
+
+
+\makeatletter
+% Conditional for the document class.   [[[1
+\cs_new:Npn \__wisper_if_document_class_aux:n #1
+  {
+    % No match
+    \quark_if_nil:nTF { #1 }
+      { \clist_map_break:n { \prg_return_false: } }
+      {
+        % Recurse for aliases
+        \str_if_eq:nnTF { #1 } { koma }
+          {
+            % koma is an alias for any KOMA-script class
+            \__wisper_if_document_class:nT { scrartcl, scrbook, scrreprt, scrlttr2 }
+              { \clist_map_break:n { \prg_return_true: } }
+          }
+          {
+            % Match
+            \@ifclassloaded{#1}
+              { \clist_map_break:n { \prg_return_true: } }
+          }
+      }
+  }
+\makeatother
+\prg_new_conditional:Npnn \__wisper_if_document_class:n #1 { p, T, F, TF }
+  { 
+    % For some reason, not wrapping \q_nil in braces doesn't properly store it
+    % in the clist and breaks the whole mapping
+    \clist_map_function:nN { #1 , {\q_nil} } \__wisper_if_document_class_aux:n
+  }
+\cs_generate_variant:Nn \__wisper_if_document_class:nTF { vTF }
+\cs_generate_variant:Nn \__wisper_if_document_class_p:n { v }
+
+\cs_new_eq:NN \IfDocClassT \__wisper_if_document_class:nT
+\cs_new_eq:NN \IfDocClassF \__wisper_if_document_class:nF
+\cs_new_eq:NN \IfDocClassTF \__wisper_if_document_class:nTF
+
+
+% vim: ft=tex ts=2 sw=2 et fdm=marker fmr=[[[,]]]:

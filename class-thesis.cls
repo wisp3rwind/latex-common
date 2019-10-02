@@ -33,3 +33,7 @@
 		raggedentrytext=true,
 		pagenumberbox=\mbox
 	]{tocline}{chapter,section}
+\PassOptionsToPackage {main=english} {babel} 
+
+
+% vim: ft=tex ts=2 sw=2 et fdm=marker fmr=[[[,]]]:
