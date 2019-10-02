@@ -1,10 +1,12 @@
-\RequirePackage{expl3}
-\ExplSyntaxOn
-
 % Defines a number of colors from Paul Tol's colour schemes as published on
 % his blog at https://personal.sron.nl/~pault/
 
-\ProvidesExplPackage{paul-tol-colors}{2018/02/27}{0.1}{Paul Tol's colorschemes and mark colors}
+\ProvidesExplPackage {paul-tol-colors}
+  {2018/02/27} {0.1}
+  {Paul Tol's colorschemes and mark colors}
+
+\RequirePackage{xcolor}
+
 
 \definecolor{q-bright-blue}{HTML}{4477AA}
 \definecolor{q-bright-cyan}{HTML}{66CCEE}
@@ -62,5 +64,3 @@
 \definecolor{q-light-orange}{HTML}{EE8866}
 \definecolor{q-light-pink}{HTML}{FFAABB}
 \definecolor{q-light-pale-grey}{HTML}{DDDDDD}
-
-\ExplSyntaxOff
