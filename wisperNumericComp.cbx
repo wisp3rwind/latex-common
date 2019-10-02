@@ -1,13 +1,19 @@
+% Inspired and partially copied from S. Khirevich's code at
+%   http://www.khirevich.com/latex/footnote_citation/
+% who in turn derived it from 
+% http://www.texdev.net/2010/03/08/biblatex-numbered-citations-as-footnotes/
+
 % TODO: add \xfootnotecite that mimics \superfullcite 
 % TODO: experiment with alphabetic citations in superscripts
+
+
 \ProvidesFile{wisperNumericComp.cbx}
 
-% The script originally taken from
-% http://www.texdev.net/2010/03/08/biblatex-numbered-citations-as-footnotes/
-% Modified by S. Khirevich
-% Modified by ...
-  % Inspired and partially copied from
-  %   http://www.khirevich.com/latex/footnote_citation/
+\RequirePackage{expl3}
+\ExplSyntaxOn
+\cs_generate_variant:Nn \str_if_in:nnTF { neTF }
+\RequirePackage{wisperProgrammingTools}
+
 
 \RequireCitationStyle{numeric-comp}
 
@@ -16,26 +22,39 @@
 %==========================================================%
 % 
 %==========================================================%
-\ExplSyntaxOn
-\RequirePackage{wisperProgrammingTools}
 
 \cs_new:Npn \__wisper_smartbibsuperscript:n #1
-  { \mkbibsuperscript{#1} foo\blx@postpunct@saved}
-\cs_new:Npn \__wisper_smartbibsuperscript:nN #1#2
+  { \mkbibsuperscript{#1} }
+\cs_new:Npn \__wisper_smartbibsuperscript:nn #1#2
   {
-    \settowidth \l_tempa_dim {#2}
-    \dim_add:Nn \l_tempa_dim { -1.8\l_tempa_dim }
+    \settowidth \l_tmpa_dim {#1}
+    \dim_add:Nn \l_tmpa_dim { -1.8\l_tmpa_dim }
 
-    \printfield{postpunct}
-    #2 \hspace* { \l_tempa_dim }
+    #1 \hspace* { \l_tmpa_dim }
     % TODO: ensure that spacing after the superscript is correct
-    \__wisper_smartbibsuperscript:n {#1}
+    \__wisper_smartbibsuperscript:n {#2}
   }
-\cs_new:Npn \__wisper_smartbibsuperscript:nw #1
+%\cs_new:Npn \__wisper_smartbibsuperscript_reverse:nn #1#2
+%  { \__wisper_smartbibsuperscript:nn #2 {#1} }
+%\cs_new:Npn \__wisper_smartbibsuperscript:nw #1
+%  {
+%    \__wisper_peek_charcode_any_ignore_spaces:nTF {.,:;}
+%      { \__wisper_smartbibsuperscript_reverse:nN {#1} }
+%      { \__wisper_smartbibsuperscript:n {#1} }
+%  }
+\cs_new:Npn \__wisper_smartbibsuperscript_postpunct:n
   {
-    \__wisper_peek_charcode_any_ignore_spaces:nTF {.,:;}
-      { \__wisper_smartbibsuperscript:nN {#1} }
-      { \__wisper_smartbibsuperscript:n {#1} }
+    \iffieldundef{postpunct}
+      { \__wisper_smartbibsuperscript:n }
+      {
+        % Cannot use \usefield for the conditional because of its argument
+        % ordering...
+        \str_if_in:neTF {.,} { \csfield {postpunct} }
+          % Needs the explicit unspace because the one in \mkbibsuperscript
+          % will be preceded directly by the punctuation that was moved left
+          { \unspace \usefield \__wisper_smartbibsuperscript:nn {postpunct} }
+          { \unspace \printfield{postpunct} \__wisper_smartbibsuperscript:n }
+      }
   }
 
 
@@ -45,7 +64,7 @@
 % The command is identical to \supercite from numeric-comp.cbx
 % except for the superscript wrapper
 %==========================================================%
-\DeclareCiteCommand{\xcite}[\__wisper_smartbibsuperscript:nw]
+\DeclareCiteCommand{\xcite}[\__wisper_smartbibsuperscript_postpunct:n]
   {\usebibmacro{cite:init}%
    \let\multicitedelim=\supercitedelim
    \iffieldundef{prenote}

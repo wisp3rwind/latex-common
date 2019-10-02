@@ -1,0 +1,36 @@
+\documentclass{article}
+
+\usepackage[
+    citestyle=wisperNumericComp,
+    bibstyle=numeric,
+    %autopunct=false,
+  ]{biblatex}
+
+\addbibresource{test-references.bib}
+
+\begin{document}
+
+No leading space
+\begin{itemize}
+  \item none\xcite{lehmberg1970} and \ldots
+  \item comma\xcite{lehmberg1970}, and\ldots
+  \item dot\xcite{lehmberg1970}. and\ldots
+  \item semicolon\xcite{lehmberg1970}; and\ldots
+  \item colon\xcite{lehmberg1970}: And\ldots
+  \item exclamation mark\xcite{lehmberg1970}! And\ldots
+  \item question mark\xcite{lehmberg1970}? And\ldots
+\end{itemize}
+
+With leading space
+\begin{itemize}
+  \item none \xcite{lehmberg1970} and \ldots
+  \item comma \xcite{lehmberg1970}, and \ldots
+  \item dot \xcite{lehmberg1970}. and \ldots
+  \item semicolon~\xcite{lehmberg1970}; and \ldots
+  \item colon~\xcite{lehmberg1970}: And \ldots
+  \item exclamation mark~\xcite{lehmberg1970}! And \ldots
+  \item question mark~\xcite{lehmberg1970}? And \ldots
+\end{itemize}
+\end{document}
+
+% vim: ft=tex ts=2 sw=2 et fdm=marker fmr=[[[,]]]:
