@@ -930,6 +930,27 @@
     \fi:
   }
 
+%\__wisper_keys_define_math:n
+%  {
+%    derivative / displayfunc .choice:,
+%    derivative / displayfunc / inset .code:n =
+%      {
+%        \cs_gset:Npn \__wisper_integrate_integrand:nnnn ##1##2##3##4
+%          { ##4 \mathop{} \! \__wisper_dif:nnnn {##1} {\BooleanFalse} {##3} {##2} }
+%        \cs_set:Npn \__wisper_derivative_print:nnn #1#2#3
+%          { \frac
+%      },
+%    derivative / displayfunc / outset .code:n =
+%      {
+%        \cs_gset:Npn \__wisper_integrate_integrand:nnnn ##1##2##3##4
+%          { \! \__wisper_dif:nnnn {##1} {\BooleanFalse} {##3} {##2} \mathop{} \! ##4 }
+%      },
+%    derivative / displayfunc .initial:n = inset,
+%    % shorthands
+%    derivative  / outset .meta:n = { derivative / displayfunc = outset },
+%    derivative  / inset .meta:n = { derivative / displayfunc = inset },
+%  }
+
 \cs_new_protected:Npn \__wisper_derivative:NNnnn #1#2#3#4#5
   {
     % #1 - command to wrap the result in (i.e. parenthesis, ...)
