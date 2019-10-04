@@ -1,7 +1,8 @@
 \RequirePackage{expl3}
 \ProvidesExplClass{wisperThesis} {2019-10-02} {0.1} {}
 
-\LoadClass[ english, a4paper, DIV=calc, BCOR=0mm, fontsize=10pt, pagesize, fleqn ]{scrbook}
+\LoadClass[english, a4paper, DIV=calc, BCOR=0mm, fontsize=10pt, pagesize, fleqn]{scrbook}
+\PassOptionsToPackage{fleqn}{amsmath}
 
 % Packages that need to be loaded early
 \RequirePackage{wisperDefaultPackagesEarly}
