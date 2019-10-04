@@ -949,7 +949,7 @@
     % Construct denominator, sum up exponents
     \__wisper_clist_map_inline_no_unbrace:nn {#5}
       {
-        \tl_put_right:Nn \l_denominator_tl {\mathop{}\!#2 {##1}}
+        \tl_put_right:Nn \l_denominator_tl {\mathop{}\!#2\relax {##1}}
         \__wisper_deriv_process_denominator_aux:w ##1 ^ \q_mark \q_stop
       }
 
@@ -965,7 +965,7 @@
                     #2^{\int_use:N \l__wisper_derivative_order_int} {#3}
                   }
                   {
-                    #2 {#3}
+                    #2\relax {#3}
                   }
               }
               {
