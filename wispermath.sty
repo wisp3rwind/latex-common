@@ -995,7 +995,7 @@
 
 \cs_new:Npn \__wisper_define_derivative_command:nN #1#2
   {
-    % Use gset since `cool` already defines a \pderiv macro
+    % Use DeclareDocumentCommand since `cool` already defines a \pderiv macro
     % The last two cs' are convenience functions, wrapping in parenthesis resp.
     % brackets
     \__wisper_declare_document_command:cnn {   #1 deriv } { m o m }
