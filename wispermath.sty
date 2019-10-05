@@ -915,6 +915,20 @@
     \max \c_math_subscript_token {#2} \; {#1}
   }
 
+\DeclareMathOperator \__wisper_operator_diag: {diag}
+\NewDocumentCommand \__wisper_operator_diag:n { s o m }
+  {
+    \__wisper_operator_diag: \__wisper_parenthesize:nnn {#1} {#2}
+      {
+        \group_begin:
+          \clist_set:Nn \l_tmpa_clist {#3}
+          \clist_use:Nn \l_tmpa_clist {,\,}
+        \group_end:
+      }
+  }
+\cs_gset_eq:NN \Diag \__wisper_operator_diag:n
+
+
 % Derivatives [[[1
 
 % TODO: Starred version of the command that disables all of the exponent processing
