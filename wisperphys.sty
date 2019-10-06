@@ -126,6 +126,24 @@
 % general quantum theory [[[1
 \DeclarePairedDelimiterX \Comm[2] \lbrack \rbrack
   { \__wisper_argument_or_empty:n {#1}, \__wisper_argument_or_empty:n {#2} }
+\DeclareDocumentCommand \CommX { s o m m }
+% plays better with align and similar environments due the lack of additional
+% grouping compared to the mathtools version
+  {
+    \IfBooleanTF {#1}
+      {
+        \mathopen{}\mathclose\left[ #3, #4 \right]
+      }
+      {
+        \IfNoValueTF {#2}
+          {
+            \mathopen\lbrack #3, #4 \mathclose\rbrack
+          }
+          {
+            \mathopen{#2\lbrack} #3, #4 \mathclose{#2\rbrack}
+          }
+      }
+  }
 
 \NewDocumentCommand \paulimx { } { \begin{pmatrix}0 & 1 \\ 1 & 0\end{pmatrix} }
 \NewDocumentCommand \paulimy { } { \begin{pmatrix}-i & 0 \\ 0 & i\end{pmatrix} }
