@@ -15,9 +15,21 @@
     \KOMAoptions{headings=normal}
     % Fix fonts in the toc
     \IfDocClassT {scrbook}
-      %{ \setkomafont{chapterentry}{\sffamily\bfseries\boldmath} }
-      %{ \setkomafont{chapterentry}{\scshape\large} }
-      { \setkomafont{chapterentry}{\sffamily\large} }
+      {
+        %\setkomafont{chapterentry}{\sffamily\bfseries\boldmath}
+        %\setkomafont{chapterentry}{\scshape\large}
+        \setkomafont{chapterentry}{\sffamily\large}
+
+        % Elements of the title page
+        \setkomafont{subtitle}{\sffamily\scshape}
+        \setkomafont{title}{\sffamily\scshape\Huge}
+        \setkomafont{titlehead}{\centering\sffamily\scshape\large}
+        \setkomafont{subject}{\sffamily}
+        \setkomafont{publishers}{\sffamily}
+        \setkomafont{author}{\sffamily}
+        \setkomafont{date}{\sffamily}
+        %\setkomafont{dedication}{\scshape}
+      }
     % fix item font in descriptions and enumerates
     \setkomafont{descriptionlabel}{\normalfont\bfseries\boldmath}
     \setkomafont{labelinglabel}{\normalfont\bfseries\boldmath}
