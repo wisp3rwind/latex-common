@@ -658,11 +658,19 @@
 % Other 'Big' operators [[[1
 \cs_new:Npn \__wisper_operator_with_limits:Nnnnnn #1#2#3#4#5#6
   {
+    % #1 - operator symbol
+    % #2 - star?
+    % #3 - inner expression
+    % #4 - variable
+    % #5 - start
+    % #6 - stop
     #1
-    \bool_if:nT {#2 && (!\__wisper_tl_if_novalue_or_blank_p:n {#4} || !\__wisper_tl_if_novalue_or_blank_p:n {#6}) }
+  \bool_lazy_and:nnF { \__wisper_tl_if_novalue_or_blank_p:n {#4} }{ \__wisper_tl_if_novalue_or_blank_p:n {#6} }
       {
         % only add this if there's a sub- or superscript to show
-        \limits
+        \bool_if:nTF {#2}
+          { \nolimits }
+          { \limits }
       }
     \__wisper_tl_if_novalue_or_blank:nF {#4}
       {
