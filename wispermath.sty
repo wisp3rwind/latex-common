@@ -527,6 +527,14 @@
 
 \cs_new_eq:NN \stdvec \vec
 
+\cs_new:Npn \__wisper_bmhat:n #1 { \bm{\hat{#1}} } 
+\cs_new:Npn \__wisper_bmhat:w
+  {
+    \peek_N_type:TF
+      { \exp_last_unbraced:Nf \__wisper_bmhat:n }
+      { \__wisper_bmhat:n }
+  }
+
 % TODO: maybe use a property to store the code in order to avoid doubling the '##'
 \__wisper_keys_define_math:n
   {
@@ -556,7 +564,7 @@
     vecdisplay / bm .code:n =
       {
         \cs_gset_eq:NN \vec \bm
-        \cs_gset:Npn \uvec ##1 { \bm{\hat{##1}} }
+        \cs_gset_eq:NN \uvec \__wisper_bmhat:w
         \cs_gset:Npn \dvec ##1 { \dot{\bm{##1}} }
         \cs_gset:Npn \ddvec ##1 { \ddot{\bm{##1}} }
       },
