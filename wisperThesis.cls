@@ -49,6 +49,7 @@
 			\clearlist{location}
 			\clearfield{note}
 			\clearfield{pagetotal}
+			\clearfield{edition}
 		}
 	}
 
