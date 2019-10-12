@@ -1,6 +1,4 @@
-\input{common.tex}
-\DocumentStyle{main_language=english}
-\Preamble{scrbook, font-TexGyre, koma-misc, alphabetic-default-footnote, footnotecite, boxes, paul-tol-colors}
+\documentclass{wisperthesis}
 \usepackage{wispermath}
 \usepackage{wisperphys}
 \usepackage{wispercode}
@@ -292,6 +290,44 @@ From the \verb|braket| package.
     \bottomrule
   \end{tabular}
 \end{table}
+
+\subsection{Feynman diagrams}
+Intended output of the \verb|\DoubleSidedDiagram| command, manually \TikZ'd
+\begin{tikzpicture}
+  \node (m) [matrix,inner xsep=0.07em, inner ysep=0.3ex]{
+      \operators
+  };
+  % side bars
+  \draw [very thick, {Round Cap[]}-{Round Cap[]}] (m.south west) -- (m.north west);
+  \draw [very thick, {Round Cap[]}-{Round Cap[]}] (m.south east) -- (m.north east);
+
+  % dashed lines for pulses
+  \coordinate (a12) at ($(a1.center) ! .5 ! (a2.center)$);
+  \coordinate (m11) at (a12 -| {m.west});
+  \coordinate (m12) at (a12 -| {m.east});
+  \draw [dashed] (m11) -- (m12);
+
+  % Arrows
+  \draw [ thick, {Stealth[length=1.4ex, width'=0pt 0.6]-} ] (m11) -- +(-150:3.5ex);
+  \draw [ thick, {-Stealth[length=1.4ex, width'=0pt 0.6]} ] (m12) -- +(30:3.5ex);
+\end{tikzpicture}
+actual output:
+\DoubleSidedDiagram{
+  { $\ketbra{g}{g}$ },
+  {
+    \Photon{in,left}{ $\Exp^{i\phi}$ },
+  },
+  { $\ketbra{g}{e}$ },
+  {
+    \Photon{in,right}{ $\Exp^{-i\phi}$ },
+  },
+  { $\ketbra{e}{e}$ },
+  {
+    \Photon{in,right}{ $\Exp^{-i\phi}$ },
+    \Photon{in,left}{ $\Exp^{-i\phi}$ },
+  },
+  { $\ketbra{f}{f}$ },
+}
 
 \section{Tables}
 

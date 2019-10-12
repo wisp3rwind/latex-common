@@ -2,9 +2,8 @@
 % I don't like in the very form they're defined in this package, but it might
 % be a good idea to reimplement sane version of them here.
 
-\ProvidesExplPackage {wisperphys} {2019-10-01} {0.1} {Empty description.}
-
 \RequirePackage{xparse}
+\ProvidesExplPackage {wisperphys} {2019-10-01} {0.1} {Empty description.}
 
 \cs_new:Npn \__wisper_keys_define_phys:n #1 { \keys_define:nn { wisper/phys } {#1} }
 \cs_new:Npn \__wisper_keys_set_phys:n #1 { \keys_set:nn { wisper/phys } {#1} }
@@ -26,6 +25,10 @@
 \RequirePackage[version=4]{mhchem}
 \cs_new:Npn \isomerslash  { \textnormal{ / } \allowbreak }
 \ProvideDocumentCommand \isomer { m } { \cesplit{{\/}{\c{isomerslash}}}{#1} }
+
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{calc}
 
 % Dirac notation
 % This re-implements much of braket.sty because the latter has certain issues:
@@ -149,5 +152,134 @@
 \NewDocumentCommand \paulimy { } { \begin{pmatrix}-i & 0 \\ 0 & i\end{pmatrix} }
 \NewDocumentCommand \paulimz { } { \begin{pmatrix}1 & 0 \\ 0 & -1\end{pmatrix} }
 
+
+% Feynman diagrams [[[1
+\tl_gset:Nn \g__wiserp_doublesided_diagram_arrow_angle_tl {30}
+\seq_new:N \__wisper_doublesided_operators_seq
+\seq_new:N \__wisper_doublesided_arrows_seq
+
+\keys_define:nn { wisper / physics / diagrams / options}
+  {
+    left .bool_set:N = \l__wisper_doublesided_diagram_left_bool,
+    left .default:n = true,
+    right .bool_set_inverse:N = \l__wisper_doublesided_diagram_left_bool,
+    right .default:n = true,
+    left .initial:n = true,
+    in .bool_set:N = \l__wisper_doublesided_diagram_in_bool,
+    in .default:n = true,
+    out .bool_set_inverse:N = \l__wisper_doublesided_diagram_in_bool,
+    out .default:n = true,
+    in .initial:n = true,
+  }
+
+\cs_new:Npn \__wisper_doublesided_diagram_tikz:nnn #1#2#3
+  {
+    \begin{tikzpicture}
+      \node (m) [matrix,inner~xsep=0.07em, inner~ysep=0.3ex]{
+        #1
+      };
+      % side bars
+      \draw [very~thick, {Round~Cap[]}-{Round~Cap[]}] (m.south~west) -- (m.north~west);
+      \draw [very~thick, {Round~Cap[]}-{Round~Cap[]}] (m.south~east) -- (m.north~east);
+
+      % dashed lines for pulses
+      #2
+
+      % Arrows
+      \int_set:Nn \l_tmpa_int {1}
+      \cs_set_eq:NN \Photon \__wisper_arrowfunc:nn
+      #3
+    \end{tikzpicture}
+  }
+\cs_generate_variant:Nn \__wisper_doublesided_diagram_tikz:nnn {xxx, xnn}
+
+\cs_new:Npn \__wisper_nodefunc:nn #1#2
+  { \exp_not:N \node (op~#1) {#2}; \exp_not:N \\ }
+
+\cs_new:Npn \__wisper_linefunc:nn #1#2
+  {
+    \exp_not:N \coordinate (a~#1~#2) at ($(op~#1 .center) ! .5 ! (op~#2 .center)$);
+    \exp_not:N \coordinate (m~#1~west) at (a~#1~#2 -| {m.west});
+    \exp_not:N \coordinate (m~#1~east) at (a~#1~#2 -| {m.east});
+    \exp_not:N \draw [densely~dashed] (m~#1~west) -- (m~#1~east);
+  }
+
+\cs_new:Npn \__wisper_arrowfunc:nn #1#2
+  {
+    \keys_set:nn  { wisper / physics / diagrams / options } {#1}
+    \bool_if:NTF \l__wisper_doublesided_diagram_left_bool
+      {
+        \bool_if:NTF \l__wisper_doublesided_diagram_in_bool
+          {
+            \draw [ thick, {Stealth[length=1.4ex, width'=0pt~0.6]}- ]
+              (m ~ \int_eval:n {\l_tmpa_int} ~ west) ~ -- ~ +(-150 \c_colon_str 3.5ex)
+              node[left, inner~sep=.2ex] {\footnotesize \tl_trim_spaces:n{#2}};
+          }
+          {
+            \draw [ thick, -{Stealth[length=1.4ex, width'=0pt~0.6]} ]
+              (m ~ \int_eval:n {\l_tmpa_int} ~ west) ~ -- ~ +(-210 \c_colon_str 3.5ex)
+              node[left, inner~sep=.2ex] {\footnotesize \tl_trim_spaces:n{#2}};
+          }
+      }
+      {
+        \bool_if:NTF \l__wisper_doublesided_diagram_in_bool
+          {
+            \draw [ thick, {Stealth[length=1.4ex, width'=0pt~0.6]}- ]
+            (m ~ \int_eval:n {\l_tmpa_int} ~ east) ~ -- ~ +(-30 \c_colon_str 3.5ex)
+            node[right, inner~sep=.2ex] {\footnotesize \tl_trim_spaces:n{#2}};
+          }
+          {
+            \draw [ thick, -{Stealth[length=1.4ex, width'=0pt~0.6]} ]
+            (m ~ \int_eval:n {\l_tmpa_int} ~ east) ~ -- ~ +(30 \c_colon_str 3.5ex)
+            node[right, inner~sep=.2ex] {\footnotesize \tl_trim_spaces:n{#2}};
+          }
+      }
+  }
+
+\cs_generate_variant:Nn \__wisper_linefunc:nn {nf}
+\cs_generate_variant:Nn \int_step_function:nN {fN}
+\cs_new:Npn \__wisper_linefunc:n #1
+  { \__wisper_linefunc:nf {#1}{ \int_eval:n { #1 + 1 } } }
+
+\cs_new:Npn \__wisper_doublesided_diagram:NN #1#2
+  {
+    \__wisper_doublesided_diagram_tikz:xnn
+      {
+        \seq_indexed_map_function:NN \__wisper_doublesided_operators_seq
+          \__wisper_nodefunc:nn
+      }
+      {
+        \int_step_function:fN
+          { \int_eval:n { \seq_count:N \__wisper_doublesided_operators_seq  - 1} }
+          \__wisper_linefunc:n
+      }
+      {
+        \seq_use:Nn \__wisper_doublesided_arrows_seq { \int_incr:N \l_tmpa_int }
+      }
+  }
+
+\NewDocumentCommand \DoubleSidedDiagram { m }
+  {
+    \bool_set_true:N \l_tmpa_bool
+    \clist_map_inline:nn {#1}
+      {
+        \bool_if:NTF \l_tmpa_bool
+          {
+            \seq_put_right:Nn \__wisper_doublesided_operators_seq {##1}
+            \bool_set_false:N \l_tmpa_bool
+          }
+          {
+            \seq_put_right:Nn \__wisper_doublesided_arrows_seq {##1}
+            \bool_set_true:N \l_tmpa_bool
+          }
+      }
+
+    \seq_reverse:N \__wisper_doublesided_operators_seq
+    \seq_reverse:N \__wisper_doublesided_arrows_seq
+
+    \__wisper_doublesided_diagram:NN 
+      \__wisper_doublesided_operators_seq
+      \__wisper_doublesided_arrows_seq
+  }
 
 % vim: ft=tex ts=2 sw=2 et fdm=marker fmr=[[[,]]]:
