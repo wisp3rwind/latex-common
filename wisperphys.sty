@@ -175,36 +175,41 @@
 
 \cs_new:Npn \__wisper_tikz_symmetrize_bbox:nn #1#2
   {
-    \tikzmath{
-      coordinate ~ \widthwest, \widtheast, \height, \depth, \c, \bboxsw, \bboxne;
-      \widthwest ~ = ~ (current~bounding~box.east) - (#1);
-      \widtheast ~ = ~ (#1) - (current~bounding~box.west);
-      \height ~ = ~ (current~bounding~box.north) - (#1);
-      \depth ~ = ~ (#1) - (current~bounding~box.south);
-      \bboxsw ~ = ~ (current~bounding~box.south~west);
-      \bboxne ~ = ~ (current~bounding~box.north~east);
-      \c ~ = ~ (#1);
-      %\width ~ = ~ max(\wwx,\wex);
-    };
+    % Show old bounding box
+    %\draw[dashed, red]
+    %  (current ~ bounding ~ box . south ~ west)
+    %  rectangle
+    %  (current ~ bounding ~ box . north ~ east);
 
-    %\str_if_in:nnTF {#2} {x}
-    %  {
-    %    \dim_set:Nn \l_tmpa_dim
-    %      { \dim_max:nn { \widthwestx } { \widtheastx } }
-    %  }
-    %  {
-    %    \dim_set:Nn \l_tmpa_dim
-    %      { \bboxswx - \bboxswe }
-    %  }
+    % TODO: respect the second argument and only symmetrize in the given
+    % direction(s). These integers can probably be used by pgfmath's
+    % ifthenelse
+    \str_if_in:nnTF {#2} {x}
+      { \tl_set:Nn \l_tmpa_tl { 1 } }
+      { \tl_set:Nn \l_tmpa_tl { 0 } }
+    \str_if_in:nnTF {#2} {y}
+      { \tl_set:Nn \l_tmpb_tl { 1 } }
+      { \tl_set:Nn \l_tmpb_tl { 0 } }
 
-    %\dim_set:Nn \l_tmpb_dim
-    %  { \dim_max:nn { \widthwestx } { \widtheastx } }
-
-
-    \path[use~as~bounding~box, draw]
-      ($(\cx,\bboxswy) - (\dim_max:nn{\widthwestx}{\widtheastx},0)$)
-      rectangle
-      ($(\cx,\bboxney) + (\dim_max:nn{\widthwestx}{\widtheastx},0)$);
+    \path[use ~ as ~ bounding ~ box
+        %, draw  % show new bounding box
+      ]
+      let
+        \p{center} = (#1),
+        \p{bbox ~ sw} = (current ~ bounding ~ box . south ~ west),
+        \p{bbox ~ ne} = (current ~ bounding ~ box . north ~ east),
+        \n{ww} = { \x{center} - \x{bbox ~ sw} },
+        \n{we} = { \x{bbox ~ ne} - \x{center} },
+        \n{dp} = { \y{center} - \y{bbox ~ sw} },
+        \n{ht} = { \y{bbox ~ ne} - \y{center} },
+        \n{ww} = { max( \n{ww}, \n{we} ) },
+        \n{we} = { \n{ww} },
+        \n{ht} = { max( \n{ht}, \n{dp} ) },
+        \n{dp} = { \n{ht} }
+      in
+        ($(#1) - (\n{ww}, \n{dp})$)
+        rectangle
+        ($(#1) + (\n{we}, \n{ht})$);
   }
 \cs_new:Npn \__wisper_doublesided_diagram_tikz:nnn #1#2#3
   {
