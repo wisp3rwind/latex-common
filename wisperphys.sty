@@ -29,6 +29,7 @@
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta}
 \usetikzlibrary{calc}
+\usetikzlibrary{math}
 
 % Dirac notation
 % This re-implements much of braket.sty because the latter has certain issues:
@@ -154,7 +155,7 @@
 
 
 % Feynman diagrams [[[1
-\tl_gset:Nn \g__wiserp_doublesided_diagram_arrow_angle_tl {30}
+\tl_gset:Nn \g__wisper_doublesided_diagram_arrow_angle_tl {30}
 \seq_new:N \__wisper_doublesided_operators_seq
 \seq_new:N \__wisper_doublesided_arrows_seq
 
@@ -172,6 +173,39 @@
     in .initial:n = true,
   }
 
+\cs_new:Npn \__wisper_tikz_symmetrize_bbox:nn #1#2
+  {
+    \tikzmath{
+      coordinate ~ \widthwest, \widtheast, \height, \depth, \c, \bboxsw, \bboxne;
+      \widthwest ~ = ~ (current~bounding~box.east) - (#1);
+      \widtheast ~ = ~ (#1) - (current~bounding~box.west);
+      \height ~ = ~ (current~bounding~box.north) - (#1);
+      \depth ~ = ~ (#1) - (current~bounding~box.south);
+      \bboxsw ~ = ~ (current~bounding~box.south~west);
+      \bboxne ~ = ~ (current~bounding~box.north~east);
+      \c ~ = ~ (#1);
+      %\width ~ = ~ max(\wwx,\wex);
+    };
+
+    %\str_if_in:nnTF {#2} {x}
+    %  {
+    %    \dim_set:Nn \l_tmpa_dim
+    %      { \dim_max:nn { \widthwestx } { \widtheastx } }
+    %  }
+    %  {
+    %    \dim_set:Nn \l_tmpa_dim
+    %      { \bboxswx - \bboxswe }
+    %  }
+
+    %\dim_set:Nn \l_tmpb_dim
+    %  { \dim_max:nn { \widthwestx } { \widtheastx } }
+
+
+    \path[use~as~bounding~box, draw]
+      ($(\cx,\bboxswy) - (\dim_max:nn{\widthwestx}{\widtheastx},0)$)
+      rectangle
+      ($(\cx,\bboxney) + (\dim_max:nn{\widthwestx}{\widtheastx},0)$);
+  }
 \cs_new:Npn \__wisper_doublesided_diagram_tikz:nnn #1#2#3
   {
     \begin{tikzpicture}
@@ -179,8 +213,10 @@
         #1
       };
       % side bars
-      \draw [very~thick, {Round~Cap[]}-{Round~Cap[]}] (m.south~west) -- (m.north~west);
-      \draw [very~thick, {Round~Cap[]}-{Round~Cap[]}] (m.south~east) -- (m.north~east);
+      \draw [very~thick, {Round~Cap[]}-{Round~Cap[]}]
+        (m.south~west) -- (m.north~west);
+      \draw [very~thick, {Round~Cap[]}-{Round~Cap[]}]
+        (m.south~east) -- (m.north~east);
 
       % dashed lines for pulses
       #2
@@ -189,6 +225,9 @@
       \int_set:Nn \l_tmpa_int {1}
       \cs_set_eq:NN \Photon \__wisper_arrowfunc:nn
       #3
+
+      % Adjust bounding box to be symmetric around the matrix' center
+      \__wisper_tikz_symmetrize_bbox:nn {m.center} {x}
     \end{tikzpicture}
   }
 \cs_generate_variant:Nn \__wisper_doublesided_diagram_tikz:nnn {xxx, xnn}
@@ -212,26 +251,34 @@
         \bool_if:NTF \l__wisper_doublesided_diagram_in_bool
           {
             \draw [ thick, {Stealth[length=1.4ex, width'=0pt~0.6]}- ]
-              (m ~ \int_eval:n {\l_tmpa_int} ~ west) ~ -- ~ +(-150 \c_colon_str 3.5ex)
-              node[left, inner~sep=.2ex] {\footnotesize \tl_trim_spaces:n{#2}};
+              (m ~ \int_eval:n { \l_tmpa_int } ~ west)
+              -- +(\int_eval:n { -180 + \g__wisper_doublesided_diagram_arrow_angle_tl } \c_colon_str 3.5ex)
+              node[left, inner~sep=.2ex]
+              { \footnotesize \tl_trim_spaces:n{#2} };
           }
           {
             \draw [ thick, -{Stealth[length=1.4ex, width'=0pt~0.6]} ]
-              (m ~ \int_eval:n {\l_tmpa_int} ~ west) ~ -- ~ +(-210 \c_colon_str 3.5ex)
-              node[left, inner~sep=.2ex] {\footnotesize \tl_trim_spaces:n{#2}};
+              (m ~ \int_eval:n { \l_tmpa_int } ~ west)
+              -- +(\int_eval:n { -180 - \g__wisper_doublesided_diagram_arrow_angle_tl } \c_colon_str 3.5ex)
+              node[left, inner~sep=.2ex]
+              { \footnotesize \tl_trim_spaces:n{#2} };
           }
       }
       {
         \bool_if:NTF \l__wisper_doublesided_diagram_in_bool
           {
             \draw [ thick, {Stealth[length=1.4ex, width'=0pt~0.6]}- ]
-            (m ~ \int_eval:n {\l_tmpa_int} ~ east) ~ -- ~ +(-30 \c_colon_str 3.5ex)
-            node[right, inner~sep=.2ex] {\footnotesize \tl_trim_spaces:n{#2}};
+              (m ~ \int_eval:n { \l_tmpa_int } ~ east)
+              -- +(\int_eval:n { -\g__wisper_doublesided_diagram_arrow_angle_tl } \c_colon_str 3.5ex)
+              node[right, inner~sep=.2ex]
+              { \footnotesize \tl_trim_spaces:n{#2} };
           }
           {
             \draw [ thick, -{Stealth[length=1.4ex, width'=0pt~0.6]} ]
-            (m ~ \int_eval:n {\l_tmpa_int} ~ east) ~ -- ~ +(30 \c_colon_str 3.5ex)
-            node[right, inner~sep=.2ex] {\footnotesize \tl_trim_spaces:n{#2}};
+              (m ~ \int_eval:n { \l_tmpa_int } ~ east)
+              -- +(\int_eval:n { \g__wisper_doublesided_diagram_arrow_angle_tl } \c_colon_str 3.5ex)
+              node[right, inner~sep=.2ex]
+              { \footnotesize \tl_trim_spaces:n{#2} };
           }
       }
   }
