@@ -32,12 +32,15 @@
 \RequirePackage{titletoc}
 \RequirePackage{wisperDefaultPackages}
 \RequirePackage[
-    citestyle=wisperNumericComp,
-    bibstyle=numeric,
+    %citestyle=wisperNumericComp,
+    %bibstyle=numeric,
+    citestyle=alphabetic,
+    bibstyle=alphabetic,
+    maxalphanames=1,
     autocite=superscript,
     hyperref=true,
     url=false,
-    isbn=false,  %  DOI only, FIXME: show ISBN if no DOI present
+    isbn=false,  %  DOI only, FIXME: show ISBN if no DOI present (maybe, for books show ISBN always?)
     maxcitenames=1,
     maxbibnames=5,
     citereset=section,
@@ -52,6 +55,24 @@
 			\clearfield{edition}
 		}
 	}
+
+% 
+% https://tex.stackexchange.com/questions/68862/biblatex-alphabetic-style-like-smith-2005
+\renewcommand*{\labelalphaothers}{}
+\DeclareLabelalphaTemplate{
+  \labelelement{
+    \field[final]{shorthand}
+    \field{labelname}
+    \field{label}
+  }
+  \labelelement{
+    \literal{,\addhighpenspace}
+  }
+  \labelelement{
+    \field{year}
+  }
+}
+\let \xcite \cite
 
 \RequirePackage{caption}
 \captionsetup{
