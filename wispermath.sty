@@ -733,7 +733,9 @@
   { \colvec {#1} }
 
 % operators [[[1
-\NewDocumentCommand \Adjoint { m } { #1^\dagger }
+\NewDocumentCommand \Transpose { m } { #1^{\intercal} }
+\cs_new_eq:NN \Trans \Transpose
+\NewDocumentCommand \Adjoint { m } { #1^{\dagger} }
 \cs_new_eq:NN \Adj \Adjoint
 \NewDocumentCommand \Operator { m } { \hat{#1} }
 \cs_new_eq:NN \Op \Operator
