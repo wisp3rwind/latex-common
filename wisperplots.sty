@@ -1,22 +1,24 @@
 \ProvidesExplPackage {wisperplots} {2019-10-01} {0.1} {Empty description.}
 
-\RequirePackage{filemod}
-\RequirePackage{shellesc}
+%\RequirePackage{filemod}
+%\RequirePackage{shellesc}
 
-\RequirePackage{pgfplots}
-\pgfplotsset{compat=1.15}
-\RequirePackage[subpreambles,sort]{standalone}
+%\RequirePackage{pgfplots}
+%\pgfplotsset{compat=1.15}
+%\RequirePackage[subpreambles,sort]{standalone}
 %\RequirePackage{tikzexternal}
 %\tikzexternalize[prefix=./build/externalized/]
 
 \tl_if_exist:NF \PlotFont { \tl_gclear:N \PlotFont }
 \tl_new:N \__plot_width_tl
 \tl_new:N \__plot_preamble_tl
+
 \keys_define:nn { plots }
   {
     width .tl_set:N = \__plot_width_tl,
     preamble .tl_set:N = \__plot_preamble_tl,
   }
+
 \cs_new:Npn \__plot_default_options:
   {
     \keys_set:nn { plots }
@@ -29,39 +31,75 @@
           }
       },
   }
-\cs_new:Npn \__plot_build_preamble:
+
+%\cs_new:Npn \__plot_build_preamble:
+%  {
+%  }
+
+%\cs_new:Npn \__plot_remake:n #1
+%  {
+%    \ShellEscape{python3~"#1"~"\__plot_filename_tl"~"\__plot_width_tl"~"\__plot_preamble_tl"}
+%  }
+
+%\NewDocumentCommand \IncludePlot { o m }
+%  {
+%    \begingroup
+%      \__plot_default_options:
+%      \tl_if_novalue:nF {#1}
+%        { \keys_set:nn { plots } {#1} }
+%      \tl_set:Nn \__plot_filename_tl {#2-\__plot_width_tl}
+%      \IfFileExists{\__plot_filename_tl.pdf}
+%        {
+%          %\tl_show:n {remake~1}
+%          %\filemodCmp{#2}{\jobname.pdf}
+%          \filemodCmp{\__plot_filename_tl.pdf}{#2}
+%            { }
+%            {
+%              % render if the python script is newer than the output
+%              \__plot_remake:n {#2}
+%            }
+%        }
+%        {
+%          % render if the plot doesn't exist
+%          %\tl_show:n {remake~2}
+%          \__plot_remake:n {#2}
+%        }
+%        \includegraphics{{\__plot_filename_tl}.pdf}
+%    \endgroup
+%  }
+
+% Output text and paper dimensions to perfectly scale plots with external tools [[[1
+\cs_new:Npn \__wisper_output_dim:N #1
   {
-  }
-\cs_new:Npn \__plot_remake:n #1
-  {
-    \ShellEscape{python3~"#1"~"\__plot_filename_tl"~"\__plot_width_tl"~"\__plot_preamble_tl"}
-  }
-\NewDocumentCommand \IncludePlot { o m }
-  {
-    \begingroup
-      \__plot_default_options:
-      \tl_if_novalue:nF {#1}
-        { \keys_set:nn { plots } {#1} }
-      \tl_set:Nn \__plot_filename_tl {#2-\__plot_width_tl}
-      \IfFileExists{\__plot_filename_tl.pdf}
-        {
-          %\tl_show:n {remake~1}
-          %\filemodCmp{#2}{\jobname.pdf}
-          \filemodCmp{\__plot_filename_tl.pdf}{#2}
-            { }
-            {
-              % render if the python script is newer than the output
-              \__plot_remake:n {#2}
-            }
-        }
-        {
-          % render if the plot doesn't exist
-          %\tl_show:n {remake~2}
-          \__plot_remake:n {#2}
-        }
-        \includegraphics{{\__plot_filename_tl}.pdf}
-    \endgroup
+    \iow_now:Nx \g_tmpa_iow
+      {
+        \tl_trim_spaces:o { \tl_to_str:n {#1} }
+        , ~
+        \dim_to_decimal:n { #1 } , ~ pt
+        %\dim_to_decimal_in_unit:nn { \textwidth } { 1mm } } , ~ mm
+      }
   }
 
+\cs_new:Npn \__wisper_dim_to_csv:nn #1#2
+  {
+    \iow_open:Nn \g_tmpa_iow {#1}
+
+    \iow_now:Nn \g_tmpa_iow { dimension, ~ value, ~ unit }
+    \clist_map_function:nN { #2 } \__wisper_output_dim:N
+
+    \iow_close:N \g_tmpa_iow
+  }
+
+\NewDocumentCommand \DimensionsToCSV { m m }
+  { \__wisper_dim_to_csv:nn {#1} {#2} }
+
+\NewDocumentCommand \DefaultDimensionsToCSV { m }
+  {
+    \__wisper_dim_to_csv:nn {#1}
+      {
+        \textwidth, \textheight, \linewidth, \marginparwidth, \marginparsep,
+        \paperwidth, \paperheight
+      }
+  }
 
 % vim: ft=tex ts=2 sw=2 et fdm=marker fmr=[[[,]]]:

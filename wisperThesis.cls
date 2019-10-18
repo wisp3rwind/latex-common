@@ -6,7 +6,7 @@
 
 % Packages that need to be loaded early
 \RequirePackage{wisperDefaultPackagesEarly}
-\RequirePackage{standalone}
+%\RequirePackage{standalone}
 \RequirePackage{pgfpages}
 \RequirePackage[main=english]{babel}
 
@@ -26,6 +26,9 @@
 		raggedentrytext=true,
 		pagenumberbox=\mbox
 	]{tocline}{chapter,section}
+
+\RequirePackage[strict]{changepage}
+\RequirePackage{wisperSidenotes}
 
 
 %\usepackage{wisperFootnotecite}
@@ -90,10 +93,10 @@
 \RequirePackage{paul-tol-colors}
 \RequirePackage{wisperBoxes}
 
-\usepackage{wispermath}
-\usepackage{wisperphys}
-\usepackage{wispercode}
-%\usepackage{wisperplots}
+\RequirePackage{wispermath}
+\RequirePackage{wisperphys}
+\RequirePackage{wispercode}
+\RequirePackage{wisperplots}
 
 % Packages that need to be loaded last
 \RequirePackage{csquotes}  % conflicts with minted if loaded in reverse order
