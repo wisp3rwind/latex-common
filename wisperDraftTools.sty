@@ -24,6 +24,7 @@
     \stepcounter{todonotecounter}
     \IfBooleanTF{#1}{}
       {
+        \textsuperscript{\color{red} \thetodonotecounter}
         \marginpar
           {
             \IfValueT{#2}{\vspace{#2}}
