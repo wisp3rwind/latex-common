@@ -148,6 +148,8 @@
           }
       }
   }
+\DeclarePairedDelimiterX \AntiComm[2] \lbrace \rbrace
+  { \__wisper_argument_or_empty:n {#1}, \__wisper_argument_or_empty:n {#2} }
 
 \NewDocumentCommand \paulimx { } { \begin{pmatrix}0 & 1 \\ 1 & 0\end{pmatrix} }
 \NewDocumentCommand \paulimy { } { \begin{pmatrix}-i & 0 \\ 0 & i\end{pmatrix} }
