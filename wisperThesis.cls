@@ -27,10 +27,6 @@
 		pagenumberbox=\mbox
 	]{tocline}{chapter,section}
 
-\RequirePackage[strict]{changepage}
-\RequirePackage{wisperSidenotes}
-
-
 %\usepackage{wisperFootnotecite}
 \RequirePackage{titletoc}
 \RequirePackage{wisperDefaultPackages}
@@ -86,6 +82,9 @@
 	calcwidth=0.9\linewidth,
 	justification=RaggedRight
 }
+
+\RequirePackage[strict]{changepage}
+\RequirePackage{wisperSidenotes}
 
 %\numberwithin{equation}{section}
 \numberwithin{equation}{chapter}
