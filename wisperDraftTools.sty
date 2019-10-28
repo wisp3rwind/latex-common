@@ -8,13 +8,16 @@
 
 % Drafts [[[2
 
-\PassOptionsToPackage{inner}{showlabels}
-\RequirePackage{showlabels}
+\bool_if:nT { \c_false_bool }
+  {
+    \PassOptionsToPackage{inner}{showlabels}
+    \RequirePackage{showlabels}
 
-\tl_gset:Nn \showlabelfont { \tiny\ttfamily }
-\showlabels{cite}
-%\showlabels{ref}
-%\showlabels{begin}
+    \tl_gset:Nn \showlabelfont { \tiny\ttfamily }
+    \showlabels{cite}
+    %\showlabels{ref}
+    %\showlabels{begin}
+  }
 
 \RequirePackage{wisperIfTwoside}
 
