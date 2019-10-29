@@ -82,6 +82,22 @@
 	calcwidth=0.9\linewidth,
 	justification=RaggedRight
 }
+\captionsetup[figure]{
+	format=plain,
+	%font=small,
+	font={sf,footnotesize},
+	labelfont=sc,
+	calcwidth=0.9\linewidth,
+	justification=RaggedRight
+}
+\captionsetup[table]{
+	format=plain,
+	%font=small,
+	font={sf,footnotesize},
+	labelfont=sc,
+	calcwidth=0.9\linewidth,
+	justification=RaggedRight
+}
 
 \RequirePackage[strict]{changepage}
 \RequirePackage{wisperSidenotes}
