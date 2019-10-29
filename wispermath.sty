@@ -531,7 +531,9 @@
 \cs_new_eq:NN \stdvec \vec
 
 \cs_new:Npn \__wisper_bmhat:n #1 { \bm{\hat{#1}} } 
-\cs_new:Npn \__wisper_bmhat:w
+% This needs to be protected, the f-expansion fails in some fragile contexts
+% (such as in a caption)
+\cs_new_protected:Npn \__wisper_bmhat:w
   {
     \peek_N_type:TF
       { \exp_last_unbraced:Nf \__wisper_bmhat:n }
