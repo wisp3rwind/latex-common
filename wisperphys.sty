@@ -6,6 +6,7 @@
 \ProvidesExplPackage {wisperphys} {2019-10-01} {0.1} {Empty description.}
 
 \cs_new:Npn \__wisper_keys_define_phys:n #1 { \keys_define:nn { wisper/phys } {#1} }
+\cs_new:Npn \__wisper_keys_define_phys:nn #1#2 { \keys_define:nn { wisper / phys / #1 } {#2} }
 \cs_new:Npn \__wisper_keys_set_phys:n #1 { \keys_set:nn { wisper/phys } {#1} }
 \cs_new_eq:NN \PhysStyle \__wisper_keys_set_phys:n
 
@@ -334,6 +335,40 @@
     \__wisper_doublesided_diagram:NN 
       \__wisper_doublesided_operators_seq
       \__wisper_doublesided_arrows_seq
+  }
+
+\tl_new:N \__wisper_spectroscropic_notation_font_tl
+\__wisper_keys_define_phys:nn { spectroscopic-notation }
+  {
+    font .tl_gset:N = \__wisper_spectroscropic_notation_font_tl,
+    font .initial:n = { \mathrm },
+  }
+\NewDocumentCommand \SpecLevel { o m m m }
+  {
+    \ensuremath{
+      %\IfValueT {#1}
+      %  { #1 }
+      %\tensor*%
+      %  %[
+      %  %  ^{
+      %  %    \__wisper_spectroscropic_notation_font_tl
+      %  %      {#2}
+      %  %  }
+      %  %]%
+      %  { #3 }%
+      %  {%
+      %    \c_math_superscript_token {x}%
+      %    \c_math_subscript_token%
+      %      { \__wisper_spectroscropic_notation_font_tl {#4} }%
+      %  }
+      {
+        \IfValueT {#1}
+          { #1 }
+      }
+      \c_math_superscript_token {#2}
+      { \__wisper_spectroscropic_notation_font_tl {#3} }
+      \c_math_subscript_token {#4}
+    }
   }
 
 % vim: ft=tex ts=2 sw=2 et fdm=marker fmr=[[[,]]]:
