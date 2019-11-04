@@ -8,7 +8,29 @@
 
 % Drafts [[[2
 
-\bool_if:nT { \c_true_bool }
+\bool_new:N \__wisper_drafttools_showlabels_bool
+\bool_new:N \__wisper_drafttools_showframe_bool
+\keys_define:nn { wisper / drafttools / options }
+  {
+    showlabels .bool_gset:N = \__wisper_drafttools_showlabels_bool,
+    showlabels .default:n = { true },
+    showlables .initial:n = { false },
+    showframe .bool_gset:N = \__wisper_drafttools_showframe_bool,
+    showframe .default:n = { true },
+    showframe .initial:n = { false },
+    draft .meta:n = {
+      showlabels = true,
+    },
+  }
+
+\ProcessKeysOptions { wisper / drafttools / options }
+
+\bool_if:nT { \__wisper_drafttools_showframe_bool }
+  {
+    \RequirePackage{showframe}
+  }
+
+\bool_if:nT { \__wisper_drafttools_showlabels_bool }
   {
     \PassOptionsToPackage{inner}{showlabels}
     \RequirePackage{showlabels}

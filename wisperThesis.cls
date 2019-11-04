@@ -127,6 +127,6 @@
   filecolor=mark-dark-green,
   urlcolor=mark-dark-blue,
 }
-\RequirePackage{wisperDraftTools}
+\RequirePackage[showlabels]{wisperDraftTools}
 
 % vim: ft=tex ts=2 sw=2 et fdm=marker fmr=[[[,]]]:
