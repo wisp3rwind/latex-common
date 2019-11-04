@@ -73,6 +73,25 @@
 }
 \let \xcite \cite
 
+% reduce indentation
+\defbibenvironment{bibliography}
+  {\list
+     {\printtext[labelalphawidth]{%
+        \printfield{labelprefix}%
+        \printfield{labelalpha}%
+        \printfield{extraalpha}}}
+     {%
+      \setlength{\labelwidth}{\labelalphawidth}% default
+      \setlength{\labelwidth}{3em}%
+      \setlength{\leftmargin}{\labelwidth}%
+      \setlength{\labelsep}{\biblabelsep}%
+      \addtolength{\leftmargin}{\labelsep}%
+      \setlength{\itemsep}{\bibitemsep}%
+      \setlength{\parsep}{\bibparsep}}%
+      \renewcommand*{\makelabel}[1]{##1\hss}}
+  {\endlist}
+  {\item}
+
 \RequirePackage{caption}
 \captionsetup{
 	format=plain,
