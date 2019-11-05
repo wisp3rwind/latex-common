@@ -30,13 +30,6 @@
 
 \__wisper_if_twoside:TF
   {
-    % onesided
-    \cs_new_eq:NN \RaggedOutside \raggedright
-    \NewDocumentEnvironment {FlushInside} { }
-      { \begin{FlushLeft} }
-      { \end{FlushLeft} }
-  }
-  {
     %twosided
     \NewDocumentCommand \RaggedOutside { }
       { \__wisper_if_odd_page:TF { \RaggedRight } { \RaggedLeft } }
@@ -44,7 +37,7 @@
     \NewDocumentEnvironment {FlushInside} { }
       {
         % This is implemented just like FlushLeft/FlushRight in ragged2e, which
-        % in turn mimic LaTeX' flushleft/flushrigh. According to source2e, the
+        % in turn mimics LaTeX' flushleft/flushright. According to source2e, the
         % trivlist is used to handle vertical spacing.
         \trivlist
         \RaggedOutside \item\relax
@@ -52,6 +45,13 @@
       {
         \endtrivlist
       }
+  }
+  {
+    % onesided
+    \cs_new_eq:NN \RaggedOutside \raggedright
+    \NewDocumentEnvironment {FlushInside} { }
+      { \begin{FlushLeft} }
+      { \end{FlushLeft} }
   }
 
 
