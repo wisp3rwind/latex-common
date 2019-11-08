@@ -27,10 +27,12 @@
 \cs_new:Npn \isomerslash  { \textnormal{ / } \allowbreak }
 \ProvideDocumentCommand \isomer { m } { \cesplit{{\/}{\c{isomerslash}}}{#1} }
 
-\usepackage{tikz}
+\RequirePackage{tikz}
+\ExplSyntaxOff
 \usetikzlibrary{arrows.meta}
 \usetikzlibrary{calc}
 \usetikzlibrary{math}
+\ExplSyntaxOn
 
 % Dirac notation
 % This re-implements much of braket.sty because the latter has certain issues:
