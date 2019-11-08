@@ -612,6 +612,19 @@
         { \begin{matrix*}[#1] #2 \end{matrix*} }
       }
   }
+\NewDocumentCommand \SmallColvec { o m }
+  {
+    \IfNoValueTF { #1 }
+      {
+        \__wisper_colvec_surrounding_resize:n
+          { \begin{smallmatrix} #2 \end{smallmatrix} }
+      }
+      {
+        % with column spec
+        \__wisper_colvec_surrounding_resize:n
+          { \begin{smallmatrix}[#1] #2 \end{smallmatrix} }
+      }
+  }
 
 
 %\DeclareMathOperator { \__wisper_operator_dim: } { dim }
@@ -740,8 +753,10 @@
 
 % combinatorics [[[1
 % \bincoef{N \\ k}
-\cs_new:Npn \bincoef #1
+\NewDocumentCommand \bincoef { m }
   { \colvec {#1} }
+\NewDocumentCommand \SmallBincoef { m }
+  { \SmallColvec {#1} }
 
 % operators [[[1
 \RenewDocumentCommand \Transpose { m } { #1^{\intercal} }
