@@ -467,8 +467,15 @@
   }
 
 % complex numbers [[[1
-\cs_gset:Npn \Conj #1
-  { #1 \c_math_superscript_token { \ast } }
+% Declare in order to overwrite COOL macro
+\DeclareDocumentCommand \Conj { s m }
+  {
+    % The starred version is a workaround to fix superscript spacing, e.g.
+    % when \Conj is applied to an expression surrounded by delimiters.
+    \IfBooleanTF {#1}
+      { #2 \c_math_superscript_token { \! \ast } }
+      { #2 \c_math_superscript_token { \ast } }
+  }
 \cs_new:Npn \HC
   { \mathrm{h.c.} }
 
