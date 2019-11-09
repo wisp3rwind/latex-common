@@ -146,6 +146,10 @@
   filecolor=mark-dark-green,
   urlcolor=mark-dark-blue,
 }
-\RequirePackage[showlabels]{wisperDraftTools}
+%\RequirePackage[showlabels]{wisperDraftTools}
+\RequirePackage[]{wisperDraftTools}
+
+\RequirePackage{wisperSmartFootnoteMark}
+
 
 % vim: ft=tex ts=2 sw=2 et fdm=marker fmr=[[[,]]]:

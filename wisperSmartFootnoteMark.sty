@@ -1,0 +1,50 @@
+\ProvidesExplPackage {wisperSmartFootnoteMark} {2019-11-09} {0.1} {Empty description.}
+
+\RequirePackage{wisperProgrammingTools}
+
+
+\makeatletter
+
+\cs_new:Npn \__wisper_unspace_punctuation:N #1
+  {
+    \settowidth \l_tmpa_dim {#1}
+    \dim_add:Nn \l_tmpa_dim { -1.8\l_tmpa_dim }
+
+    #1 \hspace* { \l_tmpa_dim }
+  }
+
+\cs_gset_eq:NN \__wisper_old_footnote:w \footnote
+
+\tl_new:N \l__wisper_footnote_punctuation_tl
+
+\cs_new:Npn \__wisper_old_footnote:nn #1#2
+  {
+    \IfNoValueTF {#1}
+      { \__wisper_old_footnote:w {#2} }
+      { \__wisper_old_footnote:w [#1] {#2} }
+  }
+
+\cs_new:Npn \__wisper_smart_footnote:nnN #1#2#3
+  {
+    \tl_set:Nn \l__wisper_footnote_punctuation_tl {#3}
+    % The punctuation must be outside \@makefnmark, else hyperref will
+    % apprently wrap it in the link.
+    \__wisper_unspace_punctuation:N \l__wisper_footnote_punctuation_tl
+    \__wisper_old_footnote:nn {#1} {#2}
+  }
+
+\RenewDocumentCommand \footnote { o m }
+  {
+    \__wisper_peek_charcode_any_ignore_spaces:nTF {.,:;}
+      {
+        \__wisper_smart_footnote:nnN {#1} {#2}
+      }
+      {
+        % peeking with ignore_spaces might have removed all spaces
+        % before the next word. Add it back.
+        \__wisper_old_footnote:nn {#1} {#2} ~
+      }
+  }
+
+\makeatother
+
