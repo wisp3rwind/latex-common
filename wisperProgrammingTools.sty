@@ -126,18 +126,19 @@
 
 
 % Peeking ahead [[[1
-\prg_new_conditional:Npnn \__wisper_peek_charcode_any_ignore_spaces:n #1 { T, F, TF }
+% Cannot be defined using \prg_new_conditional:Npnn
+\cs_new:Npn \__wisper_peek_charcode_any_ignore_spaces:nTF #1#2#3
   {
     \tl_show:n {#1}
-    \exp_args:Ne \peek_charcode_ignore_spaces:NTF , %{\tl_head:w #1 {} \q_stop}
-      { \prg_return_true: }
+    \exp_args:Ne \peek_charcode_ignore_spaces:NTF {\tl_head:w #1 {} \q_stop}
+      { #2 }
       {
         \tl_show:n {#1}
         \tl_if_single:nTF  {#1}
-          { \prg_return_false: }
+          { #3 }
           {
             \exp_args:Ne \__wisper_peek_charcode_any_ignore_spaces:nTF { \tl_tail:n {#1} }
-              { \prg_return_true: } { \prg_return_false: }
+              { #2 } { #3 }
           }
       }
   }
