@@ -1,7 +1,7 @@
 \RequirePackage{expl3}
 \ProvidesExplClass{wisperThesis} {2019-10-02} {0.1} {}
 
-\LoadClass[english, a4paper, DIV=calc, BCOR=0mm, fontsize=10pt, pagesize, fleqn]{scrbook}
+\LoadClass[english, a4paper, DIV=calc, BCOR=0mm, fontsize=10pt, pagesize=auto, fleqn]{scrbook}
 \PassOptionsToPackage{fleqn}{amsmath}
 
 % Packages that need to be loaded early
@@ -14,6 +14,17 @@
 \RequirePackage{wisperFontSetupTeXGyreAndFira}
 \RequirePackage{wisperKOMAMisc}
 \KOMAoptions{DIV=last}
+
+% Increase \textheight by 5 lines, but keep the \textwidth at the optimum value
+% that typearea found.
+% \areaset recalculates the margins to be well-balanced
+\newlength{ \LinesXXX }% Height of ... lines 
+\setlength{ \LinesXXX }{ \topskip }
+\addtolength{ \LinesXXX }{ 5\baselineskip }
+\addtolength{ \LinesXXX }{ \textheight }
+\areaset{ \textwidth }{ \LinesXXX }
+
+
 \KOMAoption{toc}{bibliography}%, flat}
 \KOMAoptions{
   overfullrule=true,
@@ -146,8 +157,9 @@
   filecolor=mark-dark-green,
   urlcolor=mark-dark-blue,
 }
-%\RequirePackage[showlabels]{wisperDraftTools}
 \RequirePackage[]{wisperDraftTools}
+%\RequirePackage[showframe, showlabels]{wisperDraftTools}
+%\RequirePackage[showlabels]{wisperDraftTools}
 
 \RequirePackage{wisperSmartFootnoteMark}
 
