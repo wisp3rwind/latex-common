@@ -161,10 +161,11 @@
 
 % Feynman diagrams [[[1
 \tl_gset:Nn \g__wisper_doublesided_diagram_arrow_angle_tl {30}
-\seq_new:N \__wisper_doublesided_operators_seq
-\seq_new:N \__wisper_doublesided_arrows_seq
+\seq_new:N \l__wisper_doublesided_operators_seq
+\seq_new:N \l__wisper_doublesided_arrows_seq
+\dim_new:N \l__wisper_doublesided_diagram_arrowlen_dim
 
-\keys_define:nn { wisper / physics / diagrams / options}
+\keys_define:nn { wisper / physics / diagrams / arrow ~ options}
   {
     left .bool_set:N = \l__wisper_doublesided_diagram_left_bool,
     left .default:n = true,
@@ -176,6 +177,11 @@
     out .bool_set_inverse:N = \l__wisper_doublesided_diagram_in_bool,
     out .default:n = true,
     in .initial:n = true,
+  }
+\keys_define:nn { wisper / physics / diagrams / options}
+  {
+    arrowlen .dim_set:N = \l__wisper_doublesided_diagram_arrowlen_dim,
+    arrowlen .initial:n = { 3.5ex },
   }
 
 \cs_new:Npn \__wisper_tikz_symmetrize_bbox:nn #1#2
@@ -255,21 +261,21 @@
 
 \cs_new:Npn \__wisper_arrowfunc:nn #1#2
   {
-    \keys_set:nn  { wisper / physics / diagrams / options } {#1}
+    \keys_set:nn  { wisper / physics / diagrams / arrow ~ options } {#1}
     \bool_if:NTF \l__wisper_doublesided_diagram_left_bool
       {
         \bool_if:NTF \l__wisper_doublesided_diagram_in_bool
           {
             \draw [ thick, {Stealth[length=1.4ex, width'=0pt~0.6]}- ]
               (m ~ \int_eval:n { \l_tmpa_int } ~ west)
-              -- +(\int_eval:n { -180 + \g__wisper_doublesided_diagram_arrow_angle_tl } \c_colon_str 3.5ex)
+              -- +(\int_eval:n { -180 + \g__wisper_doublesided_diagram_arrow_angle_tl } \c_colon_str \l__wisper_doublesided_diagram_arrowlen_dim)
               node[left, inner~sep=.2ex]
               { \footnotesize \tl_trim_spaces:n{#2} };
           }
           {
             \draw [ thick, -{Stealth[length=1.4ex, width'=0pt~0.6]} ]
               (m ~ \int_eval:n { \l_tmpa_int } ~ west)
-              -- +(\int_eval:n { -180 - \g__wisper_doublesided_diagram_arrow_angle_tl } \c_colon_str 3.5ex)
+              -- +(\int_eval:n { -180 - \g__wisper_doublesided_diagram_arrow_angle_tl } \c_colon_str \l__wisper_doublesided_diagram_arrowlen_dim)
               node[left, inner~sep=.2ex]
               { \footnotesize \tl_trim_spaces:n{#2} };
           }
@@ -279,14 +285,14 @@
           {
             \draw [ thick, {Stealth[length=1.4ex, width'=0pt~0.6]}- ]
               (m ~ \int_eval:n { \l_tmpa_int } ~ east)
-              -- +(\int_eval:n { -\g__wisper_doublesided_diagram_arrow_angle_tl } \c_colon_str 3.5ex)
+              -- +(\int_eval:n { -\g__wisper_doublesided_diagram_arrow_angle_tl } \c_colon_str \l__wisper_doublesided_diagram_arrowlen_dim)
               node[right, inner~sep=.2ex]
               { \footnotesize \tl_trim_spaces:n{#2} };
           }
           {
             \draw [ thick, -{Stealth[length=1.4ex, width'=0pt~0.6]} ]
               (m ~ \int_eval:n { \l_tmpa_int } ~ east)
-              -- +(\int_eval:n { \g__wisper_doublesided_diagram_arrow_angle_tl } \c_colon_str 3.5ex)
+              -- +(\int_eval:n { \g__wisper_doublesided_diagram_arrow_angle_tl } \c_colon_str \l__wisper_doublesided_diagram_arrowlen_dim)
               node[right, inner~sep=.2ex]
               { \footnotesize \tl_trim_spaces:n{#2} };
           }
@@ -302,41 +308,53 @@
   {
     \__wisper_doublesided_diagram_tikz:xnn
       {
-        \seq_indexed_map_function:NN \__wisper_doublesided_operators_seq
+        \seq_indexed_map_function:NN \l__wisper_doublesided_operators_seq
           \__wisper_nodefunc:nn
       }
       {
         \int_step_function:fN
-          { \int_eval:n { \seq_count:N \__wisper_doublesided_operators_seq  - 1} }
+          { \int_eval:n { \seq_count:N \l__wisper_doublesided_operators_seq  - 1} }
           \__wisper_linefunc:n
       }
       {
-        \seq_use:Nn \__wisper_doublesided_arrows_seq { \int_incr:N \l_tmpa_int }
+        \seq_use:Nn \l__wisper_doublesided_arrows_seq { \int_incr:N \l_tmpa_int }
       }
   }
 
-\NewDocumentCommand \DoubleSidedDiagram { m }
+
+\NewDocumentCommand \DoubleSidedDiagram { o m }
   {
-    \bool_set_true:N \l_tmpa_bool
-    \clist_map_inline:nn {#1}
-      {
-        \bool_if:NTF \l_tmpa_bool
-          {
-            \seq_put_right:Nn \__wisper_doublesided_operators_seq {##1}
-            \bool_set_false:N \l_tmpa_bool
-          }
-          {
-            \seq_put_right:Nn \__wisper_doublesided_arrows_seq {##1}
-            \bool_set_true:N \l_tmpa_bool
-          }
-      }
+    \group_begin:
+      \seq_clear:N \l__wisper_doublesided_operators_seq
+      \seq_clear:N \l__wisper_doublesided_arrows_seq
 
-    \seq_reverse:N \__wisper_doublesided_operators_seq
-    \seq_reverse:N \__wisper_doublesided_arrows_seq
+      \IfValueT {#1}
+        {
+          \keys_set:nn { wisper / physics / diagrams / options} {#1}
+        }
 
-    \__wisper_doublesided_diagram:NN 
-      \__wisper_doublesided_operators_seq
-      \__wisper_doublesided_arrows_seq
+      \bool_set_true:N \l_tmpa_bool
+      % Parse alternating clist of operators and arrows.
+      \clist_map_inline:nn {#2}
+        {
+          \bool_if:NTF \l_tmpa_bool
+            {
+              \seq_put_right:Nn \l__wisper_doublesided_operators_seq {##1}
+              \bool_set_false:N \l_tmpa_bool
+            }
+            {
+              \seq_put_right:Nn \l__wisper_doublesided_arrows_seq {##1}
+              \bool_set_true:N \l_tmpa_bool
+            }
+        }
+
+      \seq_reverse:N \l__wisper_doublesided_operators_seq
+      \seq_reverse:N \l__wisper_doublesided_arrows_seq
+
+      \__wisper_doublesided_diagram:NN 
+        \l__wisper_doublesided_operators_seq
+        \l__wisper_doublesided_arrows_seq
+    \group_end:
   }
 
 \tl_new:N \__wisper_spectroscropic_notation_font_tl
