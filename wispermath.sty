@@ -397,16 +397,14 @@
 \cs_gset_eq:NN \ExpVal \ExpectationValue
 \cs_new:Npn \__wisper_expval:nnn #1#2#3
   {
-    \tl_if_novalue:nTF {#1}
+    \IfBooleanTF {#1}
+      {
+        \ExpVal* {#3} 
+      }
       {
         \tl_if_novalue:nTF {#2}
-          { \ExpectationValue {#3} }
-          { \ExpectationValue [#2]{#3} }
-        }
-      {
-        \tl_if_novalue:nTF {#2}
-          { \ExpectationValue* {#3} }
-          { \ExpectationValue* [#2]{#3} }
+          { \ExpVal {#3} }
+          { \ExpVal [#2]{#3} }
       }
   }
 
