@@ -50,7 +50,7 @@
     autocite=superscript,
     hyperref=true,
     url=false,
-    isbn=false,  %  DOI only, FIXME: show ISBN if no DOI present (maybe, for books show ISBN always?)
+    %isbn=false,  %  DOI only, FIXME: show ISBN if no DOI present (maybe, for books show ISBN always?)
     maxcitenames=1,
     maxbibnames=5,
     citereset=section,
@@ -65,6 +65,13 @@
 			\clearfield{edition}
 		}
 	}
+% https://tex.stackexchange.com/a/440256/111880
+\AtEveryBibitem{%
+  \iffieldundef{doi}
+    {}
+    {\clearfield{issn}%
+     \clearfield{isbn}}%
+}
 
 % 
 % https://tex.stackexchange.com/questions/68862/biblatex-alphabetic-style-like-smith-2005
