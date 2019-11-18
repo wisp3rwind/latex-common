@@ -27,7 +27,7 @@
 
 \KOMAoption{toc}{bibliography}%, flat}
 \KOMAoptions{
-  overfullrule=true,
+  %overfullrule=true,
   numbers=noperiodatend,
 }
 \setcounter{tocdepth}{\sectiontocdepth}
@@ -159,9 +159,9 @@
   bookmarksopenlevel=3,
   %hidelinks,  % black links
   colorlinks=true,
-  %linkcolor=black,  % for internal links, color is just too much
-  linkcolor=mark-dark-green,
-  citecolor=mark-dark-cyan,
+  linkcolor=black,  % for internal links, color is just too much
+  %linkcolor=mark-dark-green,
+  citecolor=mark-dark-blue,
   filecolor=mark-dark-green,
   urlcolor=mark-dark-blue,
 }
