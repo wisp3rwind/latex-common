@@ -54,7 +54,8 @@
     maxcitenames=1,
     maxbibnames=5,
     citereset=section,
-    giveninits=true, date=year
+    giveninits=true, date=year,
+    backref=true,
   ]{biblatex}
 \AtBeginDocument{
 	\AtEveryBibitem
