@@ -19,6 +19,7 @@
 \RequirePackage{mathtools}
 \RequirePackage{cancel}
 \RequirePackage{bm}
+\cs_undefine:N \Euler
 \RequirePackage{cool}
 \RequirePackage{tikz}
 \ExplSyntaxOff
@@ -352,6 +353,7 @@
 \cs_new:Npn \Z { \ensuremath{\mathbb{Z}} }  % integers
 \cs_new:Npn \R { \ensuremath{\mathbb{R}} }  % real numbers
 \cs_new:Npn \Q { \ensuremath{\mathbb{Q}} }  % rational numbers
+\cs_undefine:N \C
 \cs_new:Npn \C { \ensuremath{\mathbb{C}} }  % complex numbers
 %\cs_new:Npn \Sphere { \ensuremath{\mathbb{S}} }  % \S^n \subset \R^{n+1}
 \cs_new:Npn \Sphere { \ensuremath{S} }  % \S^n \subset \R^{n+1}

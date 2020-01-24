@@ -8,7 +8,7 @@
 \prg_new_conditional:Npnn \__wisper_strlist_if_in:nn #1#2 { p, T, F, TF }
   {
     \__wisper_strlist_if_in:nww { #2 } #1 , #2 , \q_recursion_tail
-    \__prg_break_point:
+    \prg_break_point:
   }
 \cs_new:Npn \__wisper_strlist_if_in:nww #1 #2 ,
   {
@@ -23,7 +23,7 @@
     \else:
       \prg_return_true:
     \fi:
-    \__prg_break:
+    \prg_break:
   }
 \cs_generate_variant:Nn \__wisper_strlist_if_in:nnTF { nVTF }
 \cs_generate_variant:Nn \__wisper_strlist_if_in_p:nn { nV }

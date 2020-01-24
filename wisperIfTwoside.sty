@@ -5,9 +5,13 @@
 
 \__wisper_if_document_class:nTF {koma}
   {
+    \cs_if_exist:NTF \Ifthispageodd
+      { \cs_gset_eq:NN \__wisper_if_odd_page_aux:TF \Ifthispageodd }
+      { \cs_gset_eq:NN \__wisper_if_odd_page_aux:TF \ifthispageodd }
+
     \prg_new_protected_conditional:Npnn \__wisper_if_odd_page: { T, F, TF }
       {
-        \ifthispageodd { \prg_return_true: } { \prg_return_false: }
+        \__wisper_if_odd_page_aux:TF { \prg_return_true: } { \prg_return_false: }
       }
   }
   {
