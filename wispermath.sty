@@ -1154,4 +1154,40 @@
   { \__wisper_q:Nnn \use:n { #1 } { #2 } }
 
 
+% Use the normal (possibly sans) font for upright text (e.g. subscripts) in
+% math. \mathrm defaults to the roman font (surprise!). If the normal font
+% is set to a sans font, the default roman font may still be CM, which tends
+% to look rather ugly.
+% FIXME: The real solution here is not to use \mathrm, but the more semantic
+% \mathup
+\cs_if_free:NT \mathup
+  {
+    \cs_new:Npn \mathup #1
+      {
+        \textup{#1}
+      }
+  }
+\cs_gset_eq:NN \mathrm \mathup
+
+
+% Active subscript token in math, for use with || delimiters to yield upright
+% subscripts.
+\cs_new:Npn \__wisper_sub_upright:w |#1|
+  {
+    \sb { \mathup { #1 } }
+  }
+\cs_new_protected_nopar:Npn \__wisper_sub:w
+  {
+    \peek_charcode:NTF |
+      { \__wisper_sub_upright:w }
+      { \sb }
+  }
+\char_set_active_eq:nN {`\_} \__wisper_sub:w
+\AtBeginDocument
+  {
+    \char_set_catcode_other:n {`\_}
+    \char_set_mathcode:nn {`\_} {32768}
+  }
+
+
 % vim: ft=tex ts=2 sw=2 et fdm=marker fmr=[[[,]]]:
