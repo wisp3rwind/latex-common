@@ -39,7 +39,10 @@
     \renewcommand\labelitemiv{{\fontfamily{cmr}\selectfont\textperiodcentered}}
 
     % use ragged2e in headings
-    \renewcommand* { \raggedchapter } { \RaggedRight }
+    \IfDocClassT {scrbook}
+      {
+        \renewcommand* { \raggedchapter } { \RaggedRight }
+      }
     \renewcommand* { \raggedsection } { \RaggedRight }
     
     % Titlepage
