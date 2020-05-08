@@ -10,6 +10,8 @@
 \cs_new:Npn \__wisper_keys_set_phys:n #1 { \keys_set:nn { wisper/phys } {#1} }
 \cs_new_eq:NN \PhysStyle \__wisper_keys_set_phys:n
 
+\RequirePackage{mathtools}
+
 % Don't rewrite things that already exist [[[1
 % Use \verb|siunitx| to properly format numerical quantities.
 \RequirePackage{siunitx}
