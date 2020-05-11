@@ -27,6 +27,7 @@
 
 \KOMAoption{toc}{bibliography}%, flat}
 \KOMAoptions{
+  % FIXME: make the overfullrule dependent on the `draft` class option
   %overfullrule=true,
   numbers=noperiodatend,
 }
@@ -159,9 +160,9 @@
   bookmarksopenlevel=3,
   %hidelinks,  % black links
   colorlinks=true,
-  linkcolor=black,  % for internal links, color is just too much
-  %linkcolor=mark-dark-green,
-  citecolor=mark-dark-blue,
+  %linkcolor=black,  % for internal links, color is just too much
+  linkcolor=mark-dark-green,
+  citecolor=mark-dark-cyan,
   filecolor=mark-dark-green,
   urlcolor=mark-dark-blue,
 }
