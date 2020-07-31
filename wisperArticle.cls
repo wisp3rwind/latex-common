@@ -1,12 +1,30 @@
 \RequirePackage{expl3}
+\RequirePackage{l3keys2e}
 \ProvidesExplClass{wisperArticle} {2020-04-27} {0.1} {}
 
-\LoadClass[english, a4paper, DIV=calc, BCOR=0mm, fontsize=10pt, pagesize, fleqn]{scrartcl}
+% Class options
+\int_new:N \g_wisperArticle_extralines_int
+\keys_define:nn { wisperArticle }
+  {
+    extralines .int_set:N = \g_wisperArticle_extralines_int,
+    extralines .initial:n = 5,
+    unknown .code:n = { \PassOptionsToClass{\CurrentOption}{scrartcl} },
+  }
+\ProcessKeysOptions { wisperArticle }
+
+% Forward other documentclass options to scrbook
+%\DeclareOption*{%
+%  \PassOptionsToClass{\CurrentOption}{scrartcl}%
+%}
+%\ProcessOptions
+
+\PassOptionsToClass{english, a4paper, DIV=calc, BCOR=0mm, fontsize=10pt, pagesize=auto, fleqn}{scrartcl}
+\LoadClass{scrartcl}
 \PassOptionsToPackage{fleqn}{amsmath}
 
 % Packages that need to be loaded early
 \RequirePackage{wisperDefaultPackagesEarly}
-\RequirePackage{standalone}
+%\RequirePackage{standalone}
 \RequirePackage{pgfpages}
 \RequirePackage[main=english]{babel}
 
@@ -14,9 +32,22 @@
 \RequirePackage{wisperFontSetupTeXGyreAndFira}
 \RequirePackage{wisperKOMAMisc}
 \KOMAoptions{DIV=last}
+
+% Increase \textheight by 5 lines, but keep the \textwidth at the optimum value
+% that typearea found.
+% \areaset recalculates the margins to be well-balanced
+% FIXME: move this to wisperKOMAMisc
+\newlength{ \LinesXXX }% Height of ... lines 
+\setlength{ \LinesXXX }{ \topskip }
+\addtolength{ \LinesXXX }{ \g_wisperArticle_extralines_int \baselineskip }
+\addtolength{ \LinesXXX }{ \textheight }
+\areaset{ \textwidth }{ \LinesXXX }
+
+
 \KOMAoption{toc}{bibliography}%, flat}
 \KOMAoptions{
-  overfullrule=true,
+  % FIXME: make the overfullrule dependent on the `draft` class option
+  %overfullrule=true,
   numbers=noperiodatend,
 }
 \setcounter{tocdepth}{\sectiontocdepth}
@@ -37,11 +68,12 @@
     autocite=superscript,
     hyperref=true,
     url=false,
-    isbn=false,  %  DOI only, FIXME: show ISBN if no DOI present
+    %isbn=false,  %  DOI only, FIXME: show ISBN if no DOI present (maybe, for books show ISBN always?)
     maxcitenames=1,
     maxbibnames=5,
     citereset=section,
-    giveninits=true, date=year
+    giveninits=true, date=year,
+    backref=true,
   ]{biblatex}
 \AtBeginDocument{
 	\AtEveryBibitem
@@ -52,6 +84,50 @@
 			\clearfield{edition}
 		}
 	}
+% https://tex.stackexchange.com/a/440256/111880
+\AtEveryBibitem{%
+  \iffieldundef{doi}
+    {}
+    {\clearfield{issn}%
+     \clearfield{isbn}}%
+}
+
+% 
+% https://tex.stackexchange.com/questions/68862/biblatex-alphabetic-style-like-smith-2005
+\renewcommand*{\labelalphaothers}{}
+\DeclareLabelalphaTemplate{
+  \labelelement{
+    \field[final]{shorthand}
+    \field{labelname}
+    \field{label}
+  }
+  \labelelement{
+    \literal{,\addhighpenspace}
+  }
+  \labelelement{
+    \field{year}
+  }
+}
+\let \xcite \cite
+
+% reduce indentation
+\defbibenvironment{bibliography}
+  {\list
+     {\printtext[labelalphawidth]{%
+        \printfield{labelprefix}%
+        \printfield{labelalpha}%
+        \printfield{extraalpha}}}
+     {%
+      \setlength{\labelwidth}{\labelalphawidth}% default
+      \setlength{\labelwidth}{3em}%
+      \setlength{\leftmargin}{\labelwidth}%
+      \setlength{\labelsep}{\biblabelsep}%
+      \addtolength{\leftmargin}{\labelsep}%
+      \setlength{\itemsep}{\bibitemsep}%
+      \setlength{\parsep}{\bibparsep}}%
+      \renewcommand*{\makelabel}[1]{##1\hss}}
+  {\endlist}
+  {\item}
 
 \RequirePackage{caption}
 \captionsetup{
@@ -62,6 +138,25 @@
 	calcwidth=0.9\linewidth,
 	justification=RaggedRight
 }
+\captionsetup[figure]{
+	format=plain,
+	%font=small,
+	font={sf,footnotesize},
+	labelfont=sc,
+	calcwidth=0.9\linewidth,
+	justification=RaggedRight
+}
+\captionsetup[table]{
+	format=plain,
+	%font=small,
+	font={sf,footnotesize},
+	labelfont=sc,
+	calcwidth=0.9\linewidth,
+	justification=RaggedRight
+}
+
+\RequirePackage[strict]{changepage}
+\RequirePackage{wisperSidenotes}
 
 %\numberwithin{equation}{section}
 \numberwithin{equation}{section}
@@ -69,10 +164,10 @@
 \RequirePackage{paul-tol-colors}
 \RequirePackage{wisperBoxes}
 
-\usepackage{wispermath}
-\usepackage{wisperphys}
-\usepackage{wispercode}
-%\usepackage{wisperplots}
+\RequirePackage{wispermath}
+\RequirePackage{wisperphys}
+\RequirePackage{wispercode}
+\RequirePackage{wisperplots}
 
 % Packages that need to be loaded last
 \RequirePackage{csquotes}  % conflicts with minted if loaded in reverse order
@@ -88,7 +183,11 @@
   filecolor=mark-dark-green,
   urlcolor=mark-dark-blue,
 }
-\RequirePackage{wisperDraftTools}
+\RequirePackage[]{wisperDraftTools}
+%\RequirePackage[showframe, showlabels]{wisperDraftTools}
+%\RequirePackage[showlabels]{wisperDraftTools}
+
+\RequirePackage{wisperSmartFootnoteMark}
+
 
 % vim: ft=tex ts=2 sw=2 et fdm=marker fmr=[[[,]]]:
-

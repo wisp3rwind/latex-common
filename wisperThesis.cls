@@ -1,7 +1,25 @@
 \RequirePackage{expl3}
+\RequirePackage{l3keys2e}
 \ProvidesExplClass{wisperThesis} {2019-10-02} {0.1} {}
 
-\LoadClass[english, a4paper, DIV=calc, BCOR=0mm, fontsize=10pt, pagesize=auto, fleqn]{scrbook}
+% Class options
+\int_new:N \g_wisperThesis_extralines_int
+\keys_define:nn { wisperThesis }
+  {
+    extralines .int_set:N = \g_wisperThesis_extralines_int,
+    extralines .initial:n = 5,
+    unknown .code:n = { \PassOptionsToClass{\CurrentOption}{scrbook} },
+  }
+\ProcessKeysOptions { wisperThesis }
+
+% Forward other documentclass options to scrbook
+%\DeclareOption*{%
+%  \PassOptionsToClass{\CurrentOption}{scrbook}%
+%}
+%\ProcessOptions
+
+\PassOptionsToClass{english, a4paper, DIV=calc, BCOR=0mm, fontsize=10pt, pagesize=auto, fleqn}{scrbook}
+\LoadClass{scrbook}
 \PassOptionsToPackage{fleqn}{amsmath}
 
 % Packages that need to be loaded early
@@ -18,9 +36,10 @@
 % Increase \textheight by 5 lines, but keep the \textwidth at the optimum value
 % that typearea found.
 % \areaset recalculates the margins to be well-balanced
+% FIXME: move this to wisperKOMAMisc
 \newlength{ \LinesXXX }% Height of ... lines 
 \setlength{ \LinesXXX }{ \topskip }
-\addtolength{ \LinesXXX }{ 5\baselineskip }
+\addtolength{ \LinesXXX }{ \g_wisperThesis_extralines_int \baselineskip }
 \addtolength{ \LinesXXX }{ \textheight }
 \areaset{ \textwidth }{ \LinesXXX }
 
@@ -38,6 +57,7 @@
 		raggedentrytext=true,
 		pagenumberbox=\mbox
 	]{tocline}{chapter,section}
+
 
 %\usepackage{wisperFootnotecite}
 \RequirePackage{titletoc}
