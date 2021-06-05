@@ -610,10 +610,10 @@
   }
 
 % shorthand
-\cs_gset_eq:NN \vc \vec
-\cs_gset_eq:NN \dvc \dvec
-\cs_gset_eq:NN \ddvc \ddvec
-\cs_gset_eq:NN \uvc \uvec
+\cs_new:Npn \vc { \vec }
+\cs_new:Npn \dvc { \dvec }
+\cs_new:Npn \ddvc { \ddvec }
+\cs_new:Npn \uvc { \uvec }
 
 \__wisper_key_define_surrounding:nnn { colvec / surrounding }
   { __wisper_colvec_surrounding }
