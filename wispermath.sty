@@ -7,7 +7,7 @@
 % TODO: documentation
 % TODO: make as many commands as possible expandable, properly protect everything else
 %    % TODO: define limit command using this notation
-%    &\xrightarrow[\tau_\mathrm{LI} \to \infty]{}
+%    &\xrightarrow[\tau_\mathup{LI} \to \infty]{}
 
 \RequirePackage{expl3}
 \ProvidesExplPackage {wispermath} {2019-10-01} {0.1} {Empty description.}
@@ -32,10 +32,56 @@
 \RequirePackage{empheq}
 \RequirePackage{tensor}
 
-\cs_if_free:NT \mathup
+\cs_new_protected:Npn \__wisper_check_math_font_switch:NN #1#2
   {
-    \PackageError{wispermath}{wispermath requires \mathup to be defined!}{No help here.}
+    \cs_if_free:NT #1
+      {
+        \PackageWarningNoLine {wispermath}
+          {
+            wispermath ~ requires ~ \protect#1\space ~ to ~ be ~ defined!
+            \MessageBreak
+            Consider ~ loading ~ the ~ 'unicode-math' ~ package
+          }
+
+        % Fallback definition
+        \cs_gset_eq:NN #1 #2
+      }
   }
+
+\cs_new_protected:Npn \__wisper_check_math_font_switch_inline:Nn #1#2
+  {
+    \cs_if_free:NT #1
+      {
+        \PackageWarningNoLine {wispermath}
+          {
+            wispermath ~ requires ~ \protect#1\space ~ to ~ be ~ defined!
+            \MessageBreak
+            Consider ~ loading ~ the ~ 'unicode-math' ~ package
+          }
+
+        % Fallback definition
+        \cs_new:Npn #1 ##1
+          { #2 }
+      }
+  }
+
+\tl_map_inline:nn
+  {
+    %{ \mathup \normalfont }
+    { \symbb \mathbb }
+    { \symbf \bm }
+    { \symcal \mathcal }
+    { \symup \mathup }
+  }
+  { \__wisper_check_math_font_switch:NN #1 }
+
+\tl_map_inline:nn
+  {
+    { \mathup { \text{\normalfont{{#1}} } } }
+    { \symbfup { \bm{\mathup{#1}} } }
+    { \symbfcal { \bm{\mathcal{#1}} } }
+  }
+  { \__wisper_check_math_font_switch_inline:Nn #1 }
 
 
 % Use l3keys to configure style (cf. \Style from the cool package) [[[1
@@ -182,9 +228,9 @@
 
 % symbols [[[1
 % TODO: switch according to language, i.e. Spanish is cte.
-\cs_new:Npn \diffd { \mathrm{ d } }
-\cs_new:Npn \diffD { \mathrm{ D } }
-\cs_new:Npn \const { \mathrm{ const } }
+\cs_new:Npn \diffd { \symup{ d } }
+\cs_new:Npn \diffD { \symup{ D } }
+\cs_new:Npn \const { \mathup{ const } }
 
 % TODO: use for all appropriate operators
 \cs_new:Npn \__wisper_argument_or_empty:n #1
@@ -322,9 +368,9 @@
 
 \tl_new:N \g__wisper_symbol_identity_tl
 \prop_new:N \g__wisper_symbol_identity_prop
-\prop_put:Nnn \g__wisper_symbol_identity_prop { id } {\mathrm{id}}
-\prop_put:Nnn \g__wisper_symbol_identity_prop { 1 } {\mathbb{1}}
-\prop_put:Nnn \g__wisper_symbol_identity_prop { I } {\mathrm{\bm{I}}}
+\prop_put:Nnn \g__wisper_symbol_identity_prop { id } {\mathup{id}}
+\prop_put:Nnn \g__wisper_symbol_identity_prop { 1 } {\symbb{1}}
+\prop_put:Nnn \g__wisper_symbol_identity_prop { I } {\symbfup{I}}
 \__wisper_keys_define_math:n
   {
     symbols / identity .code:n =
@@ -347,26 +393,26 @@
 
 % misc [[[1
 \newcommand{\supposed}{\stackrel{!}{=}}
-\DeclareMathOperator { \__wisper_operator_order: }{ \mathcal{O} }
+\DeclareMathOperator { \__wisper_operator_order: }{ \symcal{O} }
 \NewDocumentCommand \Order { s }
   {
     \__wisper_operator_order: \__wisper_parenthesize:nn {#1}
   }
 
 % sets [[[1
-\cs_new:Npn \N { \ensuremath{\mathbb{N}} }  % natural numbers
-\cs_new:Npn \Z { \ensuremath{\mathbb{Z}} }  % integers
-\cs_new:Npn \R { \ensuremath{\mathbb{R}} }  % real numbers
-\cs_new:Npn \Q { \ensuremath{\mathbb{Q}} }  % rational numbers
+\cs_new:Npn \N { \ensuremath{\symbb{N}} }  % natural numbers
+\cs_new:Npn \Z { \ensuremath{\symbb{Z}} }  % integers
+\cs_new:Npn \R { \ensuremath{\symbb{R}} }  % real numbers
+\cs_new:Npn \Q { \ensuremath{\symbb{Q}} }  % rational numbers
 \cs_undefine:N \C
-\cs_new:Npn \C { \ensuremath{\mathbb{C}} }  % complex numbers
-%\cs_new:Npn \Sphere { \ensuremath{\mathbb{S}} }  % \S^n \subset \R^{n+1}
+\cs_new:Npn \C { \ensuremath{\symbb{C}} }  % complex numbers
+%\cs_new:Npn \Sphere { \ensuremath{\symbb{S}} }  % \S^n \subset \R^{n+1}
 \cs_new:Npn \Sphere { \ensuremath{S} }  % \S^n \subset \R^{n+1}
 
 \cs_gset_eq:NN \nats \N % natural numbers
-\cs_new:Npn \natsz { \ensuremath{\nats_{\mathrm{0}}} } % natural numbers incl. zero
+\cs_new:Npn \natsz { \ensuremath{\nats_{\symup{0}}} } % natural numbers incl. zero
 
-\cs_new:Npn \Pset #1 { \ensuremath{\mathcal{P} \__wisper_parenthesize_aux:w {#1} } }
+\cs_new:Npn \Pset #1 { \ensuremath{\symcal{P} \__wisper_parenthesize_aux:w {#1} } }
 
 
 \cs_new:Npn \__wisper_mid_vert:n #1
@@ -496,7 +542,7 @@
       { #2 \c_math_superscript_token { \ast } }
   }
 \cs_new:Npn \HC
-  { \mathrm{h.c.} }
+  { \mathup{h.c.} }
 
 
 % vectors etc. [[[1
@@ -605,6 +651,13 @@
         \cs_gset:Npn \uvec ##1 { \mathbold{\hat{##1}} }
         \cs_gset:Npn \dvec ##1 { \dot{\mathbold{##1}} }
         \cs_gset:Npn \ddvec ##1 { \ddot{\mathbold{##1}} }
+      },
+    vecdisplay / unicode .code:n =
+      {
+        \cs_gset_eq:NN \vec \symbf
+        \cs_gset:Npn \uvec ##1 { \symbf{\hat{##1}} }
+        \cs_gset:Npn \dvec ##1 { \dot{\symbf{##1}} }
+        \cs_gset:Npn \ddvec ##1 { \ddot{\symbf{##1}} }
       },
     vecdisplay .initial:n = bold,
   }
@@ -916,10 +969,9 @@
 \newcommand{\leb}{\ensuremath{\lambda}}
 
 % functions [[[1
-\newcommand{\func}[1]{\mathrm{#1}}
-\newcommand{\expp}[1]{\func{e}^{#1}}
+\newcommand{\expp}[1]{\symbf{e}^{#1}}
 \newcommand{\expb}[1]{\exp\left(#1\right)}
-\newcommand{\deltaf}[1]{\func{\delta} (#1)}
+\newcommand{\deltaf}[1]{\symbf{\delta} (#1)}
 \DeclareMathOperator{\asinh}{asinh}
 \DeclareMathOperator{\erf}{erf}
 \DeclareMathOperator{\Support}{supp}
